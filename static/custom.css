@@ -1,0 +1,219 @@
+/*
+ * Alerts
+ */
+
+.alert {
+  border-radius: 0px;
+}
+
+
+/*
+ * Cover page
+ */
+
+.content {
+  padding-top: 10px;
+}
+
+#cover-image {
+  background: url('images/books.jpg') no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  background-size: cover;
+  -o-background-size: cover;
+}
+
+.h-100 {
+  min-height: 100vh;
+  height: 100vh;
+}
+
+.vcenter-item{
+    display: flex;
+    align-items: center;
+}
+
+/*
+ * Cover page
+ */
+h1.cover-heading {
+  font-size: 4rem;
+}
+
+p.cover-text {
+  font-size: 1.7rem;
+}
+
+.cover-card {
+  background-color: rgba(245, 245, 245, 0.6);
+  max-width: 30rem;
+  padding-top: 30px;
+  padding-left: 50px;
+  padding-right: 50px;
+  padding-bottom: 30px;
+  border-radius: 15%;
+}
+.cover-card-block {
+  opacity: 1
+}
+
+/*
+ * login
+ */
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #17a2b8;
+  height: 100vh;
+}
+login .container #login-row #login-column #login-box {
+  margin-top: 120px;
+  max-width: 600px;
+  height: 320px;
+  border: 1px solid #9C9C9C;
+  background-color: #EAEAEA;
+}
+login .container #login-row #login-column #login-box #login-form {
+  padding: 20px;
+}
+login .container #login-row #login-column #login-box #login-form #register-link {
+  margin-top: -85px;
+}
+
+/*
+ * forms
+ */
+.nolabel label {
+  display: none;
+}
+
+ul.errorlist {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+/***** Wrapper *****/
+
+.wrapper {
+    display: block;
+}
+
+/***** Feed Page Sidebar *****/
+
+.sidebar {
+    width: 250px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: -255px;
+    z-index: 999;
+    background: #333;
+    color: #fff;
+    transition: all .3s;
+    box-shadow: 3px 3px 3px rgba(51, 51, 51, 0.5);
+    text-align: left;
+}
+
+.sidebar.active {
+    left: 0;
+}
+
+/***** Content *****/
+
+.content {
+    width: 100%;
+    transition: all 0.3s;
+}
+
+/*
+ * Typefaces
+ */
+
+.low-key {
+  color: #777777;
+  font-weight: 300;
+}
+
+.list-title {
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+/*
+ * Profile
+ */
+.profile-image {
+  width: 120px;
+  clear:both;
+  float:left;
+}
+
+.profile-text {
+  overflow:hidden;
+  padding-left:20px
+}
+
+h3.profile-title {
+  margin-bottom: 0px;
+}
+
+.profile-username {
+  color: #777777;
+  font-weight: 300;
+  font-style: italic;
+}
+
+.profile-bio {
+  font-size: 1.1rem;
+}
+
+.profile-statistics {
+  color: #777777;
+  font-weight: 300;
+  display: block;
+}
+
+.profile-statistics-item {
+  display: block;
+  padding-right: 50px;
+}
+
+/*
+ * Post
+ */
+.post-author {
+  margin-bottom: 0px;
+
+}
+
+.post-author-fullname {
+  font-weight: bold;
+}
+
+.post-author-user-details {
+  margin-left: 10px;
+  color: #777777;
+}
+
+/*
+ * Hyperlinks
+ */
+.content a {
+  text-decoration: none;
+  color: #0d6efd;
+}
+.content a:hover {
+  text-decoration: underline;
+  color: #0d6efd;
+}
+
+.post-author a {
+  text-decoration: none;
+  color: black;
+}
+.post-author a:hover {
+  text-decoration: underline;
+  color: black;
+}
