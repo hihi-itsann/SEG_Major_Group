@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bookclubs',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
@@ -128,3 +129,12 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# User model for authentication purposes
+AUTH_USER_MODEL = 'bookclubs.User'
+
+#Login URL for redirecting users from login protected views
+LOGIN_URL = 'log_in'
+
+# URL where @login_prohibited redirects to
+REDIRECT_URL_WHEN_LOGGED_IN = 'feed'

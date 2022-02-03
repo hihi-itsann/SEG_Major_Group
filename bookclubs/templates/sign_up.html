@@ -1,0 +1,18 @@
+{% extends 'base_content.html' %}
+{% block title %}
+| Sign up
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h1>Sign up</h1>
+      <form action-"{% url 'sign_up' %}" method="post">
+        {% csrf_token %}
+        {% include 'partials/bootstrap_form.html' with form=form %}
+        <input type="submit" value="Sign up" class="btb btn-primary">
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -20,4 +20,6 @@ from bookclubs import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
+    path('feed/', views.feed, name='feed'),
+    path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
 ]
