@@ -2,10 +2,10 @@ from django.contrib.auth import authenticate,login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import redirect, render
-#from bookclubs.helpers import login_prohibited
+from bookclubs.helpers import login_prohibited
 from django.contrib.auth.hashers import check_password
 from django.urls import reverse
-from bookclubs.forms import SignUpForm
+from bookclubs.forms import SignUpForm, LogInForm
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from bookclubs.models import User
@@ -21,11 +21,11 @@ from django.urls import reverse
 from django.views.generic.edit import UpdateView, CreateView
 from django.views.generic.list import MultipleObjectMixin
 
-#@login_prohibited
+@login_prohibited
 def home(request):
     return render(request, 'home.html')
 
-#@login_required
+@login_required
 def feed(request):
     return render(request, 'feed.html')
 
@@ -69,3 +69,36 @@ class SignUpView(LoginProhibitedMixin, FormView):
 
     def get_success_url(self):
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+
+class LogInView(LoginProhibitedMixin, View):
+    """View that handles log in."""
+
+    http_method_names = ['get', 'post']
+    redirect_when_logged_in_url = 'feed'
+
+    def get(self, request):
+        """Display log in template."""
+
+        self.next = request.GET.get('next') or ''
+        return self.render()
+
+    def post(self, request):
+        """Handle log in attempt."""
+        form = LogInForm(request.POST)
+        self.next = request.POST.get('next') or settings.REDIRECT_URL_WHEN_LOGGED_IN
+        user = form.get_user()
+        if user is not None:
+            login(request, user)
+            return redirect(self.next)
+        messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
+        return self.render()
+
+    def render(self):
+        """Render log in template with blank log in form."""
+
+        form = LogInForm()
+        return render(self.request, 'log_in.html', {'form': form, 'next': self.next})
+
+def log_out(request):
+    logout(request)
+    return redirect('home')
