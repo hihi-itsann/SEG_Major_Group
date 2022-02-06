@@ -2,7 +2,10 @@ from django import forms
 from django.core.validators import RegexValidator
 from .models import User,Club
 from django.contrib.auth import authenticate
-#from django.forms.widgets import DateInput
+# from django.forms.widgets import DateInput
+from django.db import IntegrityError
+import datetime
+
 
 class NewPasswordMixin(forms.Form):
     """Form mixing for new_password and password_confirmation fields."""
@@ -14,7 +17,7 @@ class NewPasswordMixin(forms.Form):
             regex=r'^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$',
             message='Password must contain an uppercase character, a lowercase '
                     'character and a number'
-            )]
+        )]
     )
     password_confirmation = forms.CharField(label='Password confirmation', widget=forms.PasswordInput())
 
@@ -28,7 +31,6 @@ class NewPasswordMixin(forms.Form):
             self.add_error('password_confirmation', 'Confirmation does not match password.')
 
 
-
 class SignUpForm(NewPasswordMixin, forms.ModelForm):
     """Form enabling unregistered users to sign up."""
 
@@ -37,8 +39,8 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
 
         model = User
         fields = ['first_name', 'last_name', 'username', 'email', 'bio']
-        widgets = { 'bio': forms.Textarea() }
-                    #'dob': DateInput(attrs={'type': 'date'} }
+        widgets = {'bio': forms.Textarea()}
+        # 'dob': DateInput(attrs={'type': 'date'} }
 
     def save(self):
         """Create a new user."""
@@ -79,7 +81,7 @@ class UserForm(forms.ModelForm):
 
         model = User
         fields = ['first_name', 'last_name', 'username', 'email', 'bio']
-        widgets = { 'bio': forms.Textarea() }
+        widgets = {'bio': forms.Textarea()}
 
 
 class PasswordForm(NewPasswordMixin):
@@ -114,13 +116,24 @@ class PasswordForm(NewPasswordMixin):
             self.user.save()
         return self.user
 
+
 class NewClubForm(forms.ModelForm):
     class Meta:
         model = Club
-        fields = ['club_name', 'location','genre', 'public']
-        widgets = { 'location': forms.Textarea(),
-                    'genre': forms.Textarea(),
-                    'public': forms.Textarea()}
+        fields = ['club_name', 'meeting_status', 'location', 'public_status', 'genre', 'description']
+        widgets = {'description': forms.Textarea()}
+
+    MEETING_STATUS_CHOICES = (
+        (True, 'In Person'),
+        (False, 'Online')
+    )
+    PUBLIC_STATUS_CHOICES = (
+        (True, 'Public'),
+        (False, 'Private')
+    )
+
+    meeting_status = forms.ChoiceField(widget=forms.Select(), label='Meetings Held', choices=MEETING_STATUS_CHOICES)
+    public_status = forms.ChoiceField(widget=forms.Select(), label='Status', choices=PUBLIC_STATUS_CHOICES)
 
     def clean(self):
         """Clean the data and generate messages for any errors."""
@@ -131,8 +144,10 @@ class NewClubForm(forms.ModelForm):
         super().save(commit=False)
         club = Club.objects.create(
             club_name=self.cleaned_data.get('club_name'),
+            meeting_status=self.cleaned_data.get('meeting_status'),
             location=self.cleaned_data.get('location'),
+            public_status=self.cleaned_data.get('public_status'),
             genre=self.cleaned_data.get('genre'),
-            public=self.cleaned_data.get('public'),
+            description=self.cleaned_data.get('description')
         )
         return club

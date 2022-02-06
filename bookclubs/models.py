@@ -7,6 +7,7 @@ from libgravatar import Gravatar
 from enum import Enum
 from django.utils.translation import gettext_lazy as _
 
+
 class User(AbstractUser):
     username = models.CharField(
         max_length=30,
@@ -20,7 +21,8 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=50, blank=False)
     email = models.EmailField(unique=True, blank=False)
     bio = models.CharField(max_length=520, blank=True)
-    #dob = models.DateField(blank=False)
+
+    # dob = models.DateField(blank=False)
 
     class Meta:
         """Model options."""
@@ -41,44 +43,64 @@ class User(AbstractUser):
         return self.gravatar(size=60)
 
 class Club(models.Model):
+    MEETING_STATUS_CHOICES = (
+        (True, 'Online'),
+        (False, 'In Person')
+    )
+    PUBLIC_STATUS_CHOICES = (
+        (True, 'Public'),
+        (False, 'Private')
+    )
+
     club_name = models.CharField(
-    unique=True,
-    max_length=20,
-    blank=False,
-    validators=[
-        RegexValidator(
-            regex=r'^\w{4,}.*$',
-            message='Club name must consist of at least four alphanumericals in first word'
+        unique=True,
+        max_length=20,
+        blank=False,
+        validators=[
+            RegexValidator(
+                regex=r'^\w{4,}.*$',
+                message='Club name must consist of at least four alphanumericals in first word'
             )
         ]
     )
+
+    meeting_status = models.BooleanField(
+        choices=MEETING_STATUS_CHOICES,
+        default=False
+    )
+
     location = models.CharField(
         max_length=100,
         blank=False
-        )
+    )
+
+    public_status = models.BooleanField(
+        choices=PUBLIC_STATUS_CHOICES,
+        default=True
+    )
 
     genre = models.CharField(
         max_length=520,
+        default='',
         blank=False
-        )
+    )
 
-    public = models.CharField(
+    description = models.CharField(
         max_length=520,
-        blank=False
-        )
+        blank=False)
 
-    club_members = models.ManyToManyField(User,through='Role')
+    club_members = models.ManyToManyField(User, through='Role')
 
-    def get_club_role(self,user):
-        return Role.objects.get(club = self, user = user).club_role
+    def get_club_role(self, user):
+        return Role.objects.get(club=self, user=user).club_role
 
-    def toggle_member(self,user):
-        role = Role.objects.get(club=self,user=user)
+    def toggle_member(self, user):
+        role = Role.objects.get(club=self, user=user)
         role.club_role = 'MEM'
         role.save()
 
-    def toggle_officer(self,user):
-        role = Role.objects.get(club=self,user=user)
+    def toggle_officer(self, user):
+        role = Role.objects.get(club=self, user=user)
         if role.club_role == 'APP' or role.club_role == 'BAN':
             return
         else:
@@ -86,8 +108,8 @@ class Club(models.Model):
             role.save()
             return
 
-    def toggle_moderator(self,user):
-        role = Role.objects.get(club=self,user=user)
+    def toggle_moderator(self, user):
+        role = Role.objects.get(club=self, user=user)
         if role.club_role == 'APP' or role.club_role == 'BAN':
             return
         else:
@@ -95,8 +117,8 @@ class Club(models.Model):
             role.save()
             return
 
-    def ban_member(self,user):
-        role = Role.objects.get(club=self,user=user)
+    def ban_member(self, user):
+        role = Role.objects.get(club=self, user=user)
         if role.club_role == 'MEM':
             role.club_role = 'BAN'
             role.save()
@@ -104,17 +126,17 @@ class Club(models.Model):
         else:
             return
 
-    def unban_member(self,user):
-        role = Role.objects.get(club=self,user=user)
+    def unban_member(self, user):
+        role = Role.objects.get(club=self, user=user)
         if role.club_role == 'BAN':
             role.delete()
             return
         else:
             return
 
-    def transfer_ownership(self,old_owner,new_owner):
-        new_owner_role = Role.objects.get(club=self,user=new_owner)
-        old_owner_role = Role.objects.get(club=self,user=old_owner)
+    def transfer_ownership(self, old_owner, new_owner):
+        new_owner_role = Role.objects.get(club=self, user=new_owner)
+        old_owner_role = Role.objects.get(club=self, user=old_owner)
         if new_owner_role.club_role == 'OFF':
             new_owner_role.club_role = 'OWN'
             new_owner_role.save()
@@ -126,35 +148,35 @@ class Club(models.Model):
 
     def get_applicants(self):
         return self.club_members.all().filter(
-            club__club_name = self.club_name,
+            club__club_name=self.club_name,
             role__club_role='APP')
 
     def get_members(self):
         return self.club_members.all().filter(
-            club__club_name = self.club_name, role__club_role = 'MEM')
+            club__club_name=self.club_name, role__club_role='MEM')
 
     def get_management(self):
         return self.club_members.all().filter(
-            club__club_name = self.club_name, role__club_role = 'OFF') | self.club_members.all().filter(
-                club__club_name = self.club_name, role__club_role = 'OWN')
+            club__club_name=self.club_name, role__club_role='OFF') | self.club_members.all().filter(
+            club__club_name=self.club_name, role__club_role='OWN')
 
     def get_banned_members(self):
         return self.club_members.all().filter(
-            club__club_name = self.club_name,
+            club__club_name=self.club_name,
             role__club_role='BAN')
 
     def get_officers(self):
         return User.objects.all().filter(
-            club__club_name = self.club_name,
+            club__club_name=self.club_name,
             role__club_role='OFF')
 
     def get_owner(self):
         return User.objects.all().filter(
-            club__club_name = self.club_name,
+            club__club_name=self.club_name,
             role__club_role='OWN')
 
-    def remove_user_from_club(self,user):
-        role = Role.objects.get(club=self,user=user)
+    def remove_user_from_club(self, user):
+        role = Role.objects.get(club=self, user=user)
         role.delete()
 
 
@@ -168,13 +190,13 @@ class Role(models.Model):
         OFFICER = 'OFF', _('Officer')
         MODERATOR = 'MOD', _('Moderator')
         OWNER = 'OWN', _('Owner')
-        BANNED = 'BAN',_('BannedMember')
+        BANNED = 'BAN', _('BannedMember')
 
     club_role = models.CharField(
-        max_length = 3,
-        choices = RoleOptions.choices,
-        default = RoleOptions.APPLICANT,
-        )
+        max_length=3,
+        choices=RoleOptions.choices,
+        default=RoleOptions.APPLICANT,
+    )
 
     def get_club_role(self):
         return self.RoleOptions(self.club_role).name.title()

@@ -1,11 +1,11 @@
-from django.contrib.auth import authenticate,login, logout
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .models import User,Club,Role
+from .models import User, Club, Role
 from django.shortcuts import redirect, render
 from bookclubs.helpers import login_prohibited
 from django.contrib.auth.hashers import check_password
 from django.urls import reverse
-from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm
+from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from bookclubs.models import User
@@ -22,13 +22,16 @@ from django.views.generic.edit import UpdateView, CreateView
 from django.views.generic.list import MultipleObjectMixin
 from .helpers import *
 
+
 @login_prohibited
 def home(request):
     return render(request, 'home.html')
 
+
 @login_required
 def feed(request):
     return render(request, 'feed.html')
+
 
 class LoginProhibitedMixin:
     """Mixin that redirects when a user is logged in."""
@@ -56,6 +59,7 @@ class LoginProhibitedMixin:
         else:
             return self.redirect_when_logged_in_url
 
+
 class SignUpView(LoginProhibitedMixin, FormView):
     """View that signs up user."""
 
@@ -70,6 +74,7 @@ class SignUpView(LoginProhibitedMixin, FormView):
 
     def get_success_url(self):
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+
 
 class LogInView(LoginProhibitedMixin, View):
     """View that handles log in."""
@@ -99,6 +104,7 @@ class LogInView(LoginProhibitedMixin, View):
 
         form = LogInForm()
         return render(self.request, 'log_in.html', {'form': form, 'next': self.next})
+
 
 def log_out(request):
     logout(request)
@@ -147,25 +153,28 @@ class PasswordView(LoginRequiredMixin, FormView):
         """Redirect the user after successful password change."""
 
         messages.add_message(self.request, messages.SUCCESS, "Password updated!")
-        return reverse('feed')
+        return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+
 
 """only login user can create new club"""
 @login_required
 def create_club(request):
-    if request.method =='POST':
+    """a logged in user can create a club"""
+    if request.method == 'POST':
         form = NewClubForm(request.POST)
         if form.is_valid():
             club = form.save()
-            club.club_members.add(request.user,through_defaults={'club_role':'OWN'})
+            club.club_members.add(request.user, through_defaults={'club_role': 'OWN'})
             return redirect('feed')
     else:
         form = NewClubForm()
-    return render(request,'new_club.html',{'form':form})
+    return render(request, 'new_club.html', {'form': form})
+
 
 @login_required
 @club_exists
 @membership_required
-def club_feed(request,club_name):
+def club_feed(request, club_name):
     is_officer = False
     is_owner = False
     current_club = Club.objects.get(club_name=club_name)
@@ -177,11 +186,14 @@ def club_feed(request,club_name):
         is_owner = True
     elif club_role == 'OFF':
         is_officer = True
-    return render(request,'club_feed.html', {'club':current_club,'is_officer':is_officer,'is_owner':is_owner,'members':members,'management':management,'number_of_applicants':number_of_applicants})
+    return render(request, 'club_feed.html',
+                  {'club': current_club, 'is_officer': is_officer, 'is_owner': is_owner, 'members': members,
+                   'management': management, 'number_of_applicants': number_of_applicants})
+
 
 @login_required
 @club_exists
-def club_welcome(request,club_name):
+def club_welcome(request, club_name):
     is_applicant = False
     is_member = False
     is_banned = False
@@ -190,16 +202,21 @@ def club_welcome(request,club_name):
     try:
         club_role = club.get_club_role(user)
     except Role.DoesNotExist:
-        return render(request,'club_welcome.html', {'club':club, 'user':user, 'is_applicant':is_applicant,'is_member':is_member,'is_banned':is_banned})
+        return render(request, 'club_welcome.html',
+                      {'club': club, 'user': user, 'is_applicant': is_applicant, 'is_member': is_member,
+                       'is_banned': is_banned})
     else:
         if club_role == 'APP':
             is_applicant = True
         elif club_role == 'BAN':
             is_banned = True
-        elif club_role ==  'MEM' or club_role ==  'OWN' or club_role ==  'OFF':
+        elif club_role == 'MEM' or club_role == 'OWN' or club_role == 'OFF':
             is_member = True
-    return render(request,'club_welcome.html', {'club':club, 'user':user, 'is_applicant':is_applicant,'is_member':is_member, 'is_banned':is_banned})
-    
+    return render(request, 'club_welcome.html',
+                  {'club': club, 'user': user, 'is_applicant': is_applicant, 'is_member': is_member,
+                   'is_banned': is_banned})
+
+
 """only login user can create new club"""
 @login_required
 def create_club(request):
