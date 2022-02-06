@@ -28,4 +28,6 @@ urlpatterns = [
     path('password/', views.PasswordView.as_view(), name='password'),
     path('club/<str:club_name>/feed/', views.club_feed ,name='club_feed'),
     path('club/<str:club_name>/', views.club_welcome ,name='club_welcome'),
+    path('create_club/', views.create_club,name='create_club'),
+    path('club/<str:club_name>/delete/', views.delete_club, name = 'delete_club'),
 ]

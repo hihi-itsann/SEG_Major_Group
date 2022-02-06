@@ -199,3 +199,24 @@ def club_welcome(request,club_name):
         elif club_role ==  'MEM' or club_role ==  'OWN' or club_role ==  'OFF':
             is_member = True
     return render(request,'club_welcome.html', {'club':club, 'user':user, 'is_applicant':is_applicant,'is_member':is_member, 'is_banned':is_banned})
+    
+"""only login user can create new club"""
+@login_required
+def create_club(request):
+    if request.method =='POST':
+        form = NewClubForm(request.POST)
+        if form.is_valid():
+            club = form.save()
+            club.club_members.add(request.user,through_defaults={'club_role':'OWN'})
+            return redirect('feed')
+    else:
+        form = NewClubForm()
+    return render(request,'new_club.html',{'form':form})
+
+@login_required
+@club_exists
+@owner_required
+def delete_club(request,club_name):
+    current_club = Club.objects.get(club_name=club_name)
+    current_club.delete()
+    return feed(request)
