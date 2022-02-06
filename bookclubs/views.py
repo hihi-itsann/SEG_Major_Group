@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate,login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+from .models import User,Club,Role
 from django.shortcuts import redirect, render
 from bookclubs.helpers import login_prohibited
 from django.contrib.auth.hashers import check_password
@@ -20,6 +20,7 @@ from django.views.generic.edit import FormView
 from django.urls import reverse
 from django.views.generic.edit import UpdateView, CreateView
 from django.views.generic.list import MultipleObjectMixin
+from .helpers import *
 
 @login_prohibited
 def home(request):
@@ -147,3 +148,54 @@ class PasswordView(LoginRequiredMixin, FormView):
 
         messages.add_message(self.request, messages.SUCCESS, "Password updated!")
         return reverse('feed')
+
+"""only login user can create new club"""
+@login_required
+def create_club(request):
+    if request.method =='POST':
+        form = NewClubForm(request.POST)
+        if form.is_valid():
+            club = form.save()
+            club.club_members.add(request.user,through_defaults={'club_role':'OWN'})
+            return redirect('feed')
+    else:
+        form = NewClubForm()
+    return render(request,'new_club.html',{'form':form})
+
+@login_required
+@club_exists
+@membership_required
+def club_feed(request,club_name):
+    is_officer = False
+    is_owner = False
+    current_club = Club.objects.get(club_name=club_name)
+    club_role = current_club.get_club_role(request.user)
+    members = current_club.get_members()
+    management = current_club.get_management()
+    number_of_applicants = current_club.get_applicants().count()
+    if club_role == 'OWN':
+        is_owner = True
+    elif club_role == 'OFF':
+        is_officer = True
+    return render(request,'club_feed.html', {'club':current_club,'is_officer':is_officer,'is_owner':is_owner,'members':members,'management':management,'number_of_applicants':number_of_applicants})
+
+@login_required
+@club_exists
+def club_welcome(request,club_name):
+    is_applicant = False
+    is_member = False
+    is_banned = False
+    club = Club.objects.get(club_name=club_name)
+    user = request.user
+    try:
+        club_role = club.get_club_role(user)
+    except Role.DoesNotExist:
+        return render(request,'club_welcome.html', {'club':club, 'user':user, 'is_applicant':is_applicant,'is_member':is_member,'is_banned':is_banned})
+    else:
+        if club_role == 'APP':
+            is_applicant = True
+        elif club_role == 'BAN':
+            is_banned = True
+        elif club_role ==  'MEM' or club_role ==  'OWN' or club_role ==  'OFF':
+            is_member = True
+    return render(request,'club_welcome.html', {'club':club, 'user':user, 'is_applicant':is_applicant,'is_member':is_member, 'is_banned':is_banned})
