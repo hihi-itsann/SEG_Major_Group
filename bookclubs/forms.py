@@ -1,6 +1,6 @@
 from django import forms
 from django.core.validators import RegexValidator
-from .models import User
+from .models import User,Club
 from django.contrib.auth import authenticate
 #from django.forms.widgets import DateInput
 
@@ -113,3 +113,23 @@ class PasswordForm(NewPasswordMixin):
             self.user.set_password(new_password)
             self.user.save()
         return self.user
+
+class NewClubForm(forms.ModelForm):
+    class Meta:
+        model = Club
+        fields = ['club_name', 'location','description']
+        widgets = { 'description': forms.Textarea() }
+
+    def clean(self):
+        """Clean the data and generate messages for any errors."""
+        super().clean()
+
+    def save(self):
+        """Create a new club."""
+        super().save(commit=False)
+        club = Club.objects.create(
+            club_name=self.cleaned_data.get('club_name'),
+            location=self.cleaned_data.get('location'),
+            description=self.cleaned_data.get('description'),
+        )
+        return club
