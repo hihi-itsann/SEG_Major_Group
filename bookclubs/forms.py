@@ -117,8 +117,10 @@ class PasswordForm(NewPasswordMixin):
 class NewClubForm(forms.ModelForm):
     class Meta:
         model = Club
-        fields = ['club_name', 'location','description']
-        widgets = { 'description': forms.Textarea() }
+        fields = ['club_name', 'location','genre', 'public']
+        widgets = { 'location': forms.Textarea(),
+                    'genre': forms.Textarea(),
+                    'public': forms.Textarea()}
 
     def clean(self):
         """Clean the data and generate messages for any errors."""
@@ -130,6 +132,7 @@ class NewClubForm(forms.ModelForm):
         club = Club.objects.create(
             club_name=self.cleaned_data.get('club_name'),
             location=self.cleaned_data.get('location'),
-            description=self.cleaned_data.get('description'),
+            genre=self.cleaned_data.get('genre'),
+            public=self.cleaned_data.get('public'),
         )
         return club

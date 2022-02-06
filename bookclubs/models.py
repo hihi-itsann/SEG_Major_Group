@@ -57,11 +57,15 @@ class Club(models.Model):
         blank=False
         )
 
-    description = models.CharField(
+    genre = models.CharField(
         max_length=520,
         blank=False
         )
 
+    public = models.CharField(
+        max_length=520,
+        blank=False
+        )
 
     club_members = models.ManyToManyField(User,through='Role')
 
