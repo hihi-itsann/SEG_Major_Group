@@ -1,4 +1,4 @@
-from django.core.validators import RegexValidator
+from django.core.validators import RegexValidator, MinLengthValidator
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from libgravatar import Gravatar
@@ -35,3 +35,23 @@ class User(AbstractUser):
     def mini_gravatar(self):
         """Return a URL to a miniature version of the user's gravatar."""
         return self.gravatar(size=60)
+
+class Book(models.Model):
+    ISBN = models.CharField(
+        max_length=10,
+        unique=True,
+        validators=[MinLengthValidator(10)] #ISBN has fiexed length 10
+    )
+    title = models.CharField(max_length=100, unique=True, blank=False)
+    author = models.CharField(max_length=100, blank=False)
+    year_of_publication = models.CharField(
+        max_length=4,
+        validators=[RegexValidator(
+            regex=r'^(?=.*[0-9]).*$',
+            message='Year should be digital number'
+            )]
+    )
+    publisher = models.CharField(max_length=100, blank=False)
+    image_url_s = models.URLField()
+    image_url_m = models.URLField()
+    image_url_l = models.URLField()
