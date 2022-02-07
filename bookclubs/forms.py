@@ -36,9 +36,9 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
         """Form options."""
 
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'bio']
+        fields = ['first_name', 'last_name', 'username', 'email', 'bio', 'dob', 'gender', 'location', 'meeting_preference']
         widgets = { 'bio': forms.Textarea() }
-                    #'dob': DateInput(attrs={'type': 'date'} }
+
 
     def save(self):
         """Create a new user."""
@@ -51,7 +51,10 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
             email=self.cleaned_data.get('email'),
             bio=self.cleaned_data.get('bio'),
             password=self.cleaned_data.get('new_password'),
-            #dob=self.cleaned_data.get('dob'),
+            dob=self.cleaned_data.get('dob'),
+            gender=self.cleaned_data.get('gender'),
+            location=self.cleaned_data.get('location'),
+            meeting_preference=self.cleaned_data.get('meeting_preference'),
         )
         return user
 
@@ -78,7 +81,7 @@ class UserForm(forms.ModelForm):
         """Form options."""
 
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'bio']
+        fields = ['first_name', 'last_name', 'username', 'email', 'bio' , 'dob', 'gender', 'location', 'meeting_preference']
         widgets = { 'bio': forms.Textarea() }
 
 

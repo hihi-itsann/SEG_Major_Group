@@ -2,6 +2,7 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from libgravatar import Gravatar
+from datetime import date
 
 class User(AbstractUser):
     username = models.CharField(
@@ -16,7 +17,19 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=50, blank=False)
     email = models.EmailField(unique=True, blank=False)
     bio = models.CharField(max_length=520, blank=True)
-    #dob = models.DateField(blank=False)
+    dob = models.DateField(blank=True,null=True)#blank=False, auto_now_add=False, auto_now=False, default=date.today())
+    GENDER_CHOICES = (
+        ('M', 'Male'),
+        ('F', 'Female'),
+        ('O', 'Other')
+    )
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True)
+    location = models.CharField(max_length=50, blank=True)
+    MEETING_CHOICES = (
+        ('O', 'Online'),
+        ('P', 'In-person')
+    )
+    meeting_preference = models.CharField(max_length=1, choices=MEETING_CHOICES, blank=True)
 
     class Meta:
         """Model options."""
