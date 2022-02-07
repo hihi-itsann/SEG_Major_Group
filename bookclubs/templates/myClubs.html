@@ -1,0 +1,26 @@
+{% extends 'base_content.html' %}
+{% block content %}
+    <div class="container">
+        <div class="col-xs-12 col-lg-6 col-xl-8">
+            <br>
+            {% if clubs %}
+                <h1>My clubs</h1>
+                <br>
+                {% for club in clubs %}
+                    <div>
+                        <tr>
+                            <td><h2>{{ club.club.club_name }}</h2></td>
+                            <p>{{ club.club.description }}</p>
+                            <p>Total Members: {{ club.club.club_members.count }}</p>
+                        </tr>
+                        <hr>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <h1>You haven't joined any club yet!</h1>
+                <p>Click <a href="{% url 'club_list' %}">here</a> to apply to one of our clubs
+                    or <a href="{% url 'create_club' %}">here</a> to create a new club.</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
