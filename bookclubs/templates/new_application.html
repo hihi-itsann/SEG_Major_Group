@@ -1,0 +1,17 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12 col-lg-6 col-xl-4">
+      <h3>new application</h3>
+        <form action="{% url 'new_application' club_name %}" method="post">
+        {% csrf_token %}
+        {% include 'partials/bootstrap_form.html' with form=form %}
+        <button type="submit" class="btn btn-primary">apply</button>
+      </form>
+    </div>
+    <div class="col-xs-12 col-lg-6 col-xl-8">
+    </div>
+  </div>
+</div>
+{% endblock %}
