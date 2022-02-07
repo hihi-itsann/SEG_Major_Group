@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate,login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import redirect, render
-from bookclubs.helpers import login_prohibited
+from bookclubs.helpers import login_prohibited, book_exists
 from django.contrib.auth.hashers import check_password
 from django.urls import reverse
 from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm
@@ -152,3 +152,9 @@ class PasswordView(LoginRequiredMixin, FormView):
 def book_list(request):
     books = Book.objects.all()
     return render(request, 'book_list.html', {'books': books})
+
+@login_required
+@book_exists
+def show_book(request, ISBN):
+    book = Book.objects.get(ISBN=ISBN)
+    return render(request, 'show_book.html', {"book": book})
