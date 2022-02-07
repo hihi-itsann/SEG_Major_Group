@@ -42,6 +42,19 @@ class User(AbstractUser):
         """Return a URL to a miniature version of the user's gravatar."""
         return self.gravatar(size=60)
 
+
+class Application(models.Model):
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    club = models.ForeignKey('Club', on_delete=models.CASCADE)
+    statement = models.CharField(max_length=520, blank=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=100, blank=False)
+
+    class Meta:
+        ordering = ['-created_at']
+        unique_together = ('user', 'club')
+
+
 class Club(models.Model):
     MEETING_STATUS_CHOICES = (
         (True, 'Online'),

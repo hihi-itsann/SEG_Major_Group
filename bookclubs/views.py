@@ -1,11 +1,11 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .models import User, Club, Role
+from .models import User, Club, Role, Application
 from django.shortcuts import redirect, render
 from bookclubs.helpers import login_prohibited
 from django.contrib.auth.hashers import check_password
 from django.urls import reverse
-from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm
+from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm, UpdateApplicationForm
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from bookclubs.models import User
@@ -21,6 +21,7 @@ from django.urls import reverse
 from django.views.generic.edit import UpdateView, CreateView
 from django.views.generic.list import MultipleObjectMixin
 from .helpers import *
+from django.db import IntegrityError
 
 
 @login_prohibited
@@ -149,6 +150,7 @@ class PasswordView(LoginRequiredMixin, FormView):
         login(self.request, self.request.user)
         return super().form_valid(form)
 
+    @property
     def get_success_url(self):
         """Redirect the user after successful password change."""
 
@@ -156,7 +158,6 @@ class PasswordView(LoginRequiredMixin, FormView):
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
 
-"""only login user can create new club"""
 @login_required
 def create_club(request):
     """a logged in user can create a club"""
@@ -218,22 +219,64 @@ def club_welcome(request, club_name):
 
 
 """only login user can create new club"""
+
+
 @login_required
 def create_club(request):
-    if request.method =='POST':
+    if request.method == 'POST':
         form = NewClubForm(request.POST)
         if form.is_valid():
             club = form.save()
-            club.club_members.add(request.user,through_defaults={'club_role':'OWN'})
+            club.club_members.add(request.user, through_defaults={'club_role': 'OWN'})
             return redirect('feed')
     else:
         form = NewClubForm()
-    return render(request,'new_club.html',{'form':form})
+    return render(request, 'new_club.html', {'form': form})
+
 
 @login_required
 @club_exists
 @owner_required
-def delete_club(request,club_name):
+def delete_club(request, club_name):
     current_club = Club.objects.get(club_name=club_name)
     current_club.delete()
     return feed(request)
+
+
+@login_required
+@club_exists
+@membership_prohibited
+def new_application(request, club_name):
+    current_club = Club.objects.get(club_name=club_name)
+    if request.method == 'POST':
+        form = NewApplicationForm(request.POST)
+        if form.is_valid():
+            try:
+                application = form.save(request.user, current_club)
+                current_club.club_members.add(request.user, through_defaults={'club_role': 'APP'})
+                messages.add_message(request, messages.SUCCESS, "Application submitted!")
+                return redirect('feed')
+            except IntegrityError as e:
+                messages.add_message(request, messages.WARNING,
+                                     "Cannot submit a new application to this club. Please edit your current "
+                                     "application.")
+                return redirect('feed')
+    else:
+        form = NewApplicationForm()
+    return render(request, 'new_application.html', {'form': form, 'club_name': club_name})
+
+
+@login_required
+@membership_prohibited
+def edit_application(request, club_name):
+    """Deletes current application and replaces it with another applcation with updated statement"""
+    club_applied = Club.objects.get(club_name=club_name)
+    application = Application.objects.get(user=request.user, club=club_applied)
+    application_id = application.id
+    form = UpdateApplicationForm(request.POST)
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save(application_id, request.user, club_applied)
+            messages.add_message(request, messages.SUCCESS, "Application edited successfully!")
+            return redirect('feed')
+    return render(request, 'edit_application.html', {'form': form, 'club_name': club_name})

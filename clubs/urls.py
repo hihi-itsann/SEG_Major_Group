@@ -26,8 +26,11 @@ urlpatterns = [
     path('log_out/', views.log_out, name='log_out'),
     path('profile/', views.ProfileUpdateView.as_view(), name='profile'),
     path('password/', views.PasswordView.as_view(), name='password'),
-    path('club/<str:club_name>/feed/', views.club_feed ,name='club_feed'),
-    path('club/<str:club_name>/', views.club_welcome ,name='club_welcome'),
-    path('create_club/', views.create_club,name='create_club'),
+    path('club/<str:club_name>/feed/', views.club_feed, name='club_feed'),
+    path('club/<str:club_name>/', views.club_welcome, name='club_welcome'),
+    path('create_club/', views.create_club, name='create_club'),
     path('club/<str:club_name>/delete/', views.delete_club, name = 'delete_club'),
+    path('new_application/<str:club_name>/', views.new_application, name='new_application'),
+    path('edit_application/<str:club_name>/', views.edit_application, name='edit_application'),
+
 ]

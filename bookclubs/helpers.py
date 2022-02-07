@@ -2,6 +2,8 @@ from django.shortcuts import redirect
 from django.conf import settings
 from .models import User, Club, Role
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib import messages
+
 
 
 def login_prohibited(view_function):
@@ -61,6 +63,25 @@ def membership_required(view_function):
             if role.club_role == 'MEM' or role.club_role == 'OFF' or role.club_role == 'OWN':
                 return view_function(request, club_name, *args, **kwargs)
             else:
+                return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+
+    return modified_view_function
+
+
+def membership_prohibited(view_function):
+    """check to make sure user is not a member"""
+    def modified_view_function(request, club_name, *args, **kwargs):
+        try:
+            club = Club.objects.get(club_name=club_name)
+            role = request.user.role_set.get(club=club)
+        except ObjectDoesNotExist:
+            return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+        else:
+            if not (role.club_role == 'MEM' or role.club_role == 'OFF' or role.club_role == 'OWN'):
+                return view_function(request, club_name, *args, **kwargs)
+            else:
+                messages.add_message(request, messages.WARNING,
+                                     "You are already a member!")
                 return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
     return modified_view_function

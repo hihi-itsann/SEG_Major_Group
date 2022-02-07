@@ -1,6 +1,6 @@
 from django import forms
 from django.core.validators import RegexValidator
-from .models import User,Club
+from .models import User, Club, Application, Role
 from django.contrib.auth import authenticate
 # from django.forms.widgets import DateInput
 from django.db import IntegrityError
@@ -53,7 +53,7 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
             email=self.cleaned_data.get('email'),
             bio=self.cleaned_data.get('bio'),
             password=self.cleaned_data.get('new_password'),
-            #dob=self.cleaned_data.get('dob'),
+            # dob=self.cleaned_data.get('dob'),
         )
         return user
 
@@ -151,3 +151,38 @@ class NewClubForm(forms.ModelForm):
             description=self.cleaned_data.get('description')
         )
         return club
+
+
+class NewApplicationForm(forms.ModelForm):
+    class Meta:
+        model = Application
+        fields = ['statement']
+
+    def save(self, user=None, club=None):
+        super().save(commit=False)
+        application = Application.objects.create(
+            user=user,
+            club=club,
+            statement=self.cleaned_data.get('statement'),
+            status='pending'
+        )
+        return application
+
+
+class UpdateApplicationForm(forms.ModelForm):
+    class Meta:
+        model = Application
+        fields = ['statement']
+
+    def save(self, past_id=None, user=None, club=None):
+        super().save(commit=False)
+        delete_application = Application.objects.get(id=past_id)
+        delete_application.delete()
+        application = Application.objects.create(
+            id=past_id,
+            user=user,
+            club=club,
+            statement=self.cleaned_data.get('statement'),
+            status='pending'
+        )
+        return application
