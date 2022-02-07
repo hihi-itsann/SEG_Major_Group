@@ -1,0 +1,23 @@
+{% extends 'base_content.html' %}
+{% block content %}
+    <br>
+    <div class="container">
+        <div class="col-xs-12 col-lg-6 col-xl-8">
+            <h1>Books</h1>
+            <br>
+            {% for book in books %}
+              <div class="row">
+                <div class="col-4 offset-2">
+                  <img src="{{ book.image_url_m }}">
+                </div>
+                <div class="col-6">
+                  <p><h2>{{ book.title }}</h2></p>
+                  <p><em>Author: {{ book.author }}</em></p>
+                  <p><em>Year: {{ book.year_of_publication }}</em></p>
+                </div>
+              </div>
+              <hr>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

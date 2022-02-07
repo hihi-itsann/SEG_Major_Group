@@ -8,7 +8,7 @@ from django.urls import reverse
 from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from bookclubs.models import User
+from bookclubs.models import User, Book
 from django.views import View
 from django.utils.decorators import method_decorator
 from django.conf import settings
@@ -147,3 +147,8 @@ class PasswordView(LoginRequiredMixin, FormView):
 
         messages.add_message(self.request, messages.SUCCESS, "Password updated!")
         return reverse('feed')
+
+@login_required
+def book_list(request):
+    books = Book.objects.all()
+    return render(request, 'book_list.html', {'books': books})
