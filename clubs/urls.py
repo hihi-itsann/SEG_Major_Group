@@ -32,5 +32,6 @@ urlpatterns = [
     path('club/<str:club_name>/delete/', views.delete_club, name = 'delete_club'),
     path('new_application/<str:club_name>/', views.new_application, name='new_application'),
     path('edit_application/<str:club_name>/', views.edit_application, name='edit_application'),
+    path('withdraw_application/<str:club_name>/', views.withdraw_application, name='withdraw_application'),
 
 ]

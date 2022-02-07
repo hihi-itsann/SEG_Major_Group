@@ -245,29 +245,24 @@ def delete_club(request, club_name):
 
 @login_required
 @club_exists
-@membership_prohibited
+@non_applicant_required
 def new_application(request, club_name):
     current_club = Club.objects.get(club_name=club_name)
     if request.method == 'POST':
         form = NewApplicationForm(request.POST)
         if form.is_valid():
-            try:
-                application = form.save(request.user, current_club)
-                current_club.club_members.add(request.user, through_defaults={'club_role': 'APP'})
-                messages.add_message(request, messages.SUCCESS, "Application submitted!")
-                return redirect('feed')
-            except IntegrityError as e:
-                messages.add_message(request, messages.WARNING,
-                                     "Cannot submit a new application to this club. Please edit your current "
-                                     "application.")
-                return redirect('feed')
+            application = form.save(request.user, current_club)
+            current_club.club_members.add(request.user, through_defaults={'club_role': 'APP'})
+            messages.add_message(request, messages.SUCCESS, "Application submitted!")
+            return redirect('feed')
     else:
         form = NewApplicationForm()
     return render(request, 'new_application.html', {'form': form, 'club_name': club_name})
 
 
 @login_required
-@membership_prohibited
+@club_exists
+@applicant_required
 def edit_application(request, club_name):
     """Deletes current application and replaces it with another applcation with updated statement"""
     club_applied = Club.objects.get(club_name=club_name)
@@ -280,3 +275,23 @@ def edit_application(request, club_name):
             messages.add_message(request, messages.SUCCESS, "Application edited successfully!")
             return redirect('feed')
     return render(request, 'edit_application.html', {'form': form, 'club_name': club_name})
+
+
+@login_required
+@club_exists
+@applicant_required
+def withdraw_application(request, club_name):
+    club_applied = Club.objects.get(club_name=club_name)
+    try:
+        Application.objects.get(user=request.user, club=club_applied).delete()
+        Role.objects.get(user=request.user, club=club_applied).delete()
+        messages.add_message(request, messages.SUCCESS, "Application withdrawn.")
+        return redirect('feed')
+    except Application.DoesNotExist:
+        messages.add_message(request, messages.WARNING, "No application submitted for this club.")
+    return render(request, 'edit_application.html', {'club_name': club_name})
+
+
+
+
+
