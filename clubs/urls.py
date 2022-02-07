@@ -33,5 +33,7 @@ urlpatterns = [
     path('new_application/<str:club_name>/', views.new_application, name='new_application'),
     path('edit_application/<str:club_name>/', views.edit_application, name='edit_application'),
     path('withdraw_application/<str:club_name>/', views.withdraw_application, name='withdraw_application'),
+    path('club_list/', views.club_list, name = 'club_list'),
+    path('myClubs/', views.myClubs, name='myClubs'),
 
 ]

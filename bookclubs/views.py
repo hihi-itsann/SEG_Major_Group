@@ -292,6 +292,19 @@ def withdraw_application(request, club_name):
     return render(request, 'edit_application.html', {'club_name': club_name})
 
 
+@login_required
+def myClubs(request):
+    clubs = Role.objects.filter(user=request.user)
+    return render(request, 'myClubs.html', {'clubs': clubs})
 
-
-
+@login_required
+def club_list(request):
+    clubs = []
+    if Role.objects.filter(user=request.user):
+        relations = Role.objects.filter(user=request.user)
+        clubs = Club.objects.all()
+        for club in relations:
+            clubs = clubs.exclude(club_name=club.club.club_name)
+    else:
+        clubs = Club.objects.all()
+    return render(request, 'club_list.html', {'clubs': clubs})
