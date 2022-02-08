@@ -1,9 +1,11 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .models import User, Club, Role, Application
+from .models import User, Club, Role, Application, Post
 from django.shortcuts import redirect, render
 from bookclubs.helpers import login_prohibited
 from django.contrib.auth.hashers import check_password
+from django.urls import reverse
+from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm, UpdateApplicationForm, PostForm
 from django.urls import reverse, reverse_lazy
 from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm
 from django.urls import reverse
@@ -19,9 +21,12 @@ from django.views.generic.detail import DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.views.generic.edit import FormView
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.views.generic.list import MultipleObjectMixin
+from .helpers import *
+from django.db import IntegrityError
+
 from .models import Post
 from .forms import PostForm
 from .helpers import *
@@ -293,6 +298,43 @@ def withdraw_application(request, club_name):
         messages.add_message(request, messages.WARNING, "No application submitted for this club.")
     return render(request, 'edit_application.html', {'club_name': club_name})
 
+@login_required
+@club_exists
+@management_required
+def applicants_list(request,club_name):
+        is_empty = False
+        current_club = Club.objects.get(club_name=club_name)
+        applicants = current_club.get_applicants()
+        if applicants.count() == 0:
+            is_empty = True
+        return render(request,'applicants_list.html', {'applicants':applicants,'is_empty':is_empty, 'current_club':current_club})
+
+@login_required
+@club_exists
+@management_required
+def accept_applicant(request,club_name,user_id):
+        current_club = Club.objects.get(club_name=club_name)
+        try:
+            applicant = User.objects.get(id=user_id,club__club_name = current_club.club_name, role__club_role = 'APP')
+            current_club.toggle_member(applicant)
+        except (ObjectDoesNotExist):
+            return redirect('feed')
+
+        else:
+            return applicants_list(request,current_club.club_name)
+
+@login_required
+@club_exists
+@management_required
+def reject_applicant(request,club_name,user_id):
+        current_club = Club.objects.get(club_name=club_name)
+        try:
+            applicant = User.objects.get(id=user_id,club__club_name = current_club.club_name, role__club_role = 'APP')
+            current_club.remove_user_from_club(applicant)
+        except ObjectDoesNotExist:
+            return redirect('feed')
+        else:
+            return applicants_list(request,current_club.club_name)
 
 @login_required
 def myClubs(request):
@@ -310,6 +352,7 @@ def club_list(request):
     else:
         clubs = Club.objects.all()
     return render(request, 'club_list.html', {'clubs': clubs})
+    return reverse('feed')
 
 class FeedView(ListView):
     model = Post

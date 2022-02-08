@@ -1,11 +1,10 @@
 from django import forms
 from django.core.validators import RegexValidator
-from .models import User, Club, Application, Role
+from .models import User, Club, Application, Role, Post
 from django.contrib.auth import authenticate
 # from django.forms.widgets import DateInput
 from django.db import IntegrityError
 import datetime
-from .models import Post
 
 
 from .models import Post
@@ -33,7 +32,6 @@ class NewPasswordMixin(forms.Form):
         password_confirmation = self.cleaned_data.get('password_confirmation')
         if new_password != password_confirmation:
             self.add_error('password_confirmation', 'Confirmation does not match password.')
-
 
 
 class SignUpForm(NewPasswordMixin, forms.ModelForm):

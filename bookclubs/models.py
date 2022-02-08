@@ -7,6 +7,7 @@ from libgravatar import Gravatar
 from datetime import date
 from django.urls import reverse
 from datetime import datetime, date
+from django.utils.translation import gettext_lazy as _
 from enum import Enum
 from django.utils.translation import gettext_lazy as _
 
