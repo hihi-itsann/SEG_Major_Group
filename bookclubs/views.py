@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import redirect, render
 from bookclubs.helpers import login_prohibited
 from django.contrib.auth.hashers import check_password
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -18,8 +18,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.views.generic.edit import FormView
 from django.urls import reverse
-from django.views.generic.edit import UpdateView, CreateView
+from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.views.generic.list import MultipleObjectMixin
+from .models import Post
+from .forms import PostForm
 
 @login_prohibited
 def home(request):
@@ -147,3 +149,18 @@ class PasswordView(LoginRequiredMixin, FormView):
 
         messages.add_message(self.request, messages.SUCCESS, "Password updated!")
         return reverse('feed')
+
+class FeedView(ListView):
+    model = Post
+    template_name = 'feed.html'
+    ordering = ['-post_date','-post_datetime',]
+
+class CreatePostView(CreateView):
+    model = Post
+    form_class = PostForm
+    template_name = 'create_post.html'
+
+class DeletePostView(DeleteView):
+    model = Post
+    template_name = 'delete_post.html'
+    success_url = reverse_lazy('feed')

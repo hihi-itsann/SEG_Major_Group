@@ -3,6 +3,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from libgravatar import Gravatar
 from datetime import date
+from django.urls import reverse
+from datetime import datetime, date
 
 class User(AbstractUser):
     username = models.CharField(
@@ -48,3 +50,16 @@ class User(AbstractUser):
     def mini_gravatar(self):
         """Return a URL to a miniature version of the user's gravatar."""
         return self.gravatar(size=60)
+
+class Post(models.Model):
+    title = models.CharField(max_length=255)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    body = models.TextField()
+    post_date = models.DateField(auto_now_add=True)
+    post_datetime = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title + ' | ' + str(self.author)
+
+    def get_absolute_url(self):
+        return reverse('feed')

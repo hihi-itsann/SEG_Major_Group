@@ -2,6 +2,7 @@ from django import forms
 from django.core.validators import RegexValidator
 from .models import User
 from django.contrib.auth import authenticate
+from .models import Post
 #from django.forms.widgets import DateInput
 
 class NewPasswordMixin(forms.Form):
@@ -116,3 +117,15 @@ class PasswordForm(NewPasswordMixin):
             self.user.set_password(new_password)
             self.user.save()
         return self.user
+
+class PostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ('title','author','body')
+
+        widgets = {
+            'title': forms.TextInput(attrs={'class':'form-control', 'placeholder':'Which was the name of the book that you just finished?'}),
+            'author': forms.Select(attrs={'class':'form-control'}),
+            'body': forms.Textarea(attrs={'class':'form-control', 'placeholder': 'What are your thoughts?'}),
+
+        }

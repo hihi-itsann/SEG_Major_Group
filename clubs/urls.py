@@ -17,13 +17,19 @@ from django.contrib import admin
 from django.urls import path
 from bookclubs import views
 
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
-    path('feed/', views.feed, name='feed'),
+    #path('feed/', views.feed, name='feed'),
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
     path('log_in/', views.LogInView.as_view(), name='log_in'),
     path('log_out/', views.log_out, name='log_out'),
     path('profile/', views.ProfileUpdateView.as_view(), name='profile'),
     path('password/', views.PasswordView.as_view(), name='password'),
+    path('feed/', views.FeedView.as_view(), name='feed'),
+    path('create_post/', views.CreatePostView.as_view(), name='create_post'),
+    path('article/delete/<int:pk>', views.DeletePostView.as_view(), name='delete_post'),
+
 ]
