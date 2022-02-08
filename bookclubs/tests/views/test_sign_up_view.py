@@ -5,6 +5,7 @@ from django.urls import reverse
 from bookclubs.forms import SignUpForm
 from bookclubs.models import User
 from bookclubs.tests.helpers import LogInTester
+from datetime import date
 
 class SignUpViewTestCase(TestCase, LogInTester):
     """Tests of the sign up view."""
@@ -19,6 +20,10 @@ class SignUpViewTestCase(TestCase, LogInTester):
          'username': '@janedoe',
          'email': 'janedoe@example.org',
          'bio': 'My bio',
+         'dob': '2002-07-14',
+         'gender': 'F',
+         'location': 'York',
+         'meeting_preference': 'P',
          'new_password': 'Password123',
          'password_confirmation': 'Password123'
          }
@@ -71,6 +76,10 @@ class SignUpViewTestCase(TestCase, LogInTester):
          self.assertEqual(user.bio, 'My bio')
          is_password_correct = check_password('Password123', user.password)
          self.assertTrue(is_password_correct)
+         self.assertEqual(user.dob, date(2002, 7, 14))
+         self.assertEqual(user.gender, 'F')
+         self.assertEqual(user.location, 'York')
+         self.assertEqual(user.meeting_preference, 'P')
          self.assertTrue(self._is_logged_in())
 
     def test_post_sign_up_redirects_when_logged_in(self):

@@ -1,0 +1,17 @@
+{% extends 'base_content.html' %}
+{% block title %} This post will disappear {% endblock %}
+{% block content %}
+
+<h1>DELETE A POST</h1>
+<br></br>
+<h2>Delete: {{ post.title }}</h2>
+
+<div class="form-group">
+    <form method="POST">
+      {% csrf_token %}
+      <b>Are you sure you want to delete this post? You won't be able to recover it again!</b></br>
+      <!--<button onclick="location.href='feed.html'" type="button" class="btn btn-light">Keep publication</button></br>-->
+      <br></br>
+      <button type="submit" class="btn btn-danger">Delete publication</button>
+</div>
+{% endblock %}

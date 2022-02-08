@@ -4,9 +4,10 @@ from django.core.exceptions import ValidationError
 from django.db.models import When
 from django.contrib.auth.models import AbstractUser
 from libgravatar import Gravatar
-from enum import Enum
+from datetime import date
+from django.urls import reverse
+from datetime import datetime, date
 from django.utils.translation import gettext_lazy as _
-
 
 class User(AbstractUser):
     username = models.CharField(
@@ -21,8 +22,19 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=50, blank=False)
     email = models.EmailField(unique=True, blank=False)
     bio = models.CharField(max_length=520, blank=True)
-
-    # dob = models.DateField(blank=False)
+    dob = models.DateField(blank=True,null=True)#blank=False, auto_now_add=False, auto_now=False, default=date.today())
+    GENDER_CHOICES = (
+        ('M', 'Male'),
+        ('F', 'Female'),
+        ('O', 'Other')
+    )
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True)
+    location = models.CharField(max_length=50, blank=True)
+    MEETING_CHOICES = (
+        ('O', 'Online'),
+        ('P', 'In-person')
+    )
+    meeting_preference = models.CharField(max_length=1, choices=MEETING_CHOICES, blank=True)
 
     class Meta:
         """Model options."""
@@ -213,3 +225,16 @@ class Role(models.Model):
 
     def get_club_role(self):
         return self.RoleOptions(self.club_role).name.title()
+
+class Post(models.Model):
+    title = models.CharField(max_length=255)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    body = models.TextField()
+    post_date = models.DateField(auto_now_add=True)
+    post_datetime = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title + ' | ' + str(self.author)
+
+    def get_absolute_url(self):
+        return reverse('feed')
