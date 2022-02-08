@@ -1,9 +1,10 @@
 from django import forms
 from django.core.validators import RegexValidator
-from .models import User
+from .models import User, Club, Application, Role, Post
 from django.contrib.auth import authenticate
-from .models import Post
-#from django.forms.widgets import DateInput
+from django.db import IntegrityError
+import datetime
+
 
 class NewPasswordMixin(forms.Form):
     """Form mixing for new_password and password_confirmation fields."""
@@ -15,7 +16,7 @@ class NewPasswordMixin(forms.Form):
             regex=r'^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$',
             message='Password must contain an uppercase character, a lowercase '
                     'character and a number'
-            )]
+        )]
     )
     password_confirmation = forms.CharField(label='Password confirmation', widget=forms.PasswordInput())
 
@@ -27,7 +28,6 @@ class NewPasswordMixin(forms.Form):
         password_confirmation = self.cleaned_data.get('password_confirmation')
         if new_password != password_confirmation:
             self.add_error('password_confirmation', 'Confirmation does not match password.')
-
 
 
 class SignUpForm(NewPasswordMixin, forms.ModelForm):
@@ -117,6 +117,77 @@ class PasswordForm(NewPasswordMixin):
             self.user.set_password(new_password)
             self.user.save()
         return self.user
+
+
+class NewClubForm(forms.ModelForm):
+    class Meta:
+        model = Club
+        fields = ['club_name', 'meeting_status', 'location', 'public_status', 'genre', 'description']
+        widgets = {'description': forms.Textarea()}
+
+    MEETING_STATUS_CHOICES = (
+        (True, 'In Person'),
+        (False, 'Online')
+    )
+    PUBLIC_STATUS_CHOICES = (
+        (True, 'Public'),
+        (False, 'Private')
+    )
+
+    meeting_status = forms.ChoiceField(widget=forms.Select(), label='Meetings Held', choices=MEETING_STATUS_CHOICES)
+    public_status = forms.ChoiceField(widget=forms.Select(), label='Status', choices=PUBLIC_STATUS_CHOICES)
+
+    def clean(self):
+        """Clean the data and generate messages for any errors."""
+        super().clean()
+
+    def save(self):
+        """Create a new club."""
+        super().save(commit=False)
+        club = Club.objects.create(
+            club_name=self.cleaned_data.get('club_name'),
+            meeting_status=self.cleaned_data.get('meeting_status'),
+            location=self.cleaned_data.get('location'),
+            public_status=self.cleaned_data.get('public_status'),
+            genre=self.cleaned_data.get('genre'),
+            description=self.cleaned_data.get('description')
+        )
+        return club
+
+
+class NewApplicationForm(forms.ModelForm):
+    class Meta:
+        model = Application
+        fields = ['statement']
+
+    def save(self, user=None, club=None):
+        super().save(commit=False)
+        application = Application.objects.create(
+            user=user,
+            club=club,
+            statement=self.cleaned_data.get('statement'),
+            status='pending'
+        )
+        return application
+
+
+class UpdateApplicationForm(forms.ModelForm):
+    class Meta:
+        model = Application
+        fields = ['statement']
+
+    def save(self, past_id=None, user=None, club=None):
+        super().save(commit=False)
+        delete_application = Application.objects.get(id=past_id)
+        delete_application.delete()
+        application = Application.objects.create(
+            id=past_id,
+            user=user,
+            club=club,
+            statement=self.cleaned_data.get('statement'),
+            status='pending'
+        )
+        return application
 
 class PostForm(forms.ModelForm):
     class Meta:
