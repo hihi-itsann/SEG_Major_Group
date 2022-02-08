@@ -5,7 +5,11 @@ from django.contrib.auth import authenticate
 # from django.forms.widgets import DateInput
 from django.db import IntegrityError
 import datetime
+from .models import Post
 
+
+from .models import Post
+#from django.forms.widgets import DateInput
 
 class NewPasswordMixin(forms.Form):
     """Form mixing for new_password and password_confirmation fields."""
@@ -31,6 +35,7 @@ class NewPasswordMixin(forms.Form):
             self.add_error('password_confirmation', 'Confirmation does not match password.')
 
 
+
 class SignUpForm(NewPasswordMixin, forms.ModelForm):
     """Form enabling unregistered users to sign up."""
 
@@ -38,9 +43,9 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
         """Form options."""
 
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'bio']
-        widgets = {'bio': forms.Textarea()}
-        # 'dob': DateInput(attrs={'type': 'date'} }
+        fields = ['first_name', 'last_name', 'username', 'email', 'bio', 'dob', 'gender', 'location', 'meeting_preference']
+        widgets = { 'bio': forms.Textarea() }
+
 
     def save(self):
         """Create a new user."""
@@ -53,7 +58,10 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
             email=self.cleaned_data.get('email'),
             bio=self.cleaned_data.get('bio'),
             password=self.cleaned_data.get('new_password'),
-            # dob=self.cleaned_data.get('dob'),
+            dob=self.cleaned_data.get('dob'),
+            gender=self.cleaned_data.get('gender'),
+            location=self.cleaned_data.get('location'),
+            meeting_preference=self.cleaned_data.get('meeting_preference'),
         )
         return user
 
@@ -80,8 +88,8 @@ class UserForm(forms.ModelForm):
         """Form options."""
 
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'bio']
-        widgets = {'bio': forms.Textarea()}
+        fields = ['first_name', 'last_name', 'username', 'email', 'bio' , 'dob', 'gender', 'location', 'meeting_preference']
+        widgets = { 'bio': forms.Textarea() }
 
 
 class PasswordForm(NewPasswordMixin):
@@ -186,3 +194,15 @@ class UpdateApplicationForm(forms.ModelForm):
             status='pending'
         )
         return application
+
+class PostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ('title','author','body')
+
+        widgets = {
+            'title': forms.TextInput(attrs={'class':'form-control', 'placeholder':'Which was the name of the book that you just finished?'}),
+            'author': forms.Select(attrs={'class':'form-control'}),
+            'body': forms.Textarea(attrs={'class':'form-control', 'placeholder': 'What are your thoughts?'}),
+
+        }

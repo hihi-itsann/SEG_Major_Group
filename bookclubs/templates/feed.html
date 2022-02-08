@@ -4,4 +4,19 @@
 {% endblock %}
 {% block content %}
 <h1>FEED</h1>
+<ul>
+{% for post in object_list%}
+    <li>
+      <b><u>{{ post.title }}</u> - <i>{{ post.author }}</i> {{ post.post_date }} {{ post.post_datetime }}</b>
+      <small>
+          {% if user.is_authenticated %}
+            {% if user.id == post.author.id%}
+              <a href="{% url 'delete_post' post.pk %}">(Delete)</a>
+            {% endif %}
+          {% endif %}
+      </small><br/>
+      {{ post.body}}
+    </li>
+{% endfor %}
+</ul>
 {% endblock %}

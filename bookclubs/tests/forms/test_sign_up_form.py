@@ -4,6 +4,7 @@ from django import forms
 from django.test import TestCase
 from bookclubs.forms import SignUpForm
 from bookclubs.models import User
+from datetime import date
 
 class SignUpFormTestCase(TestCase):
      """Unit tests of the sign up form."""
@@ -14,6 +15,10 @@ class SignUpFormTestCase(TestCase):
              'username': '@janedoe',
              'email': 'janedoe@example.org',
              'bio': 'My bio',
+             'dob': '2002-07-14',
+             'gender': 'F',
+             'location': 'York',
+             'meeting_preference': 'P',
              'new_password': 'Password123',
              'password_confirmation': 'Password123'
          }
@@ -37,6 +42,12 @@ class SignUpFormTestCase(TestCase):
          self.assertIn('password_confirmation', form.fields)
          password_confirmation_widget = form.fields['password_confirmation'].widget
          self.assertTrue(isinstance(password_confirmation_widget, forms.PasswordInput))
+         self.assertIn('dob', form.fields)
+         dateBirth_field = form.fields['dob']
+         self.assertTrue(isinstance(dateBirth_field, forms.DateField))
+         self.assertIn('gender', form.fields)
+         self.assertIn('location', form.fields)
+         self.assertIn('meeting_preference', form.fields)
 
      def test_form_uses_model_validation(self):
          self.form_input['username'] = 'badusername'
@@ -77,5 +88,9 @@ class SignUpFormTestCase(TestCase):
          self.assertEqual(user.last_name, 'Doe')
          self.assertEqual(user.email, 'janedoe@example.org')
          self.assertEqual(user.bio, 'My bio')
+         self.assertEqual(user.dob, date(2002, 7, 14))
+         self.assertEqual(user.gender, 'F')
+         self.assertEqual(user.location, 'York')
+         self.assertEqual(user.meeting_preference, 'P')
          is_password_correct = check_password('Password123', user.password)
          self.assertTrue(is_password_correct)

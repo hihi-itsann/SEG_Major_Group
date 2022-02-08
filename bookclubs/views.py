@@ -4,6 +4,8 @@ from .models import User, Club, Role, Application
 from django.shortcuts import redirect, render
 from bookclubs.helpers import login_prohibited
 from django.contrib.auth.hashers import check_password
+from django.urls import reverse, reverse_lazy
+from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm
 from django.urls import reverse
 from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm, UpdateApplicationForm
 from django.contrib import messages
@@ -18,8 +20,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.views.generic.edit import FormView
 from django.urls import reverse
-from django.views.generic.edit import UpdateView, CreateView
+from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.views.generic.list import MultipleObjectMixin
+from .models import Post
+from .forms import PostForm
 from .helpers import *
 from django.db import IntegrityError
 
@@ -75,7 +79,6 @@ class SignUpView(LoginProhibitedMixin, FormView):
 
     def get_success_url(self):
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
-
 
 class LogInView(LoginProhibitedMixin, View):
     """View that handles log in."""
@@ -150,7 +153,6 @@ class PasswordView(LoginRequiredMixin, FormView):
         login(self.request, self.request.user)
         return super().form_valid(form)
 
-    @property
     def get_success_url(self):
         """Redirect the user after successful password change."""
 
@@ -308,3 +310,18 @@ def club_list(request):
     else:
         clubs = Club.objects.all()
     return render(request, 'club_list.html', {'clubs': clubs})
+
+class FeedView(ListView):
+    model = Post
+    template_name = 'feed.html'
+    ordering = ['-post_date','-post_datetime',]
+
+class CreatePostView(CreateView):
+    model = Post
+    form_class = PostForm
+    template_name = 'create_post.html'
+
+class DeletePostView(DeleteView):
+    model = Post
+    template_name = 'delete_post.html'
+    success_url = reverse_lazy('feed')
