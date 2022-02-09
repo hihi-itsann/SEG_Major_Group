@@ -36,6 +36,7 @@ urlpatterns = [
     path('edit_application/<str:club_name>/', views.edit_application, name='edit_application'),
     path('withdraw_application/<str:club_name>/', views.withdraw_application, name='withdraw_application'),
     path('club_list/', views.club_list, name = 'club_list'),
+    path('my_applications/', views.my_applications, name='my_applications'),
     path('my_clubs/', views.my_clubs, name='my_clubs'),
     path('feed/', views.FeedView.as_view(), name='feed'),
     path('create_post/', views.CreatePostView.as_view(), name='create_post'),

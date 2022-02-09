@@ -354,6 +354,11 @@ def club_list(request):
     else:
         clubs = Club.objects.all()
     return render(request, 'club_list.html', {'clubs': clubs})
+
+@login_required
+def my_applications(request):
+    applications = Application.objects.filter(user=request.user)
+    return render(request, 'my_applications.html', {'applications': applications})
     return reverse('feed')
 
 class FeedView(LoginRequiredMixin, ListView):
