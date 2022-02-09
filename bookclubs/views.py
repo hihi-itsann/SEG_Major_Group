@@ -329,9 +329,9 @@ def reject_applicant(request,club_name,user_id):
             return applicants_list(request,current_club.club_name)
 
 @login_required
-def myClubs(request):
+def my_clubs(request):
     clubs = Role.objects.filter(user=request.user)
-    return render(request, 'myClubs.html', {'clubs': clubs})
+    return render(request, 'my_clubs.html', {'clubs': clubs})
 
 @login_required
 def club_list(request):
