@@ -10,12 +10,40 @@
       <b><u>{{ post.title }}</u> - <i>{{ post.author }}</i> {{ post.post_date }} {{ post.post_datetime }}</b>
       <small>
           {% if user.is_authenticated %}
+            <a href="{% url 'create_comment' post.pk%}">(Comment)</a>
             {% if user.id == post.author.id%}
               <a href="{% url 'delete_post' post.pk %}">(Delete)</a>
             {% endif %}
+
           {% endif %}
       </small><br/>
+
       {{ post.body}}
+
+      <br/><br/>
+        {% if not post.comments.all %}
+            <b>No Comments Yet</b>
+        {% else %}
+            <b>Comment:</b>
+            <br/>
+            {% for comment in post.comments.all%}
+                <b><i>{{ comment.author.username }}</i> - <i>{{ post.post_datetime }}</i></b>
+                <small>
+                    {% if user.is_authenticated %}
+                      {% if user.id == post.author.id or user.id == comment.author.id%}
+                        <a href="{% url 'delete_comment' comment.pk %}">(Delete)</a>
+                      {% endif %}
+                    {% endif %}
+                </small>
+                <br/>
+                {{ comment.body}}
+
+                <br/>
+            {% endfor %}
+        {% endif %}
+
+      <br/><br/>
+
     </li>
 {% endfor %}
 </ul>

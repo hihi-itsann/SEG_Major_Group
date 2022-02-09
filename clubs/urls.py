@@ -36,10 +36,10 @@ urlpatterns = [
     path('edit_application/<str:club_name>/', views.edit_application, name='edit_application'),
     path('withdraw_application/<str:club_name>/', views.withdraw_application, name='withdraw_application'),
     path('club_list/', views.club_list, name = 'club_list'),
-    path('myClubs/', views.myClubs, name='myClubs'),
-
+    path('my_clubs/', views.my_clubs, name='my_clubs'),
     path('feed/', views.FeedView.as_view(), name='feed'),
     path('create_post/', views.CreatePostView.as_view(), name='create_post'),
     path('article/delete/<int:pk>', views.DeletePostView.as_view(), name='delete_post'),
-
+    path('create_comment/<int:pk>', views.CreateCommentView.as_view(), name='create_comment'),
+    path('delete_comment/<int:pk>', views.DeleteCommentView.as_view(), name='delete_comment'),
 ]

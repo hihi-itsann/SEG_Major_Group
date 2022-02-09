@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .models import User, Club, Role, Application, Post
+from .models import User, Club, Role, Application, Post, Comment
 from django.shortcuts import redirect, render
 from bookclubs.helpers import login_prohibited
 from django.contrib.auth.hashers import check_password
@@ -10,6 +10,7 @@ from django.urls import reverse, reverse_lazy
 from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm
 from django.urls import reverse
 from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm, UpdateApplicationForm
+from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm, UpdateApplicationForm, PostForm, CommentForm
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from bookclubs.models import User
@@ -84,6 +85,7 @@ class SignUpView(LoginProhibitedMixin, FormView):
 
     def get_success_url(self):
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+
 
 class LogInView(LoginProhibitedMixin, View):
     """View that handles log in."""
@@ -337,9 +339,9 @@ def reject_applicant(request,club_name,user_id):
             return applicants_list(request,current_club.club_name)
 
 @login_required
-def myClubs(request):
+def my_clubs(request):
     clubs = Role.objects.filter(user=request.user)
-    return render(request, 'myClubs.html', {'clubs': clubs})
+    return render(request, 'my_clubs.html', {'clubs': clubs})
 
 @login_required
 def club_list(request):
@@ -354,17 +356,33 @@ def club_list(request):
     return render(request, 'club_list.html', {'clubs': clubs})
     return reverse('feed')
 
-class FeedView(ListView):
+class FeedView(LoginRequiredMixin, ListView):
     model = Post
     template_name = 'feed.html'
     ordering = ['-post_date','-post_datetime',]
 
-class CreatePostView(CreateView):
+class CreatePostView(LoginRequiredMixin, CreateView):
     model = Post
     form_class = PostForm
     template_name = 'create_post.html'
 
-class DeletePostView(DeleteView):
+class DeletePostView(LoginRequiredMixin, DeleteView):
     model = Post
     template_name = 'delete_post.html'
+    success_url = reverse_lazy('feed')
+
+class CreateCommentView(LoginRequiredMixin, CreateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = 'create_comment.html'
+    success_url = reverse_lazy('feed')
+
+    def form_valid(self,form):
+        form.instance.related_post_id= self.kwargs['pk']
+        form.instance.author= self.request.user
+        return super().form_valid(form)
+
+class DeleteCommentView(LoginRequiredMixin, DeleteView):
+    model = Comment
+    template_name = 'delete_comment.html'
     success_url = reverse_lazy('feed')
