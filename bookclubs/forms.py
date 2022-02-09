@@ -1,6 +1,6 @@
 from django import forms
 from django.core.validators import RegexValidator
-from .models import User, Club, Application, Role, Post
+from .models import User, Club, Application, Role, Post, Comment
 from django.contrib.auth import authenticate
 from django.db import IntegrityError
 import datetime
@@ -199,4 +199,13 @@ class PostForm(forms.ModelForm):
             'author': forms.Select(attrs={'class':'form-control'}),
             'body': forms.Textarea(attrs={'class':'form-control', 'placeholder': 'What are your thoughts?'}),
 
+        }
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ('body',)
+
+        widgets = {
+            'body': forms.Textarea(),
         }

@@ -1,11 +1,11 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .models import User, Club, Role, Application, Post
+from .models import User, Club, Role, Application, Post, Comment
 from django.shortcuts import redirect, render
 from bookclubs.helpers import login_prohibited
 from django.contrib.auth.hashers import check_password
 from django.urls import reverse
-from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm, UpdateApplicationForm, PostForm
+from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm, UpdateApplicationForm, PostForm, CommentForm
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from bookclubs.models import User
@@ -359,4 +359,20 @@ class CreatePostView(LoginRequiredMixin, CreateView):
 class DeletePostView(LoginRequiredMixin, DeleteView):
     model = Post
     template_name = 'delete_post.html'
+    success_url = reverse_lazy('feed')
+
+class CreateCommentView(LoginRequiredMixin, CreateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = 'create_comment.html'
+    success_url = reverse_lazy('feed')
+
+    def form_valid(self,form):
+        form.instance.related_post_id= self.kwargs['pk']
+        form.instance.author= self.request.user
+        return super().form_valid(form)
+
+class DeleteCommentView(LoginRequiredMixin, DeleteView):
+    model = Comment
+    template_name = 'delete_comment.html'
     success_url = reverse_lazy('feed')

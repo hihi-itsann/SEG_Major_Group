@@ -40,4 +40,6 @@ urlpatterns = [
     path('feed/', views.FeedView.as_view(), name='feed'),
     path('create_post/', views.CreatePostView.as_view(), name='create_post'),
     path('article/delete/<int:pk>', views.DeletePostView.as_view(), name='delete_post'),
+    path('create_comment/<int:pk>', views.CreateCommentView.as_view(), name='create_comment'),
+    path('delete_comment/<int:pk>', views.DeleteCommentView.as_view(), name='delete_comment'),
 ]
