@@ -38,6 +38,7 @@ class User(AbstractUser):
 
 class Book(models.Model):
     ISBN = models.CharField(
+        primary_key=True,
         max_length=10,
         unique=True,
         validators=[MinLengthValidator(10)] #ISBN has fiexed length 10

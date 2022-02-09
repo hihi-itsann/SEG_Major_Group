@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate,login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import redirect, render
-from bookclubs.helpers import login_prohibited, book_exists
+from bookclubs.helpers import login_prohibited
 from django.contrib.auth.hashers import check_password
 from django.urls import reverse
 from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm
@@ -20,6 +20,7 @@ from django.views.generic.edit import FormView
 from django.urls import reverse
 from django.views.generic.edit import UpdateView, CreateView
 from django.views.generic.list import MultipleObjectMixin
+from django.http import Http404
 
 @login_prohibited
 def home(request):
@@ -148,13 +149,30 @@ class PasswordView(LoginRequiredMixin, FormView):
         messages.add_message(self.request, messages.SUCCESS, "Password updated!")
         return reverse('feed')
 
-@login_required
-def book_list(request):
-    books = Book.objects.all()
-    return render(request, 'book_list.html', {'books': books})
+class BookListView(LoginRequiredMixin, ListView):
+    """View that shows a list of all books"""
+    model = Book
+    template_name = 'book_list.html'
+    context_object_name = "books"
 
-@login_required
-@book_exists
-def show_book(request, ISBN):
-    book = Book.objects.get(ISBN=ISBN)
-    return render(request, 'show_book.html', {"book": book})
+
+class ShowBookView(LoginRequiredMixin, DetailView):
+    """View that shows book details."""
+    model = Book
+    template_name = 'show_book.html'
+    pk_url_kwarg = 'ISBN'
+
+    def get_context_data(self, **kwargs):
+        """Generate context data to be shown in the template."""
+        book = self.get_object()
+        context = super(ShowBookView, self).get_context_data(**kwargs)
+        context['book'] = book
+        return context
+
+    def get(self, request, *args, **kwargs):
+        """Handle get request, and redirect to book_list if ISBN invalid."""
+
+        try:
+            return super().get(request, *args, **kwargs)
+        except Http404:
+            return redirect('book_list')
