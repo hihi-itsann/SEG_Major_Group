@@ -1,0 +1,26 @@
+{% extends 'base_content.html' %}
+{% block content %}
+    <br>
+    <br>
+    <div class="container">
+        <div class="row">
+
+          <div class="col-lg-3 offset-0">
+            <img src="{{ book.image_url_l }}">
+          </div>
+
+          <div class="col-lg-6 offset-2">
+            <h1>{{ book.title }}</h1>
+            <hr>
+            <h4><em>Author: {{ book.author }}</em></h4><br>
+            <h4><em>Year: {{ book.year_of_publication }}</em></h4><br>
+            <h4><em>publisher: {{ book.publisher }}</em></h4><br>
+            <h4><em>ISBN: {{ book.ISBN }}</em></h4><br>
+            <h1 style="color:Green">Rating: {{ book.getAverageRate|floatformat:1 }}/10</h1>
+            <button type="button" class="btn btn-outline-primary btn-lg"><a href="{% url 'create_book_rating' book.ISBN %}">Create Your Rate here</a></button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+{% endblock %}

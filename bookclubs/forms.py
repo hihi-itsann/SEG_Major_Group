@@ -1,6 +1,6 @@
 from django import forms
 from django.core.validators import RegexValidator
-from .models import User, Club, Application, Role, Post, Comment
+from .models import User, Club, Application, Role, Post, Comment, Rating
 from django.contrib.auth import authenticate
 # from django.forms.widgets import DateInput
 from django.db import IntegrityError
@@ -122,7 +122,11 @@ class PasswordForm(NewPasswordMixin):
             self.user.save()
         return self.user
 
-
+class RateForm(forms.ModelForm):
+    class Meta:
+        model = Rating
+        fields = ['rate']
+        
 class NewClubForm(forms.ModelForm):
     class Meta:
         model = Club
@@ -213,3 +217,4 @@ class CommentForm(forms.ModelForm):
         widgets = {
             'body': forms.Textarea(),
         }
+
