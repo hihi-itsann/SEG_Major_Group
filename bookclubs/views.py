@@ -5,10 +5,10 @@ from django.shortcuts import redirect, render
 from bookclubs.helpers import login_prohibited
 from django.contrib.auth.hashers import check_password
 from django.urls import reverse
-from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm, UpdateApplicationForm, PostForm, CommentForm
+from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm, UpdateApplicationForm, PostForm, CommentForm, RateForm
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from bookclubs.models import User
+from bookclubs.models import User, Book, Rating
 from django.views import View
 from django.utils.decorators import method_decorator
 from django.conf import settings
@@ -20,9 +20,10 @@ from django.views.generic.edit import FormView
 from django.urls import reverse, reverse_lazy
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.views.generic.list import MultipleObjectMixin
+
+from django.http import Http404
 from .helpers import *
 from django.db import IntegrityError
-
 
 @login_prohibited
 def home(request):
@@ -156,6 +157,44 @@ class PasswordView(LoginRequiredMixin, FormView):
         messages.add_message(self.request, messages.SUCCESS, "Password updated!")
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
+class BookListView(LoginRequiredMixin, ListView):
+    """View that shows a list of all books"""
+    model = Book
+    template_name = 'book_list.html'
+    context_object_name = "books"
+
+
+class ShowBookView(LoginRequiredMixin, DetailView):
+    """View that shows book details."""
+    model = Book
+    template_name = 'show_book.html'
+    pk_url_kwarg = 'ISBN'
+
+    def get(self, request, *args, **kwargs):
+        """Handle get request, and redirect to book_list if ISBN invalid."""
+
+        try:
+            return super().get(request, *args, **kwargs)
+        except Http404:
+            return redirect('book_list')
+
+class CreateBookRateView(LoginRequiredMixin, CreateView):
+    model = Rating
+    form_class = RateForm
+    template_name = 'create_book_rating.html'
+
+    def form_valid(self, form):
+        """Process a valid form."""
+        form.instance.user = self.request.user
+        form.instance.book_id = self.kwargs['ISBN']
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        """Return URL to redirect the user too after valid form handling."""
+        return reverse('book_list')
+
+    def handle_no_permission(self):
+        return redirect('log_in')
 
 @login_required
 def create_club(request):

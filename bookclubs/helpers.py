@@ -1,9 +1,8 @@
 from django.shortcuts import redirect
 from django.conf import settings
-from .models import User, Club, Role
+from .models import User, Club, Role, Book
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
-
 
 def login_prohibited(view_function):
     """check that the user is logged in"""

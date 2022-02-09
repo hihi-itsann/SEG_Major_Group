@@ -1,9 +1,10 @@
-from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
+from django.core.validators import RegexValidator, MinLengthValidator, MinValueValidator, MaxValueValidator
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.db.models import When
 from django.contrib.auth.models import AbstractUser
 from libgravatar import Gravatar
+from django.db.models import Avg
 from datetime import date
 from django.urls import reverse
 from datetime import datetime, date
@@ -54,6 +55,28 @@ class User(AbstractUser):
         """Return a URL to a miniature version of the user's gravatar."""
         return self.gravatar(size=60)
 
+class Book(models.Model):
+    ISBN = models.CharField(
+        primary_key=True,
+        max_length=10,
+        unique=True,
+        validators=[MinLengthValidator(10)] #ISBN has fiexed length 10
+    )
+    title = models.CharField(max_length=100, unique=True, blank=False)
+    author = models.CharField(max_length=100, blank=False)
+    year_of_publication = models.IntegerField(validators=[MinValueValidator(1000), MaxValueValidator(2022)], blank=False)
+    publisher = models.CharField(max_length=100, blank=False)
+    image_url_s = models.URLField(blank=False)
+    image_url_m = models.URLField(blank=False)
+    image_url_l = models.URLField(blank=False)
+
+    def getAverageRate(self):
+        return self.rating_set.all().aggregate(Avg('rate'))['rate__avg']
+
+class Rating(models.Model):
+    rate = models.FloatField(default=0, validators=[MinValueValidator(0.0), MaxValueValidator(10.0)])
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
 class Application(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE)
@@ -251,3 +274,4 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
