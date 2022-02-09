@@ -1,0 +1,16 @@
+{% extends 'base_content.html' %}
+{% block title %} What's on your mind? {% endblock %}
+{% block content %}
+
+<div class="container">
+
+    <h1>CREATE A POST</h1>
+
+    <div class="form-group">
+        <form method="POST">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit" class="btn btn-secondary">Post publication</button>
+    </div>
+</div>
+{% endblock %}

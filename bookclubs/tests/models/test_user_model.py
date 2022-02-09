@@ -150,6 +150,91 @@ class UserModelTestCase(TestCase):
         self._assert_user_is_invalid()
 
 #test for date of birth
-    #def test_dob_must_not_be_blank(self):
-    #    self.user.dob = ''
-    #    self._assert_user_is_invalid()
+    def test_dob_may_be_blank(self):
+        self.user.dob = ''
+        self._assert_user_is_valid()
+
+    def test_dob_may_be_null(self):
+        self.user.dob = None
+        self._assert_user_is_valid()
+
+    def test_dob_need_not_be_unique(self):
+        second_user = User.objects.get(username='@janedoe')
+        self.user.dob = second_user.dob
+        self._assert_user_is_valid()
+
+#test for gender
+    def test_gender_may_be_blank(self):
+        self.user.gender = ''
+        self._assert_user_is_valid()
+
+    def test_gender_need_not_be_unique(self):
+        second_user = User.objects.get(username='@janedoe')
+        self.user.gender = second_user.gender
+        self._assert_user_is_valid()
+
+    def test_gender_may_contain_1_characters(self):
+        self.user.gender = 'F' * 1
+        self._assert_user_is_valid()
+
+    def test_gender_must_not_contain_more_than_1_characters_long(self):
+        self.user.gender = 'F' * 2
+        self._assert_user_is_invalid()
+
+    def test_gender_must_be_chose_from_list(self):
+        self.user.gender = 'F'
+        self._assert_user_is_valid()
+        self.user.gender = 'M'
+        self._assert_user_is_valid()
+        self.user.gender = 'O'
+        self._assert_user_is_valid()
+        self.user.gender = 'A'
+        self._assert_user_is_invalid()
+        self.user.gender = 'B'
+        self._assert_user_is_invalid()
+
+#test for location
+    def test_location_may_be_blank(self):
+        self.user.location = ''
+        self._assert_user_is_valid()
+
+    def test_location_need_not_be_unique(self):
+        second_user = User.objects.get(username='@janedoe')
+        self.user.location = second_user.location
+        self._assert_user_is_valid()
+
+    def test_location_may_contain_50_characters(self):
+        self.user.location = 'x' * 50
+        self._assert_user_is_valid()
+
+    def test_location_must_not_contain_more_than_50_characters_long(self):
+        self.user.location = 'x' * 51
+        self._assert_user_is_invalid()
+
+#test for meeting preference
+    def test_meeting_preference_may_be_blank(self):
+        self.user.meeting_preference = ''
+        self._assert_user_is_valid()
+
+    def test_meeting_preference_need_not_be_unique(self):
+        second_user = User.objects.get(username='@janedoe')
+        self.user.meeting_preference = second_user.meeting_preference
+        self._assert_user_is_valid()
+
+    def test_meeting_preference_may_contain_1_characters(self):
+        self.user.meeting_preference = 'O' * 1
+        self._assert_user_is_valid()
+
+    def test_meeting_preference_must_not_contain_more_than_1_characters_long(self):
+        self.user.meeting_preference = 'O' * 2
+        self._assert_user_is_invalid()
+
+    def test_meeting_preference_must_be_chose_from_list(self):
+        self.user.meeting_preference = 'O'
+        self._assert_user_is_valid()
+        self.user.meeting_preference = 'P'
+        self._assert_user_is_valid()
+        self.user.meeting_preference = 'A'
+        self._assert_user_is_invalid()
+        self.user.meeting_preference = 'B'
+        self._assert_user_is_invalid()

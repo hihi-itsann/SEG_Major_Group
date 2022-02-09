@@ -8,6 +8,10 @@
        "username": "@janedoe",
        "email": "janedoe@example.org",
        "bio": "Hello, I'm Jane Doe.",
+       "dob": "2002-07-14",
+       "gender": "F",
+       "location": "York",
+       "meeting_preference": "P",
        "password": "pbkdf2_sha256$260000$4BNvFuAWoTT1XVU8D6hCay$KqDCG+bHl8TwYcvA60SGhOMluAheVOnF1PMz0wClilc=",
        "is_active": true
      }
