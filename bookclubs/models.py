@@ -238,3 +238,12 @@ class Post(models.Model):
 
     def get_absolute_url(self):
         return reverse('feed')
+
+class Comment(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    body = models.TextField(max_length=520, blank=False)
+    related_post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']

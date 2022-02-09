@@ -150,7 +150,6 @@ class PasswordView(LoginRequiredMixin, FormView):
         login(self.request, self.request.user)
         return super().form_valid(form)
 
-    @property
     def get_success_url(self):
         """Redirect the user after successful password change."""
 
@@ -347,17 +346,17 @@ def club_list(request):
     return render(request, 'club_list.html', {'clubs': clubs})
     return reverse('feed')
 
-class FeedView(ListView):
+class FeedView(LoginRequiredMixin, ListView):
     model = Post
     template_name = 'feed.html'
     ordering = ['-post_date','-post_datetime',]
 
-class CreatePostView(CreateView):
+class CreatePostView(LoginRequiredMixin, CreateView):
     model = Post
     form_class = PostForm
     template_name = 'create_post.html'
 
-class DeletePostView(DeleteView):
+class DeletePostView(LoginRequiredMixin, DeleteView):
     model = Post
     template_name = 'delete_post.html'
     success_url = reverse_lazy('feed')
