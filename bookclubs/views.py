@@ -5,10 +5,10 @@ from django.shortcuts import redirect, render
 from bookclubs.helpers import login_prohibited
 from django.contrib.auth.hashers import check_password
 from django.urls import reverse
-from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm
+from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, RateForm
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from bookclubs.models import User, Book
+from bookclubs.models import User, Book, Rating
 from django.views import View
 from django.utils.decorators import method_decorator
 from django.conf import settings
@@ -162,13 +162,6 @@ class ShowBookView(LoginRequiredMixin, DetailView):
     template_name = 'show_book.html'
     pk_url_kwarg = 'ISBN'
 
-    def get_context_data(self, **kwargs):
-        """Generate context data to be shown in the template."""
-        book = self.get_object()
-        context = super(ShowBookView, self).get_context_data(**kwargs)
-        context['book'] = book
-        return context
-
     def get(self, request, *args, **kwargs):
         """Handle get request, and redirect to book_list if ISBN invalid."""
 
@@ -176,3 +169,21 @@ class ShowBookView(LoginRequiredMixin, DetailView):
             return super().get(request, *args, **kwargs)
         except Http404:
             return redirect('book_list')
+
+class CreateBookRateView(LoginRequiredMixin, CreateView):
+    model = Rating
+    form_class = RateForm
+    template_name = 'create_book_rating.html'
+
+    def form_valid(self, form):
+        """Process a valid form."""
+        form.instance.user = self.request.user
+        form.instance.book_id = self.kwargs['ISBN']
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        """Return URL to redirect the user too after valid form handling."""
+        return reverse('book_list')
+
+    def handle_no_permission(self):
+        return redirect('log_in')

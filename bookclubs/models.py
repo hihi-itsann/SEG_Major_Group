@@ -2,6 +2,7 @@ from django.core.validators import RegexValidator, MinLengthValidator, MinValueV
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from libgravatar import Gravatar
+from django.db.models import Avg
 
 class User(AbstractUser):
     username = models.CharField(
@@ -50,3 +51,11 @@ class Book(models.Model):
     image_url_s = models.URLField(blank=False)
     image_url_m = models.URLField(blank=False)
     image_url_l = models.URLField(blank=False)
+
+    def getAverageRate(self):
+        return self.rating_set.all().aggregate(Avg('rate'))['rate__avg']
+
+class Rating(models.Model):
+    rate = models.FloatField(default=0, validators=[MinValueValidator(0.0), MaxValueValidator(10.0)])
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)

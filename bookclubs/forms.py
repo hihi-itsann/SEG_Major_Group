@@ -1,6 +1,6 @@
 from django import forms
 from django.core.validators import RegexValidator
-from .models import User
+from .models import User, Rating
 from django.contrib.auth import authenticate
 #from django.forms.widgets import DateInput
 
@@ -113,3 +113,8 @@ class PasswordForm(NewPasswordMixin):
             self.user.set_password(new_password)
             self.user.save()
         return self.user
+
+class RateForm(forms.ModelForm):
+    class Meta:
+        model = Rating
+        fields = ['rate']
