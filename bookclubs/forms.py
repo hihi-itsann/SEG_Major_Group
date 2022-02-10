@@ -178,7 +178,7 @@ class NewApplicationForm(forms.ModelForm):
             user=user,
             club=club,
             statement=self.cleaned_data.get('statement'),
-            status='pending'
+            status='P'
         )
         return application
 
@@ -188,16 +188,17 @@ class UpdateApplicationForm(forms.ModelForm):
         model = Application
         fields = ['statement']
 
-    def save(self, past_id=None, user=None, club=None):
+    def save(self, user=None, club=None):
         super().save(commit=False)
-        delete_application = Application.objects.get(id=past_id)
+        delete_application = Application.objects.get(user=user, club=club)
+        past_id = delete_application.id
         delete_application.delete()
         application = Application.objects.create(
             id=past_id,
             user=user,
             club=club,
             statement=self.cleaned_data.get('statement'),
-            status='pending'
+            status='P'
         )
         return application
 

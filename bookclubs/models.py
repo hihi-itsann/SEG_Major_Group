@@ -87,15 +87,30 @@ class Rating(models.Model):
 
 
 class Application(models.Model):
+    STATUS_CHOICES = (
+        ('P', 'Pending'),
+        ('A', 'Accepted'),
+        ('R', 'Rejected')
+    )
     user = models.ForeignKey('User', on_delete=models.CASCADE)
     club = models.ForeignKey('Club', on_delete=models.CASCADE)
     statement = models.CharField(max_length=520, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=100, blank=False)
+    status = models.CharField(max_length=1, choices=STATUS_CHOICES)
 
     class Meta:
         ordering = ['-created_at']
         unique_together = ('user', 'club')
+
+    def change_status(self, choice):
+        if choice == 'A':
+            self.status = 'A'
+        elif choice == 'R':
+            self.status = 'R'
+        else:
+            self.status = 'P'
+        self.save()
+
 
 
 class Club(models.Model):

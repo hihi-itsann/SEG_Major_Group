@@ -16,9 +16,10 @@
           <tr class="row_hover">
             <td>{{ application.club.club_name }}</td>
             <td>{{ application.statement }}</td>
-            <td> {{ application.status }} </td>
+            <td> {{ application.get_status_display}} </td>
+
             <td>
-              {% if application.status == 'pending' %}
+              {% if application.status == 'P' %}
                 <a href="{% url 'edit_application' application.club.club_name %}" class=btn2>
                   EDIT
                 </a>

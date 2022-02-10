@@ -19,7 +19,7 @@ class LogInFormTestCase(TestCase):
         password_field = form.fields['password']
         self.assertTrue(isinstance(password_field.widget,forms.PasswordInput))
 
-    def test_form_accepts_valid_input(self):
+    def test_form_application_lists_valid_input(self):
         form = LogInForm(data=self.form_input)
         self.assertTrue(form.is_valid())
 

@@ -1,40 +1,26 @@
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
-from .models import User, Club, Role, Application, Post, Comment
-from django.shortcuts import redirect, render
-from bookclubs.helpers import login_prohibited
-from django.contrib.auth.hashers import check_password
-from django.urls import reverse
-from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm, UpdateApplicationForm, PostForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import ImproperlyConfigured
+from django.http import Http404
+from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
-from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm
-from django.urls import reverse
-from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm, UpdateApplicationForm
-from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm, UpdateApplicationForm, PostForm, CommentForm
-from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm, UpdateApplicationForm, PostForm, CommentForm, RateForm
-from django.contrib import messages
-from django.contrib.auth import get_user_model
-from bookclubs.models import User, Book, Rating
 from django.views import View
-from django.utils.decorators import method_decorator
-from django.conf import settings
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.views.generic.edit import FormView
-from django.urls import reverse, reverse_lazy
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
-from django.views.generic.list import MultipleObjectMixin
 
-from django.http import Http404
-from .helpers import *
-from django.db import IntegrityError
+from django.shortcuts import redirect, render, get_object_or_404
 
-from .models import Post
+from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm, \
+    UpdateApplicationForm, CommentForm, RateForm
+from bookclubs.models import Rating
 from .forms import PostForm
 from .helpers import *
-from django.db import IntegrityError
+from .models import Application, Comment
+from .models import Post
+
 
 @login_prohibited
 def home(request):
@@ -125,9 +111,9 @@ def log_out(request):
 
 
 @login_required
-def show_user(request, user_id):
+def show_user(request, username):
     try:
-        user = User.objects.get(id=user_id)
+        user = User.objects.get(username=username)
     except ObjectDoesNotExist:
         return redirect('user_list')
     else:
@@ -298,6 +284,7 @@ def new_application(request, club_name):
         form = NewApplicationForm(request.POST)
         if form.is_valid():
             application = form.save(request.user, current_club)
+            application.change_status('P')
             current_club.club_members.add(request.user, through_defaults={'club_role': 'APP'})
             messages.add_message(request, messages.SUCCESS, "Application submitted!")
             return redirect('feed')
@@ -317,7 +304,7 @@ def edit_application(request, club_name):
     form = UpdateApplicationForm(request.POST)
     if request.method == 'POST':
         if form.is_valid():
-            form.save(application_id, request.user, club_applied)
+            form.save(request.user, club_applied)
             messages.add_message(request, messages.SUCCESS, "Application edited successfully!")
             return redirect('feed')
     return render(request, 'edit_application.html', {'form': form, 'club_name': club_name})
@@ -344,19 +331,14 @@ def withdraw_application(request, club_name):
 def application_list(request, club_name):
     is_empty = False
     current_club = Club.objects.get(club_name=club_name)
-    applications = [i for i in current_club.application_set.all() if
-                    i in Application.objects.filter(status='pending')]
+    # applications = [i for i in current_club.application_set.all() if
+    #                 i in Application.objects.filter(status='P')]
+    applications = Application.objects.filter(club=current_club, status='P')
     applicants = current_club.get_applicants()
     if applicants.count() == 0:
         is_empty = True
     return render(request, 'application_list.html',
                   {'applicants': applicants, 'applications': applications, 'is_empty': is_empty, 'current_club': current_club})
-
-# @login_required
-# def view_app_to_club(request, club_id):
-#     applications = [i for i in Club.objects.get(id=club_id).application_set.all() if
-#                     i in Application.objects.filter(status='pending')]
-#     return render(request, 'view_app_to_club.html', {'applications': applications})
 
 
 @login_required
@@ -364,12 +346,15 @@ def application_list(request, club_name):
 @management_required
 def accept_applicant(request, club_name, user_id):
     current_club = Club.objects.get(club_name=club_name)
+    user = User.objects.get(id=user_id)
+    application = Application.objects.get(user=user, club=current_club)
+    application.change_status('A')
     try:
         applicant = User.objects.get(id=user_id, club__club_name=current_club.club_name, role__club_role='APP')
         current_club.toggle_member(applicant)
-    except (ObjectDoesNotExist):
-        return redirect('feed')
 
+    except (ObjectDoesNotExist):
+        return application_list(request, current_club.club_name)
     else:
         return application_list(request, current_club.club_name)
 
@@ -379,6 +364,9 @@ def accept_applicant(request, club_name, user_id):
 @management_required
 def reject_applicant(request, club_name, user_id):
     current_club = Club.objects.get(club_name=club_name)
+    user = User.objects.get(id=user_id)
+    application = Application.objects.get(user=user, club=current_club)
+    application.change_status('R')
     try:
         applicant = User.objects.get(id=user_id, club__club_name=current_club.club_name, role__club_role='APP')
         current_club.remove_user_from_club(applicant)

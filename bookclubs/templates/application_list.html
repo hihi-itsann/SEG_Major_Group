@@ -18,27 +18,25 @@
             <th scope="col"></th>
             <th scope="col">Name</th>
             <th scope="col">Email</th>
-            <th scope="col">Experience Level</th>
             <th scope="col">Statement</th>
           </tr>
         </thead>
-        {% for user in applicants %}
+        {% for application in applications %}
         <tr>
           <td>
-            <img src="{{ user.mini_gravatar }}" alt="Gravatar of {{ user.username }}" class="rounded-circle" >
+            <img src="{{ application.user.mini_gravatar }}" alt="Gravatar of {{ application.user.username }}" class="rounded-circle" >
           </td>
-          <td class="align-middle"> <a href="{% url 'show_user' user.id %}">{{user.full_name}}</a></td>
-          <td class="align-middle"> {{user.username}}</td>
-          <td class="align-middle"> {{user.get_chess_experience}}</td>
-          <td class="align-middle"> {{user.bio}}</td>
+          <td class="align-middle"> <a href="{% url 'show_user' application.user.id %}">{{application.user.username}}</a></td>
+          <td class="align-middle"> {{application.user.username}}</td>
+          <td class="align-middle"> {{application.user.bio}}</td>
           <td class="align-middle">
-            <form action = "{% url 'accept_applicant' current_club.club_name user.id %}" method="post">
+            <form action = "{% url 'accept_applicant' current_club.club_name application.user.id %}" method="post">
               {% csrf_token %}
               <input type="submit" class="btn btn-outline-success" value="Accept" name="accept-btn"/>
             </form>
           </td>
           <td class="align-middle">
-            <form action = "{% url 'reject_applicant' current_club.club_name user.id %}" method="post">
+            <form action = "{% url 'reject_applicant' current_club.club_name application.user.id %}" method="post">
               {% csrf_token %}
               <input type="submit" class="btn btn-outline-danger" value="Reject" name="reject-btn"/>
             </form>
