@@ -346,26 +346,28 @@ def club_list(request):
     return render(request, 'club_list.html', {'clubs': clubs})
     return reverse('feed')
 
-class FeedView(LoginRequiredMixin, ListView):
+
+class PostCommentView(LoginRequiredMixin, ListView):
     model = Post
-    template_name = 'feed.html'
+    template_name = 'post_comment.html'
     ordering = ['-post_date','-post_datetime',]
 
 class CreatePostView(LoginRequiredMixin, CreateView):
     model = Post
     form_class = PostForm
     template_name = 'create_post.html'
+    success_url = reverse_lazy('post_comment')
 
 class DeletePostView(LoginRequiredMixin, DeleteView):
     model = Post
     template_name = 'delete_post.html'
-    success_url = reverse_lazy('feed')
+    success_url = reverse_lazy('post_comment')
 
 class CreateCommentView(LoginRequiredMixin, CreateView):
     model = Comment
     form_class = CommentForm
     template_name = 'create_comment.html'
-    success_url = reverse_lazy('feed')
+    success_url = reverse_lazy('post_comment')
 
     def form_valid(self,form):
         form.instance.related_post_id= self.kwargs['pk']
@@ -375,4 +377,4 @@ class CreateCommentView(LoginRequiredMixin, CreateView):
 class DeleteCommentView(LoginRequiredMixin, DeleteView):
     model = Comment
     template_name = 'delete_comment.html'
-    success_url = reverse_lazy('feed')
+    success_url = reverse_lazy('post_comment')
