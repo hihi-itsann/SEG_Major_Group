@@ -2,18 +2,22 @@ import os
 import csv
 import sys
 import re
-
+import urllib.request
+import json
+import textwrap
+# Part of getGenra code comes from https://gist.github.com/AO8/faa3f52d3d5eac63820cfa7ec2b24aa7
 from surprise import Dataset
 from surprise import Reader
 
 from collections import defaultdict
 
-class BookRecommender:
+    
+class BookLens:
     
     isbn_to_bookTitle = {}
     bookTitle_to_isbn = {}
-    ratingsPath = '/book-review-dataset/BX_Book_Ratings.csv'
-    booksPath   = '/book-review-dataset/BX_Books.csv'
+    ratingsPath = '../ml-latest-small/BX_Book_Ratings.csv'
+    booksPath   = '../ml-latest-small/BX_Books.csv'
 
     def loadBookRecommenderLatestSmall(self):
 
@@ -94,4 +98,15 @@ class BookRecommender:
             return self.bookTitle_to_isbn
         else:
             return 0
+    
+    def getGenra(self, isbn):
+        base_api_link = "https://www.googleapis.com/books/v1/volumes?q=isbn:"
+
+        with urllib.request.urlopen(base_api_link + isbn) as f:
+            text = f.read()
+
+        decoded_text = text.decode("utf-8")
+        obj = json.loads(decoded_text) # deserializes decoded_text to a Python object
+        volume_info = obj["items"][0] 
+        return  volume_info["volumeInfo"]["categories"]
                 
