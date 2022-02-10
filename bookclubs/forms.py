@@ -10,6 +10,7 @@ import datetime
 from .models import Post
 #from django.forms.widgets import DateInput
 
+
 class NewPasswordMixin(forms.Form):
     """Form mixing for new_password and password_confirmation fields."""
 
@@ -41,9 +42,9 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
         """Form options."""
 
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'bio', 'dob', 'gender', 'location', 'meeting_preference']
-        widgets = { 'bio': forms.Textarea() }
-
+        fields = ['first_name', 'last_name', 'username', 'email', 'bio', 'dob', 'gender', 'location',
+                  'meeting_preference']
+        widgets = {'bio': forms.Textarea()}
 
     def save(self):
         """Create a new user."""
@@ -86,8 +87,9 @@ class UserForm(forms.ModelForm):
         """Form options."""
 
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'bio' , 'dob', 'gender', 'location', 'meeting_preference']
-        widgets = { 'bio': forms.Textarea() }
+        fields = ['first_name', 'last_name', 'username', 'email', 'bio', 'dob', 'gender', 'location',
+                  'meeting_preference']
+        widgets = {'bio': forms.Textarea()}
 
 
 class PasswordForm(NewPasswordMixin):
@@ -122,11 +124,13 @@ class PasswordForm(NewPasswordMixin):
             self.user.save()
         return self.user
 
+
 class RateForm(forms.ModelForm):
     class Meta:
         model = Rating
         fields = ['rate']
-        
+
+
 class NewClubForm(forms.ModelForm):
     class Meta:
         model = Club
@@ -197,17 +201,20 @@ class UpdateApplicationForm(forms.ModelForm):
         )
         return application
 
+
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ('title','author','body')
+        fields = ('title', 'author', 'body')
 
         widgets = {
-            'title': forms.TextInput(attrs={'class':'form-control', 'placeholder':'Which was the name of the book that you just finished?'}),
-            'author': forms.Select(attrs={'class':'form-control'}),
-            'body': forms.Textarea(attrs={'class':'form-control', 'placeholder': 'What are your thoughts?'}),
+            'title': forms.TextInput(attrs={'class': 'form-control',
+                                            'placeholder': 'Which was the name of the book that you just finished?'}),
+            'author': forms.Select(attrs={'class': 'form-control'}),
+            'body': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'What are your thoughts?'}),
 
         }
+
 
 class CommentForm(forms.ModelForm):
     class Meta:
@@ -217,4 +224,3 @@ class CommentForm(forms.ModelForm):
         widgets = {
             'body': forms.Textarea(),
         }
-

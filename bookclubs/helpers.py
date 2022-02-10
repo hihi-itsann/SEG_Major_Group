@@ -6,6 +6,7 @@ from django.contrib import messages
 
 def login_prohibited(view_function):
     """check that the user is logged in"""
+
     def modified_view_function(request):
         if request.user.is_authenticated:
             return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
@@ -17,6 +18,7 @@ def login_prohibited(view_function):
 
 def management_required(view_function):
     """check whether the user is an officer or an owner"""
+
     def modified_view_function(request, club_name, *args, **kwargs):
         try:
             club = Club.objects.get(club_name=club_name)
@@ -34,6 +36,7 @@ def management_required(view_function):
 
 def owner_required(view_function):
     """check whether the user is an owner"""
+
     def modified_view_function(request, club_name, *args, **kwargs):
         try:
             club = Club.objects.get(club_name=club_name)
@@ -51,6 +54,7 @@ def owner_required(view_function):
 
 def membership_required(view_function):
     """check whether the user is a member"""
+
     def modified_view_function(request, club_name, *args, **kwargs):
         try:
             club = Club.objects.get(club_name=club_name)
@@ -67,7 +71,8 @@ def membership_required(view_function):
 
 
 def non_applicant_required(view_function):
-    """check to make sure user is not a membe or an applicant"""
+    """check to make sure user is not a member or an applicant"""
+
     def modified_view_function(request, club_name, *args, **kwargs):
         try:
             club = Club.objects.get(club_name=club_name)
@@ -80,11 +85,13 @@ def non_applicant_required(view_function):
             else:
                 messages.add_message(request, messages.WARNING, "You are already a member!")
             return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+
     return modified_view_function
 
 
 def applicant_required(view_function):
     """check to make sure user an applicant"""
+
     def modified_view_function(request, club_name, *args, **kwargs):
         try:
             club = Club.objects.get(club_name=club_name)
@@ -98,11 +105,13 @@ def applicant_required(view_function):
             else:
                 messages.add_message(request, messages.WARNING, "You are already a member!")
                 return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+
     return modified_view_function
 
 
 def club_exists(view_function):
     """check whether the club exists"""
+
     def modified_view_function(request, club_name, *args, **kwargs):
         try:
             club = Club.objects.get(club_name=club_name)

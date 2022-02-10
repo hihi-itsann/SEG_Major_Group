@@ -124,6 +124,16 @@ def log_out(request):
     return redirect('home')
 
 
+@login_required
+def show_user(request, user_id):
+    try:
+        user = User.objects.get(id=user_id)
+    except ObjectDoesNotExist:
+        return redirect('user_list')
+    else:
+        return render(request, 'show_user.html', {'user': user})
+
+
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     """View to update logged-in user's profile."""
 
@@ -168,6 +178,7 @@ class PasswordView(LoginRequiredMixin, FormView):
         messages.add_message(self.request, messages.SUCCESS, "Password updated!")
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
+
 class BookListView(LoginRequiredMixin, ListView):
     """View that shows a list of all books"""
     model = Book
@@ -189,6 +200,7 @@ class ShowBookView(LoginRequiredMixin, DetailView):
         except Http404:
             return redirect('book_list')
 
+
 class CreateBookRateView(LoginRequiredMixin, CreateView):
     model = Rating
     form_class = RateForm
@@ -206,19 +218,6 @@ class CreateBookRateView(LoginRequiredMixin, CreateView):
 
     def handle_no_permission(self):
         return redirect('log_in')
-
-@login_required
-def create_club(request):
-    """a logged in user can create a club"""
-    if request.method == 'POST':
-        form = NewClubForm(request.POST)
-        if form.is_valid():
-            club = form.save()
-            club.club_members.add(request.user, through_defaults={'club_role': 'OWN'})
-            return redirect('feed')
-    else:
-        form = NewClubForm()
-    return render(request, 'new_club.html', {'form': form})
 
 
 @login_required
@@ -267,11 +266,9 @@ def club_welcome(request, club_name):
                    'is_banned': is_banned})
 
 
-"""only login user can create new club"""
-
-
 @login_required
 def create_club(request):
+    """a user can create a club"""
     if request.method == 'POST':
         form = NewClubForm(request.POST)
         if form.is_valid():
@@ -313,7 +310,7 @@ def new_application(request, club_name):
 @club_exists
 @applicant_required
 def edit_application(request, club_name):
-    """Deletes current application and replaces it with another applcation with updated statement"""
+    """Deletes current application and replaces it with another application with updated statement"""
     club_applied = Club.objects.get(club_name=club_name)
     application = Application.objects.get(user=request.user, club=club_applied)
     application_id = application.id
@@ -340,48 +337,62 @@ def withdraw_application(request, club_name):
         messages.add_message(request, messages.WARNING, "No application submitted for this club.")
     return render(request, 'edit_application.html', {'club_name': club_name})
 
-@login_required
-@club_exists
-@management_required
-def applicants_list(request,club_name):
-        is_empty = False
-        current_club = Club.objects.get(club_name=club_name)
-        applicants = current_club.get_applicants()
-        if applicants.count() == 0:
-            is_empty = True
-        return render(request,'applicants_list.html', {'applicants':applicants,'is_empty':is_empty, 'current_club':current_club})
 
 @login_required
 @club_exists
 @management_required
-def accept_applicant(request,club_name,user_id):
-        current_club = Club.objects.get(club_name=club_name)
-        try:
-            applicant = User.objects.get(id=user_id,club__club_name = current_club.club_name, role__club_role = 'APP')
-            current_club.toggle_member(applicant)
-        except (ObjectDoesNotExist):
-            return redirect('feed')
+def application_list(request, club_name):
+    is_empty = False
+    current_club = Club.objects.get(club_name=club_name)
+    applications = [i for i in current_club.application_set.all() if
+                    i in Application.objects.filter(status='pending')]
+    applicants = current_club.get_applicants()
+    if applicants.count() == 0:
+        is_empty = True
+    return render(request, 'application_list.html',
+                  {'applicants': applicants, 'applications': applications, 'is_empty': is_empty, 'current_club': current_club})
 
-        else:
-            return applicants_list(request,current_club.club_name)
+# @login_required
+# def view_app_to_club(request, club_id):
+#     applications = [i for i in Club.objects.get(id=club_id).application_set.all() if
+#                     i in Application.objects.filter(status='pending')]
+#     return render(request, 'view_app_to_club.html', {'applications': applications})
+
 
 @login_required
 @club_exists
 @management_required
-def reject_applicant(request,club_name,user_id):
-        current_club = Club.objects.get(club_name=club_name)
-        try:
-            applicant = User.objects.get(id=user_id,club__club_name = current_club.club_name, role__club_role = 'APP')
-            current_club.remove_user_from_club(applicant)
-        except ObjectDoesNotExist:
-            return redirect('feed')
-        else:
-            return applicants_list(request,current_club.club_name)
+def accept_applicant(request, club_name, user_id):
+    current_club = Club.objects.get(club_name=club_name)
+    try:
+        applicant = User.objects.get(id=user_id, club__club_name=current_club.club_name, role__club_role='APP')
+        current_club.toggle_member(applicant)
+    except (ObjectDoesNotExist):
+        return redirect('feed')
+
+    else:
+        return application_list(request, current_club.club_name)
+
+
+@login_required
+@club_exists
+@management_required
+def reject_applicant(request, club_name, user_id):
+    current_club = Club.objects.get(club_name=club_name)
+    try:
+        applicant = User.objects.get(id=user_id, club__club_name=current_club.club_name, role__club_role='APP')
+        current_club.remove_user_from_club(applicant)
+    except ObjectDoesNotExist:
+        return redirect('feed')
+    else:
+        return application_list(request, current_club.club_name)
+
 
 @login_required
 def my_clubs(request):
     clubs = Role.objects.filter(user=request.user)
     return render(request, 'my_clubs.html', {'clubs': clubs})
+
 
 @login_required
 def club_list(request):
@@ -395,26 +406,30 @@ def club_list(request):
         clubs = Club.objects.all()
     return render(request, 'club_list.html', {'clubs': clubs})
 
+
 @login_required
 def my_applications(request):
     applications = Application.objects.filter(user=request.user)
     return render(request, 'my_applications.html', {'applications': applications})
-    return reverse('feed')
+
 
 class FeedView(LoginRequiredMixin, ListView):
     model = Post
     template_name = 'feed.html'
-    ordering = ['-post_date','-post_datetime',]
+    ordering = ['-post_date', '-post_datetime', ]
+
 
 class CreatePostView(LoginRequiredMixin, CreateView):
     model = Post
     form_class = PostForm
     template_name = 'create_post.html'
 
+
 class DeletePostView(LoginRequiredMixin, DeleteView):
     model = Post
     template_name = 'delete_post.html'
     success_url = reverse_lazy('feed')
+
 
 class CreateCommentView(LoginRequiredMixin, CreateView):
     model = Comment
@@ -422,10 +437,11 @@ class CreateCommentView(LoginRequiredMixin, CreateView):
     template_name = 'create_comment.html'
     success_url = reverse_lazy('feed')
 
-    def form_valid(self,form):
-        form.instance.related_post_id= self.kwargs['pk']
-        form.instance.author= self.request.user
+    def form_valid(self, form):
+        form.instance.related_post_id = self.kwargs['pk']
+        form.instance.author = self.request.user
         return super().form_valid(form)
+
 
 class DeleteCommentView(LoginRequiredMixin, DeleteView):
     model = Comment
