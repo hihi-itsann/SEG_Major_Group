@@ -98,7 +98,8 @@ class BookLens:
             return self.bookTitle_to_isbn
         else:
             return 0
-    
+            
+# not sure if this useful at current stage
     def getGenra(self, isbn):
         base_api_link = "https://www.googleapis.com/books/v1/volumes?q=isbn:"
 
