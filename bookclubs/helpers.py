@@ -1,11 +1,12 @@
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.conf import settings
-from .models import User, Club, Role, Book
+from .models import User, Club, Role, Book, Application
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
 
 def login_prohibited(view_function):
     """check that the user is logged in"""
+
     def modified_view_function(request):
         if request.user.is_authenticated:
             return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
@@ -17,6 +18,7 @@ def login_prohibited(view_function):
 
 def management_required(view_function):
     """check whether the user is an officer or an owner"""
+
     def modified_view_function(request, club_name, *args, **kwargs):
         try:
             club = Club.objects.get(club_name=club_name)
@@ -34,6 +36,7 @@ def management_required(view_function):
 
 def owner_required(view_function):
     """check whether the user is an owner"""
+
     def modified_view_function(request, club_name, *args, **kwargs):
         try:
             club = Club.objects.get(club_name=club_name)
@@ -51,6 +54,7 @@ def owner_required(view_function):
 
 def membership_required(view_function):
     """check whether the user is a member"""
+
     def modified_view_function(request, club_name, *args, **kwargs):
         try:
             club = Club.objects.get(club_name=club_name)
@@ -67,24 +71,33 @@ def membership_required(view_function):
 
 
 def non_applicant_required(view_function):
-    """check to make sure user is not a membe or an applicant"""
+    """check to make sure user is not a member or an applicant"""
+
     def modified_view_function(request, club_name, *args, **kwargs):
-        try:
-            club = Club.objects.get(club_name=club_name)
-            role = request.user.role_set.get(club=club)
-        except ObjectDoesNotExist:
-            return view_function(request, club_name, *args, **kwargs)
-        else:
-            if role.club_role == 'APP':
-                messages.add_message(request, messages.WARNING, "You have already applied for this club.")
+        current_club = Club.objects.get(club_name=club_name)
+        if Application.objects.filter(user=request.user, club=current_club).count() > 0:
+            if Application.objects.get(user=request.user, club=current_club).status == 'R':
+                messages.add_message(request, messages.WARNING, "You are not able to re-apply to this club.")
             else:
                 messages.add_message(request, messages.WARNING, "You are already a member!")
             return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+        else:
+            try:
+                role = request.user.role_set.get(club=current_club)
+                if role.club_role == 'APP':
+                    messages.add_message(request, messages.WARNING, "You have already applied for this club.")
+                else:
+                    messages.add_message(request, messages.WARNING, "You are already a member!")
+                return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+            except ObjectDoesNotExist:
+                return view_function(request, club_name, *args, **kwargs)
+
     return modified_view_function
 
 
 def applicant_required(view_function):
     """check to make sure user an applicant"""
+
     def modified_view_function(request, club_name, *args, **kwargs):
         try:
             club = Club.objects.get(club_name=club_name)
@@ -98,11 +111,13 @@ def applicant_required(view_function):
             else:
                 messages.add_message(request, messages.WARNING, "You are already a member!")
                 return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+
     return modified_view_function
 
 
 def club_exists(view_function):
     """check whether the club exists"""
+
     def modified_view_function(request, club_name, *args, **kwargs):
         try:
             club = Club.objects.get(club_name=club_name)

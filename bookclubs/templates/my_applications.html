@@ -1,0 +1,33 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="table_container">
+  <h1 class="tbl-header">APPLICATION</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>CLUB</th>
+          <th>STATEMENT</th>
+          <th>STATUS</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for application in applications %}
+          <tr class="row_hover">
+            <td>{{ application.club.club_name }}</td>
+            <td>{{ application.statement }}</td>
+            <td> {{ application.get_status_display}} </td>
+
+            <td>
+              {% if application.status == 'P' %}
+                <a href="{% url 'edit_application' application.club.club_name %}" class=btn2>
+                  EDIT
+                </a>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+</div>
+{% endblock %}
