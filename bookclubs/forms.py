@@ -1,9 +1,14 @@
 from django import forms
 from django.core.validators import RegexValidator
-from .models import User, Club, Application, Role, Post, Comment
+from .models import User, Club, Application, Role, Post, Comment, Rating
 from django.contrib.auth import authenticate
+# from django.forms.widgets import DateInput
 from django.db import IntegrityError
 import datetime
+
+
+from .models import Post
+#from django.forms.widgets import DateInput
 
 
 class NewPasswordMixin(forms.Form):
@@ -37,9 +42,9 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
         """Form options."""
 
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'bio', 'dob', 'gender', 'location', 'meeting_preference']
-        widgets = { 'bio': forms.Textarea() }
-
+        fields = ['first_name', 'last_name', 'username', 'email', 'bio', 'dob', 'gender', 'location',
+                  'meeting_preference']
+        widgets = {'bio': forms.Textarea()}
 
     def save(self):
         """Create a new user."""
@@ -82,8 +87,9 @@ class UserForm(forms.ModelForm):
         """Form options."""
 
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'bio' , 'dob', 'gender', 'location', 'meeting_preference']
-        widgets = { 'bio': forms.Textarea() }
+        fields = ['first_name', 'last_name', 'username', 'email', 'bio', 'dob', 'gender', 'location',
+                  'meeting_preference']
+        widgets = {'bio': forms.Textarea()}
 
 
 class PasswordForm(NewPasswordMixin):
@@ -117,6 +123,12 @@ class PasswordForm(NewPasswordMixin):
             self.user.set_password(new_password)
             self.user.save()
         return self.user
+
+
+class RateForm(forms.ModelForm):
+    class Meta:
+        model = Rating
+        fields = ['rate']
 
 
 class NewClubForm(forms.ModelForm):
@@ -166,7 +178,7 @@ class NewApplicationForm(forms.ModelForm):
             user=user,
             club=club,
             statement=self.cleaned_data.get('statement'),
-            status='pending'
+            status='P'
         )
         return application
 
@@ -176,30 +188,34 @@ class UpdateApplicationForm(forms.ModelForm):
         model = Application
         fields = ['statement']
 
-    def save(self, past_id=None, user=None, club=None):
+    def save(self, user=None, club=None):
         super().save(commit=False)
-        delete_application = Application.objects.get(id=past_id)
+        delete_application = Application.objects.get(user=user, club=club)
+        past_id = delete_application.id
         delete_application.delete()
         application = Application.objects.create(
             id=past_id,
             user=user,
             club=club,
             statement=self.cleaned_data.get('statement'),
-            status='pending'
+            status='P'
         )
         return application
+
 
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ('title','author','body')
+        fields = ('title', 'author', 'body')
 
         widgets = {
-            'title': forms.TextInput(attrs={'class':'form-control', 'placeholder':'Which was the name of the book that you just finished?'}),
-            'author': forms.Select(attrs={'class':'form-control'}),
-            'body': forms.Textarea(attrs={'class':'form-control', 'placeholder': 'What are your thoughts?'}),
+            'title': forms.TextInput(attrs={'class': 'form-control',
+                                            'placeholder': 'Which was the name of the book that you just finished?'}),
+            'author': forms.Select(attrs={'class': 'form-control'}),
+            'body': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'What are your thoughts?'}),
 
         }
+
 
 class CommentForm(forms.ModelForm):
     class Meta:

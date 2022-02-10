@@ -1,0 +1,24 @@
+{% extends 'base_content.html' %}
+{% block content %}
+    <br>
+    <div class="container">
+        <div class="col-xs-12 col-lg-6 col-xl-8">
+            <h1>Book List</h1>
+            <br>
+            {% for book in books %}
+              <div class="row">
+                <div class="col-4 offset-2">
+                  <img src="{{ book.image_url_m }}">
+                </div>
+                <div class="col-6">
+                  <h2><a href="{% url 'show_book' book.ISBN %}">{{ book.title }}</a></h2>
+                  <h5 style="color:Green">Rating: {{ book.getAverageRate|floatformat:1 }}/10</h5>
+                  <p><em>Author: {{ book.author }}</em></p>
+                  <p><em>ISBN: {{ book.ISBN }}</em></p>
+                </div>
+              </div>
+              <hr>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

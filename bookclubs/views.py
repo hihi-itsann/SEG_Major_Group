@@ -1,27 +1,23 @@
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
-from .models import User, Club, Role, Application, Post, Comment
-from django.shortcuts import redirect, render
-from bookclubs.helpers import login_prohibited
-from django.contrib.auth.hashers import check_password
-from django.urls import reverse
-from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm, UpdateApplicationForm, PostForm, CommentForm
-from django.contrib import messages
-from django.contrib.auth import get_user_model
-from bookclubs.models import User
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import ImproperlyConfigured
+from django.http import Http404
+from django.shortcuts import render
+from django.urls import reverse, reverse_lazy
 from django.views import View
-from django.utils.decorators import method_decorator
-from django.conf import settings
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.views.generic.edit import FormView
-from django.urls import reverse, reverse_lazy
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
-from django.views.generic.list import MultipleObjectMixin
+from django.shortcuts import redirect, render, get_object_or_404
+from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm, \
+    UpdateApplicationForm, CommentForm, RateForm
+from bookclubs.models import Rating
+from .forms import PostForm
 from .helpers import *
-from django.db import IntegrityError
+from .models import Application, Comment
+from .models import Post
 
 
 @login_prohibited
@@ -112,6 +108,16 @@ def log_out(request):
     return redirect('home')
 
 
+@login_required
+def show_user(request, username):
+    try:
+        user = User.objects.get(username=username)
+    except ObjectDoesNotExist:
+        return redirect('user_list')
+    else:
+        return render(request, 'show_user.html', {'user': user})
+
+
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     """View to update logged-in user's profile."""
 
@@ -157,18 +163,45 @@ class PasswordView(LoginRequiredMixin, FormView):
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
 
-@login_required
-def create_club(request):
-    """a logged in user can create a club"""
-    if request.method == 'POST':
-        form = NewClubForm(request.POST)
-        if form.is_valid():
-            club = form.save()
-            club.club_members.add(request.user, through_defaults={'club_role': 'OWN'})
-            return redirect('feed')
-    else:
-        form = NewClubForm()
-    return render(request, 'new_club.html', {'form': form})
+class BookListView(LoginRequiredMixin, ListView):
+    """View that shows a list of all books"""
+    model = Book
+    template_name = 'book_list.html'
+    context_object_name = "books"
+
+
+class ShowBookView(LoginRequiredMixin, DetailView):
+    """View that shows book details."""
+    model = Book
+    template_name = 'show_book.html'
+    pk_url_kwarg = 'ISBN'
+
+    def get(self, request, *args, **kwargs):
+        """Handle get request, and redirect to book_list if ISBN invalid."""
+
+        try:
+            return super().get(request, *args, **kwargs)
+        except Http404:
+            return redirect('book_list')
+
+
+class CreateBookRateView(LoginRequiredMixin, CreateView):
+    model = Rating
+    form_class = RateForm
+    template_name = 'create_book_rating.html'
+
+    def form_valid(self, form):
+        """Process a valid form."""
+        form.instance.user = self.request.user
+        form.instance.book_id = self.kwargs['ISBN']
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        """Return URL to redirect the user too after valid form handling."""
+        return reverse('book_list')
+
+    def handle_no_permission(self):
+        return redirect('log_in')
 
 
 @login_required
@@ -217,11 +250,9 @@ def club_welcome(request, club_name):
                    'is_banned': is_banned})
 
 
-"""only login user can create new club"""
-
-
 @login_required
 def create_club(request):
+    """a user can create a club"""
     if request.method == 'POST':
         form = NewClubForm(request.POST)
         if form.is_valid():
@@ -251,6 +282,7 @@ def new_application(request, club_name):
         form = NewApplicationForm(request.POST)
         if form.is_valid():
             application = form.save(request.user, current_club)
+            application.change_status('P')
             current_club.club_members.add(request.user, through_defaults={'club_role': 'APP'})
             messages.add_message(request, messages.SUCCESS, "Application submitted!")
             return redirect('feed')
@@ -263,14 +295,14 @@ def new_application(request, club_name):
 @club_exists
 @applicant_required
 def edit_application(request, club_name):
-    """Deletes current application and replaces it with another applcation with updated statement"""
+    """Deletes current application and replaces it with another application with updated statement"""
     club_applied = Club.objects.get(club_name=club_name)
     application = Application.objects.get(user=request.user, club=club_applied)
     application_id = application.id
     form = UpdateApplicationForm(request.POST)
     if request.method == 'POST':
         if form.is_valid():
-            form.save(application_id, request.user, club_applied)
+            form.save(request.user, club_applied)
             messages.add_message(request, messages.SUCCESS, "Application edited successfully!")
             return redirect('feed')
     return render(request, 'edit_application.html', {'form': form, 'club_name': club_name})
@@ -290,48 +322,63 @@ def withdraw_application(request, club_name):
         messages.add_message(request, messages.WARNING, "No application submitted for this club.")
     return render(request, 'edit_application.html', {'club_name': club_name})
 
-@login_required
-@club_exists
-@management_required
-def applicants_list(request,club_name):
-        is_empty = False
-        current_club = Club.objects.get(club_name=club_name)
-        applicants = current_club.get_applicants()
-        if applicants.count() == 0:
-            is_empty = True
-        return render(request,'applicants_list.html', {'applicants':applicants,'is_empty':is_empty, 'current_club':current_club})
 
 @login_required
 @club_exists
 @management_required
-def accept_applicant(request,club_name,user_id):
-        current_club = Club.objects.get(club_name=club_name)
-        try:
-            applicant = User.objects.get(id=user_id,club__club_name = current_club.club_name, role__club_role = 'APP')
-            current_club.toggle_member(applicant)
-        except (ObjectDoesNotExist):
-            return redirect('feed')
+def application_list(request, club_name):
+    is_empty = False
+    current_club = Club.objects.get(club_name=club_name)
+    # applications = [i for i in current_club.application_set.all() if
+    #                 i in Application.objects.filter(status='P')]
+    applications = Application.objects.filter(club=current_club, status='P')
+    applicants = current_club.get_applicants()
+    if applicants.count() == 0:
+        is_empty = True
+    return render(request, 'application_list.html',
+                  {'applicants': applicants, 'applications': applications, 'is_empty': is_empty, 'current_club': current_club})
 
-        else:
-            return applicants_list(request,current_club.club_name)
 
 @login_required
 @club_exists
 @management_required
-def reject_applicant(request,club_name,user_id):
-        current_club = Club.objects.get(club_name=club_name)
-        try:
-            applicant = User.objects.get(id=user_id,club__club_name = current_club.club_name, role__club_role = 'APP')
-            current_club.remove_user_from_club(applicant)
-        except ObjectDoesNotExist:
-            return redirect('feed')
-        else:
-            return applicants_list(request,current_club.club_name)
+def accept_applicant(request, club_name, user_id):
+    current_club = Club.objects.get(club_name=club_name)
+    user = User.objects.get(id=user_id)
+    application = Application.objects.get(user=user, club=current_club)
+    application.change_status('A')
+    try:
+        applicant = User.objects.get(id=user_id, club__club_name=current_club.club_name, role__club_role='APP')
+        current_club.toggle_member(applicant)
+
+    except (ObjectDoesNotExist):
+        return application_list(request, current_club.club_name)
+    else:
+        return application_list(request, current_club.club_name)
+
 
 @login_required
-def myClubs(request):
+@club_exists
+@management_required
+def reject_applicant(request, club_name, user_id):
+    current_club = Club.objects.get(club_name=club_name)
+    user = User.objects.get(id=user_id)
+    application = Application.objects.get(user=user, club=current_club)
+    application.change_status('R')
+    try:
+        applicant = User.objects.get(id=user_id, club__club_name=current_club.club_name, role__club_role='APP')
+        current_club.remove_user_from_club(applicant)
+    except ObjectDoesNotExist:
+        return redirect('feed')
+    else:
+        return application_list(request, current_club.club_name)
+
+
+@login_required
+def my_clubs(request):
     clubs = Role.objects.filter(user=request.user)
-    return render(request, 'myClubs.html', {'clubs': clubs})
+    return render(request, 'my_clubs.html', {'clubs': clubs})
+
 
 @login_required
 def club_list(request):
@@ -344,7 +391,12 @@ def club_list(request):
     else:
         clubs = Club.objects.all()
     return render(request, 'club_list.html', {'clubs': clubs})
-    return reverse('feed')
+
+
+@login_required
+def my_applications(request):
+    applications = Application.objects.filter(user=request.user)
+    return render(request, 'my_applications.html', {'applications': applications})
 
 
 class PostCommentView(LoginRequiredMixin, ListView):
@@ -358,10 +410,12 @@ class CreatePostView(LoginRequiredMixin, CreateView):
     template_name = 'create_post.html'
     success_url = reverse_lazy('post_comment')
 
+
 class DeletePostView(LoginRequiredMixin, DeleteView):
     model = Post
     template_name = 'delete_post.html'
     success_url = reverse_lazy('post_comment')
+
 
 class CreateCommentView(LoginRequiredMixin, CreateView):
     model = Comment
@@ -369,10 +423,11 @@ class CreateCommentView(LoginRequiredMixin, CreateView):
     template_name = 'create_comment.html'
     success_url = reverse_lazy('post_comment')
 
-    def form_valid(self,form):
-        form.instance.related_post_id= self.kwargs['pk']
-        form.instance.author= self.request.user
+    def form_valid(self, form):
+        form.instance.related_post_id = self.kwargs['pk']
+        form.instance.author = self.request.user
         return super().form_valid(form)
+
 
 class DeleteCommentView(LoginRequiredMixin, DeleteView):
     model = Comment

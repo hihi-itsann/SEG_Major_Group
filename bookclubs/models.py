@@ -1,13 +1,17 @@
-from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
+from django.core.validators import RegexValidator, MinLengthValidator, MinValueValidator, MaxValueValidator
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.db.models import When
 from django.contrib.auth.models import AbstractUser
 from libgravatar import Gravatar
+from django.db.models import Avg
 from datetime import date
 from django.urls import reverse
 from datetime import datetime, date
 from django.utils.translation import gettext_lazy as _
+from enum import Enum
+from django.utils.translation import gettext_lazy as _
+
 
 class User(AbstractUser):
     username = models.CharField(
@@ -15,14 +19,15 @@ class User(AbstractUser):
         unique=True,
         validators=[RegexValidator(
             regex=r'^@\w{3,}$',
-            message='Username must consist of @ followed by at least three alphanumbericals'
+            message='Username must consist of @ followed by at least three alphanumerics'
         )]
     )
     first_name = models.CharField(max_length=50, blank=False)
     last_name = models.CharField(max_length=50, blank=False)
     email = models.EmailField(unique=True, blank=False)
     bio = models.CharField(max_length=520, blank=True)
-    dob = models.DateField(blank=True,null=True)#blank=False, auto_now_add=False, auto_now=False, default=date.today())
+    dob = models.DateField(blank=True,
+                           null=True)  # blank=False, auto_now_add=False, auto_now=False, default=date.today())
     GENDER_CHOICES = (
         ('M', 'Male'),
         ('F', 'Female'),
@@ -55,16 +60,57 @@ class User(AbstractUser):
         return self.gravatar(size=60)
 
 
+class Book(models.Model):
+    ISBN = models.CharField(
+        primary_key=True,
+        max_length=10,
+        unique=True,
+        validators=[MinLengthValidator(10)]  # ISBN has fixed length 10
+    )
+    title = models.CharField(max_length=100, unique=True, blank=False)
+    author = models.CharField(max_length=100, blank=False)
+    year_of_publication = models.IntegerField(validators=[MinValueValidator(1000), MaxValueValidator(2022)],
+                                              blank=False)
+    publisher = models.CharField(max_length=100, blank=False)
+    image_url_s = models.URLField(blank=False)
+    image_url_m = models.URLField(blank=False)
+    image_url_l = models.URLField(blank=False)
+
+    def getAverageRate(self):
+        return self.rating_set.all().aggregate(Avg('rate'))['rate__avg']
+
+
+class Rating(models.Model):
+    rate = models.FloatField(default=0, validators=[MinValueValidator(0.0), MaxValueValidator(10.0)])
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+
 class Application(models.Model):
+    STATUS_CHOICES = (
+        ('P', 'Pending'),
+        ('A', 'Accepted'),
+        ('R', 'Rejected')
+    )
     user = models.ForeignKey('User', on_delete=models.CASCADE)
     club = models.ForeignKey('Club', on_delete=models.CASCADE)
     statement = models.CharField(max_length=520, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=100, blank=False)
+    status = models.CharField(max_length=1, choices=STATUS_CHOICES)
 
     class Meta:
         ordering = ['-created_at']
         unique_together = ('user', 'club')
+
+    def change_status(self, choice):
+        if choice == 'A':
+            self.status = 'A'
+        elif choice == 'R':
+            self.status = 'R'
+        else:
+            self.status = 'P'
+        self.save()
+
 
 
 class Club(models.Model):
@@ -84,7 +130,7 @@ class Club(models.Model):
         validators=[
             RegexValidator(
                 regex=r'^\w{4,}.*$',
-                message='Club name must consist of at least four alphanumericals in first word'
+                message='Club name must consist of at least four alphanumerics in first word'
             )
         ]
     )
@@ -226,6 +272,7 @@ class Role(models.Model):
     def get_club_role(self):
         return self.RoleOptions(self.club_role).name.title()
 
+
 class Post(models.Model):
     title = models.CharField(max_length=255)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -239,8 +286,9 @@ class Post(models.Model):
     def get_absolute_url(self):
         return reverse('feed')
 
+
 class Comment(models.Model):
-    #name = models.CharField(max_length=50, blank=False, default="Unknown")
+    # name = models.CharField(max_length=50, blank=False, default="Unknown")
     author = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     body = models.TextField(max_length=520, blank=False)
     related_post = models.ForeignKey(Post, related_name="comments", on_delete=models.CASCADE)

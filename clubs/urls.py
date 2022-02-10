@@ -17,8 +17,6 @@ from django.contrib import admin
 from django.urls import path
 from bookclubs import views
 
-
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
@@ -27,17 +25,24 @@ urlpatterns = [
     path('log_in/', views.LogInView.as_view(), name='log_in'),
     path('log_out/', views.log_out, name='log_out'),
     path('profile/', views.ProfileUpdateView.as_view(), name='profile'),
+    path('user/<str:username>/', views.show_user, name='show_user'),
     path('password/', views.PasswordView.as_view(), name='password'),
+    path('book_list/', views.BookListView.as_view(), name='book_list'),
+    path('show_book/<str:ISBN>/', views.ShowBookView.as_view(), name='show_book'),
+    path('create_book_rating/<str:ISBN>/', views.CreateBookRateView.as_view(), name='create_book_rating'),
     path('club/<str:club_name>/feed/', views.club_feed, name='club_feed'),
     path('club/<str:club_name>/', views.club_welcome, name='club_welcome'),
     path('create_club/', views.create_club, name='create_club'),
-    path('club/<str:club_name>/delete/', views.delete_club, name = 'delete_club'),
+    path('club/<str:club_name>/delete/', views.delete_club, name='delete_club'),
     path('new_application/<str:club_name>/', views.new_application, name='new_application'),
     path('edit_application/<str:club_name>/', views.edit_application, name='edit_application'),
     path('withdraw_application/<str:club_name>/', views.withdraw_application, name='withdraw_application'),
-    path('club_list/', views.club_list, name = 'club_list'),
-    path('myClubs/', views.myClubs, name='myClubs'),
-    #path('feed/', views.FeedView.as_view(), name='feed'),
+    path('my_applications/', views.my_applications, name='my_applications'),
+    path('application_list/<str:club_name>/', views.application_list, name='application_list'),
+    path('accept_applicant/<str:club_name>/<int:user_id>/', views.accept_applicant, name='accept_applicant'),
+    path('reject_applicant/<str:club_name>/<int:user_id>/', views.reject_applicant, name='reject_applicant'),
+    path('club_list/', views.club_list, name='club_list'),
+    path('my_clubs/', views.my_clubs, name='my_clubs'),
     path('post_comment/', views.PostCommentView.as_view(), name='post_comment'),
     path('create_post/', views.CreatePostView.as_view(), name='create_post'),
     path('article/delete/<int:pk>', views.DeletePostView.as_view(), name='delete_post'),
