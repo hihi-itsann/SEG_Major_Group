@@ -141,7 +141,7 @@ class Club(models.Model):
 
     public_status = models.BooleanField(
         choices=PUBLIC_STATUS_CHOICES,
-        default=True
+        default=False
     )
 
     genre = models.CharField(
