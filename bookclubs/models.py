@@ -1,15 +1,10 @@
+from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator, MinLengthValidator, MinValueValidator, MaxValueValidator
 from django.db import models
-from django.core.exceptions import ValidationError
-from django.db.models import When
 from django.contrib.auth.models import AbstractUser
 from libgravatar import Gravatar
 from django.db.models import Avg
-from datetime import date
 from django.urls import reverse
-from datetime import datetime, date
-from django.utils.translation import gettext_lazy as _
-from enum import Enum
 from django.utils.translation import gettext_lazy as _
 
 
@@ -112,7 +107,6 @@ class Application(models.Model):
         self.save()
 
 
-
 class Club(models.Model):
     MEETING_STATUS_CHOICES = (
         (True, 'Online'),
@@ -172,7 +166,7 @@ class Club(models.Model):
 
     def toggle_officer(self, user):
         role = Role.objects.get(club=self, user=user)
-        if role.club_role == 'APP' or role.club_role == 'BAN':
+        if role.club_role == 'BAN':
             return
         else:
             role.club_role = 'OFF'
@@ -181,7 +175,7 @@ class Club(models.Model):
 
     def toggle_moderator(self, user):
         role = Role.objects.get(club=self, user=user)
-        if role.club_role == 'APP' or role.club_role == 'BAN':
+        if role.club_role == 'BAN':
             return
         else:
             role.club_role = 'MOD'
@@ -217,11 +211,6 @@ class Club(models.Model):
         else:
             return
 
-    def get_applicants(self):
-        return self.club_members.all().filter(
-            club__club_name=self.club_name,
-            role__club_role='APP')
-
     def get_members(self):
         return self.club_members.all().filter(
             club__club_name=self.club_name, role__club_role='MEM')
@@ -256,7 +245,6 @@ class Role(models.Model):
     club = models.ForeignKey(Club, on_delete=models.CASCADE)
 
     class RoleOptions(models.TextChoices):
-        APPLICANT = 'APP', _('Applicant')
         MEMBER = 'MEM', _('Member')
         OFFICER = 'OFF', _('Officer')
         MODERATOR = 'MOD', _('Moderator')
@@ -266,7 +254,7 @@ class Role(models.Model):
     club_role = models.CharField(
         max_length=3,
         choices=RoleOptions.choices,
-        default=RoleOptions.APPLICANT,
+        default=RoleOptions.MEMBER,
     )
 
     def get_club_role(self):
