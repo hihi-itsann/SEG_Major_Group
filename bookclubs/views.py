@@ -254,7 +254,7 @@ def create_club(request):
             return redirect('feed')
     else:
         form = NewClubForm()
-    return render(request, 'new_club.html', {'form': form})
+    return render(request, 'create_club.html', {'form': form})
 
 
 @login_required
@@ -269,7 +269,7 @@ def delete_club(request, club_name):
 @login_required
 @club_exists
 @non_applicant_required
-def new_application(request, club_name):
+def create_application(request, club_name):
     """Creates a new application, automatically accepted if club is public"""
     current_club = Club.objects.get(club_name=club_name)
     if request.method == 'POST':
@@ -286,7 +286,7 @@ def new_application(request, club_name):
             return redirect('my_applications')
     else:
         form = NewApplicationForm()
-    return render(request, 'new_application.html', {'form': form, 'club_name': club_name})
+    return render(request, 'create_application.html', {'form': form, 'club_name': club_name})
 
 
 @login_required
@@ -383,7 +383,7 @@ def club_list(request):
     return render(request, 'club_list.html', {'clubs': clubs})
 
 
-class FeedView(LoginRequiredMixin, ListView):
+class PostCommentView(LoginRequiredMixin, ListView):
     model = Post
     template_name = 'post_comment.html'
     ordering = ['-post_date','-post_datetime',]
