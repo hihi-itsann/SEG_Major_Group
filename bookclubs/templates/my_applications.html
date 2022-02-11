@@ -1,33 +1,85 @@
 {% extends 'base_content.html' %}
 {% block content %}
-<div class="table_container">
-  <h1 class="tbl-header">APPLICATION</h1>
-    <table>
-      <thead>
-        <tr>
-          <th>CLUB</th>
-          <th>STATEMENT</th>
-          <th>STATUS</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for application in applications %}
-          <tr class="row_hover">
-            <td>{{ application.club.club_name }}</td>
-            <td>{{ application.statement }}</td>
-            <td> {{ application.get_status_display}} </td>
+    <style>
+        h1 {
+            padding: 5px;
+            text-align: left;
 
-            <td>
-              {% if application.status == 'P' %}
-                <a href="{% url 'edit_application' application.club.club_name %}" class=btn2>
-                  EDIT
-                </a>
-              {% endif %}
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-</div>
+        }
+
+        h5 {
+            padding: 5px;
+            text-align: left;
+
+        }
+
+        table {
+            border-collapse: separate;
+            border-spacing: 0 15px;
+        }
+
+        td {
+            width: 150px;
+            text-align: left;
+            padding: 5px;
+        }
+    </style>
+    <div class="container">
+        <div class="row justify-content-between">
+            <h1> My Applications </h1>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div>
+                {% if applications_count != 0 %}
+                    {% if applications_count == 1 %}
+                        <h5>You have {{ applications_count }} application.</h5>
+                    {% else %}
+                        <h5>You have {{ applications_count }} applications.</h5>
+                    {% endif %}
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>CLUB</th>
+                            <th>STATEMENT</th>
+                            <th>STATUS</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for application in applications %}
+                            <tr class="row_hover">
+                                <td>{{ application.club.club_name }}</td>
+                                <td>{{ application.statement }}</td>
+                                <td> {{ application.get_status_display }} </td>
+                                <td>
+                                    {% if application.status == 'P' %}
+                                        <a href="{% url 'edit_application' application.club.club_name %}" class=button>
+                                            Edit
+                                        </a>
+
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if application.status == 'P' %}
+                                        <a href="{% url 'withdraw_application' application.club.club_name %}"
+                                           class=button>
+                                            Withdraw
+                                        </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div>
+                        <h5>You haven't applied to any clubs.</h5>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 {% endblock %}

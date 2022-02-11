@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+
 from bookclubs import views
 
 urlpatterns = [
@@ -34,13 +35,13 @@ urlpatterns = [
     path('club/<str:club_name>/', views.club_welcome, name='club_welcome'),
     path('create_club/', views.create_club, name='create_club'),
     path('club/<str:club_name>/delete/', views.delete_club, name='delete_club'),
-    path('new_application/<str:club_name>/', views.new_application, name='new_application'),
-    path('edit_application/<str:club_name>/', views.edit_application, name='edit_application'),
-    path('withdraw_application/<str:club_name>/', views.withdraw_application, name='withdraw_application'),
+    path('club/<str:club_name>/apply/', views.new_application, name='new_application'),
+    path('club/<str:club_name>/edit_application/', views.edit_application, name='edit_application'),
+    path('club/<str:club_name>/withdraw_application/', views.withdraw_application, name='withdraw_application'),
     path('my_applications/', views.my_applications, name='my_applications'),
-    path('application_list/<str:club_name>/', views.application_list, name='application_list'),
-    path('accept_applicant/<str:club_name>/<int:user_id>/', views.accept_applicant, name='accept_applicant'),
-    path('reject_applicant/<str:club_name>/<int:user_id>/', views.reject_applicant, name='reject_applicant'),
+    path('club/<str:club_name>/applications/', views.application_list, name='application_list'),
+    path('club/<str:club_name>/accept/<int:user_id>/', views.accept_applicant, name='accept_applicant'),
+    path('club/<str:club_name>/reject/<int:user_id>/', views.reject_applicant, name='reject_applicant'),
     path('club_list/', views.club_list, name='club_list'),
     path('my_clubs/', views.my_clubs, name='my_clubs'),
     path('post_comment/', views.PostCommentView.as_view(), name='post_comment'),
