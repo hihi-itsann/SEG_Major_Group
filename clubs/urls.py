@@ -21,6 +21,7 @@ from bookclubs import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
+    path('feed/', views.feed, name='feed'),
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
     path('log_in/', views.LogInView.as_view(), name='log_in'),
     path('log_out/', views.log_out, name='log_out'),
@@ -43,7 +44,7 @@ urlpatterns = [
     path('club/<str:club_name>/reject/<int:user_id>/', views.reject_applicant, name='reject_applicant'),
     path('club_list/', views.club_list, name='club_list'),
     path('my_clubs/', views.my_clubs, name='my_clubs'),
-    path('feed/', views.FeedView.as_view(), name='feed'),
+    path('post_comment/', views.PostCommentView.as_view(), name='post_comment'),
     path('create_post/', views.CreatePostView.as_view(), name='create_post'),
     path('article/delete/<int:pk>', views.DeletePostView.as_view(), name='delete_post'),
     path('create_comment/<int:pk>', views.CreateCommentView.as_view(), name='create_comment'),
