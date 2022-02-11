@@ -210,7 +210,7 @@ class PostForm(forms.ModelForm):
 
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control',
-                                            'placeholder': 'Which was the name of the book that you just finished?'}),
+                                            'placeholder': 'What is the name of the book that you just finished?'}),
             'author': forms.Select(attrs={'class': 'form-control'}),
             'body': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'What are your thoughts?'}),
 
