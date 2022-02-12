@@ -4,6 +4,7 @@
         "chdir",
         "Genra",
         "LOOCV",
-        "RMSE"
+        "RMSE",
+        "similarty"
     ]
 }
