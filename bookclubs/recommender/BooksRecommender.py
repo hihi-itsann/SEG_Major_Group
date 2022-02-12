@@ -123,6 +123,7 @@ class BooksRecommender:
         for isbn, ratingCount in sorted(ratings.items(), key = lambda x: x[1], reverse = True):
             rankings[isbn] = rank
             rank += 1
+        return rankings
 
     def getYears(self):
         p = re.compile(r"(?:\((\d{4})\))?\s*$")
