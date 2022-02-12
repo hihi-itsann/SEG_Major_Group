@@ -4,7 +4,7 @@ from bookclubs.models import User
 from bookclubs.tests.helpers import reverse_with_next
 
 
-class ShowUserViewTest(TestCase):
+class ShowUserViewTestCase(TestCase):
 
     VIEW = 'show_user'
 
