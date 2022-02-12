@@ -82,7 +82,6 @@ class CreateApplicationViewTestCase(TestCase):
         after_count = Application.objects.count()
         self.assertEqual(after_count, before_count)
 
-    # TODO: Try assertRedirect test again
     def test_create_application_redirects_when_accepted_applicant(self):
         self.log_in(self.user)
         Application.objects.create(user=self.user, club=self.club_private, statement='not empty', status='A')
