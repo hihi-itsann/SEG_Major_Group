@@ -1,5 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
+
+from bookclubs.forms import NewApplicationForm
 from bookclubs.models import User, Club, Application, Role
 from bookclubs.tests.helpers import reverse_with_next
 
@@ -24,6 +26,9 @@ class CreateApplicationViewTestCase(TestCase):
             'statement': 'Hello I would like to join this club.'
         }
 
+    def log_in(self, user):
+        self.client.login(username=user.username, password="Password123")
+
     def test_create_application_url(self):
         self.assertEqual(self.url_private, f'/club/{self.club_private.club_name}/apply/')
         self.assertEqual(self.url_public, f'/club/{self.club_public.club_name}/apply/')
@@ -37,7 +42,7 @@ class CreateApplicationViewTestCase(TestCase):
         self.assertEqual(after_count, before_count)
 
     def test_create_application_redirects_when_an_owner(self):
-        self.client.login(username=self.user.username, password="Password123")
+        self.log_in(self.user)
         Role.objects.create(user=self.user, club=self.club_private, club_role='OWN')
         before_count = Application.objects.count()
         redirect_url = reverse('club_feed', kwargs={'club_name': self.club_private.club_name})
@@ -47,7 +52,7 @@ class CreateApplicationViewTestCase(TestCase):
         self.assertEqual(after_count, before_count)
 
     def test_create_application_redirects_when_a_banned_user(self):
-        self.client.login(username=self.user.username, password="Password123")
+        self.log_in(self.user)
         Role.objects.create(user=self.user, club=self.club_private, club_role='BAN')
         before_count = Application.objects.count()
         redirect_url = reverse('feed')
@@ -58,17 +63,17 @@ class CreateApplicationViewTestCase(TestCase):
 
     # TODO: Try assertRedirect test again
     def test_create_application_redirects_when_a_member(self):
-        self.client.login(username=self.user.username, password="Password123")
+        self.log_in(self.user)
         Role.objects.create(user=self.user, club=self.club_private, club_role='MEM')
         before_count = Application.objects.count()
         redirect_url = f'/club/{self.club_private.club_name}/feed/'
         response = self.client.get(self.url_private)
-        # self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
+        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
         after_count = Application.objects.count()
         self.assertEqual(after_count, before_count)
 
     def test_create_application_redirects_when_rejected_applicant(self):
-        self.client.login(username=self.user.username, password="Password123")
+        self.log_in(self.user)
         Application.objects.create(user=self.user, club=self.club_private, statement='not empty', status='R')
         before_count = Application.objects.count()
         redirect_url = reverse('my_applications')
@@ -79,17 +84,17 @@ class CreateApplicationViewTestCase(TestCase):
 
     # TODO: Try assertRedirect test again
     def test_create_application_redirects_when_accepted_applicant(self):
-        self.client.login(username=self.user.username, password="Password123")
+        self.log_in(self.user)
         Application.objects.create(user=self.user, club=self.club_private, statement='not empty', status='A')
         before_count = Application.objects.count()
         redirect_url = reverse('club_feed', kwargs={'club_name': self.club_private.club_name})
         response = self.client.get(self.url_private)
-        # self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
+        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
         after_count = Application.objects.count()
         self.assertEqual(after_count, before_count)
 
     def test_create_application_redirects_when_pending_applicant(self):
-        self.client.login(username=self.user.username, password="Password123")
+        self.log_in(self.user)
         Application.objects.create(user=self.user, club=self.club_private, statement='not empty', status='P')
         before_count = Application.objects.count()
         redirect_url = reverse('my_applications')
@@ -99,7 +104,7 @@ class CreateApplicationViewTestCase(TestCase):
         self.assertEqual(after_count, before_count)
 
     def test_create_application_is_successful_private_club(self):
-        self.client.login(username=self.user.username, password="Password123")
+        self.log_in(self.user)
         before_count = Application.objects.count()
         response = self.client.post(self.url_private, self.form_input, follow=True)
         after_count = Application.objects.count()
@@ -112,7 +117,7 @@ class CreateApplicationViewTestCase(TestCase):
         self.assertEqual(application.status, 'P')
 
     def test_create_application_is_successful_public_club(self):
-        self.client.login(username=self.user.username, password="Password123")
+        self.log_in(self.user)
         before_count = Application.objects.count()
         response = self.client.post(self.url_public, self.form_input, follow=True)
         after_count = Application.objects.count()
@@ -123,3 +128,12 @@ class CreateApplicationViewTestCase(TestCase):
         application = Application.objects.get(user=self.user, club=self.club_public)
         self.assertEqual(application.statement, 'Hello I would like to join this club.')
         self.assertEqual(application.status, 'A')
+
+    def test_create_application_shows_form(self):
+        self.log_in(self.user)
+        response = self.client.get(self.url_private)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, f'{self.VIEW}.html')
+        form = response.context['form']
+        self.assertTrue(isinstance(form, NewApplicationForm))
+        self.assertFalse(form.is_bound)
