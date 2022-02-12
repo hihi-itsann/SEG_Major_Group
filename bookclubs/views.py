@@ -107,12 +107,12 @@ def log_out(request):
 
 @login_required
 def show_user(request, username):
-    try:
+    if User.objects.filter(username=username).count() == 1:
         user = User.objects.get(username=username)
-    except ObjectDoesNotExist:
-        return redirect('user_list')
-    else:
         return render(request, 'show_user.html', {'user': user})
+    else:
+        messages.add_message(request, messages.WARNING, "User not found.")
+        return redirect('feed')
 
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
@@ -386,7 +386,7 @@ def club_list(request):
 class PostCommentView(LoginRequiredMixin, ListView):
     model = Post
     template_name = 'post_comment.html'
-    ordering = ['-post_date','-post_datetime',]
+    ordering = ['-post_date', '-post_datetime', ]
 
 
 class CreatePostView(LoginRequiredMixin, CreateView):
