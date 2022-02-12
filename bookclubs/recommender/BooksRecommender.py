@@ -85,10 +85,10 @@ class BooksRecommender:
         ratingsDataset = Dataset.load_from_df(self.loadRatingData(), reader = reader)
 
         with open(self.booksPath, newline='', encoding='ISO-8859-1') as csvfile:
-                bookReader = csv.reader(csvfile)
+                bookReader = csv.reader(csvfile, delimiter = ';')
                 next(bookReader)  #Skip header line
                 for row in bookReader:
-                    isbn = int(row[0])
+                    isbn = row[0]
                     bookTitle = row[1]
                     self.isbn_to_bookTitle[isbn] = bookTitle
                     self.bookTitle_to_isbn[bookTitle] = isbn
@@ -98,12 +98,12 @@ class BooksRecommender:
         userRatings = []
         hitUser = False
         with open(self.ratingsPath, newLine = '') as csvfile:
-            ratingReader = csv.reader(csvfile)
+            ratingReader = csv.reader(csvfile, delimiter = ';', quotechar = '"')
             next(ratingReader)
             for row in ratingReader:
                 userID = int(row[0])
                 if (user == userID):
-                    isbn = int(row[1])
+                    isbn = row[1]
                     rating = float(row[2].strip('"'))
                     userRatings.append((isbn, rating))
                     hitUser = True
@@ -113,14 +113,14 @@ class BooksRecommender:
     def getPopularityRanks(self):
         ratings = defaultdict(int)
         rankings = defaultdict(int)
-        with open(self.ratingsPath, newline = '') as csvfile:
-            ratingReader = csv.reader(csvfile)
+        with open(self.ratingsPath, newline = '', encoding='ISO-8859-1') as csvfile:
+            ratingReader = csv.reader(csvfile, delimiter = ';')
             next(ratingReader)
             for row in ratingReader:
-                isbn = int(row[1])
+                isbn = row[1]
                 ratings[isbn] += 1
         rank = 1
-        for isbn, ratingCount in sorted(ratings.items().strip('"'), key = lambda x: x[1], reverse = True):
+        for isbn, ratingCount in sorted(ratings.items(), key = lambda x: x[1], reverse = True):
             rankings[isbn] = rank
             rank += 1
 
@@ -128,10 +128,10 @@ class BooksRecommender:
         p = re.compile(r"(?:\((\d{4})\))?\s*$")
         years = defaultdict(int)
         with open(self.booksPath, newline='', encoding='ISO-8859-1') as csvfile:
-            bookReader = csv.reader(csvfile)
+            bookReader = csv.reader(csvfile, delimiter = ';')
             next(bookReader)
             for row in bookReader:
-                isbn = int(row[0])
+                isbn = row[0]
                 title = row[1]
                 m = p.search(title)
                 year = m.group(1)
