@@ -120,7 +120,7 @@ def applicant_required(view_function):
                 return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
             else:
                 messages.add_message(request, messages.WARNING, "You are already a member!")
-                return redirect(f'/club/{club_name}/feed')
+                return redirect(f'/club/{club_name}/feed/')
         if Application.objects.filter(user=request.user, club=current_club).count() > 0:
             application_status = Application.objects.get(user=request.user, club=current_club).status
             if application_status == 'R':
