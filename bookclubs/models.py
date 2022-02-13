@@ -295,8 +295,8 @@ class Meeting(models.Model):
         (True, 'Online'),
         (False, 'In Person')
     )
-    host = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    chooser = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    host = models.ForeignKey(User, related_name='meeting_host', on_delete=models.CASCADE, null=True)
+    chooser = models.ForeignKey(User, related_name='book_chooser', on_delete=models.CASCADE, null=True)
     book = models.ForeignKey(Book, on_delete=models.CASCADE, null=True)
     topic = models.CharField(max_length=120, default='', blank=False)
     description = models.TextField(max_length=520, blank=True)
@@ -306,4 +306,4 @@ class Meeting(models.Model):
     time_end = models.TimeField(blank=False)
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ['-date']

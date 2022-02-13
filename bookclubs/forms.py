@@ -44,7 +44,7 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
         model = User
         fields = ['first_name', 'last_name', 'username', 'email', 'bio', 'dob', 'gender', 'location',
                   'meeting_preference']
-        widgets = {'bio': forms.Textarea()}
+        widgets = {'dob': forms.DateInput(format='%d/%m/%Y'), 'bio': forms.Textarea()}
 
     def save(self):
         """Create a new user."""
