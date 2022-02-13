@@ -87,15 +87,17 @@ def non_applicant_required(view_function):
                 return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
             else:
                 messages.add_message(request, messages.WARNING, "You are already a member!")
-                return redirect(f'/club/{club_name}/feed')
+                return redirect(f'/club/{club_name}/feed/')
         if Application.objects.filter(user=request.user, club=current_club).count() > 0:
             application_status = Application.objects.get(user=request.user, club=current_club).status
             if application_status == 'R':
                 messages.add_message(request, messages.WARNING, "You are not able to re-apply to this club.")
                 return redirect('my_applications')
             elif application_status == 'A':
-                messages.add_message(request, messages.WARNING, "You are already a member!")
-                return redirect(f'/club/{club_name}/feed')
+                messages.add_message(request, messages.WARNING, "Your application was accepted, however "
+                                                                "something went wrong. You are now a member!")
+                Role.objects.get_or_create(user=request.user, club=current_club, club_role='MEM')
+                return redirect(f'/club/{club_name}/feed/')
             else:
                 messages.add_message(request, messages.WARNING, "You have already applied for this club.")
                 return redirect('my_applications')
@@ -120,7 +122,7 @@ def applicant_required(view_function):
                 return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
             else:
                 messages.add_message(request, messages.WARNING, "You are already a member!")
-                return redirect(f'/club/{club_name}/feed')
+                return redirect(f'/club/{club_name}/feed/')
         if Application.objects.filter(user=request.user, club=current_club).count() > 0:
             application_status = Application.objects.get(user=request.user, club=current_club).status
             if application_status == 'R':
@@ -128,7 +130,9 @@ def applicant_required(view_function):
                                                                 "club.")
                 return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
             elif application_status == 'A':
-                messages.add_message(request, messages.WARNING, "You are already a member!")
+                messages.add_message(request, messages.WARNING, "Your application was accepted, however "
+                                                                "something went wrong. You are now a member!")
+                Role.objects.get_or_create(user=request.user, club=current_club, club_role='MEM')
                 return redirect(f'/club/{club_name}/feed/')
             else:
                 return view_function(request, club_name, *args, **kwargs)
