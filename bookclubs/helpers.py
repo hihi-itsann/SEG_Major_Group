@@ -18,6 +18,7 @@ def login_prohibited(view_function):
     return modified_view_function
 
 
+# TODO: Change officer to moderator?
 def management_required(view_function):
     """check whether the user is an officer or an owner"""
 

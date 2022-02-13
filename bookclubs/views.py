@@ -326,6 +326,7 @@ def my_applications(request):
                   {'applications': applications, 'applications_count': applications_count})
 
 
+# TODO: Fix data shown
 @login_required
 @club_exists
 @management_required
