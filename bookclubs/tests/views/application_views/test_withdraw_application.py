@@ -6,7 +6,7 @@ from bookclubs.tests.helpers import reverse_with_next
 
 
 class EditApplicationViewTestCase(TestCase):
-    """Tests for the creation of an application"""
+    """Tests for the withdrawal of an application"""
 
     VIEW = 'withdraw_application'
 
