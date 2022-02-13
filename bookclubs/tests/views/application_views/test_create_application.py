@@ -65,7 +65,7 @@ class CreateApplicationViewTestCase(TestCase):
         self.log_in(self.user)
         Role.objects.create(user=self.user, club=self.club_private, club_role='MEM')
         before_count = Application.objects.count()
-        redirect_url = f'/club/{self.club_private.club_name}/feed/'
+        redirect_url = reverse('club_feed', kwargs={'club_name': self.club_private.club_name})
         response = self.client.get(self.url_private)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
         after_count = Application.objects.count()
