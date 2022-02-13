@@ -152,7 +152,8 @@ class Club(models.Model):
 
     description = models.CharField(
         max_length=520,
-        blank=False)
+        blank=False
+    )
 
     club_members = models.ManyToManyField(User, through='Role')
 
@@ -284,6 +285,25 @@ class Comment(models.Model):
 
     def get_absolute_url(self):
         return reverse('feed')
+
+    class Meta:
+        ordering = ['-created_at']
+
+
+class Meeting(models.Model):
+    MEETING_STATUS_CHOICES = (
+        (True, 'Online'),
+        (False, 'In Person')
+    )
+    host = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    chooser = models.ForeignKey(User, on_deleted=models.SET_NULL, null=True)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, null=True)
+    topic = models.CharField(max_length=120, default='', blank=False)
+    description = models.TextField(max_length=520, blank=True)
+    meeting_status = models.BooleanField(choices=MEETING_STATUS_CHOICES, default=False)
+    date = models.DateTimeField(blank=False)
+    time_start = models.TimeField(black=False)
+    time_end = models.TimeField(blank=False)
 
     class Meta:
         ordering = ['-created_at']
