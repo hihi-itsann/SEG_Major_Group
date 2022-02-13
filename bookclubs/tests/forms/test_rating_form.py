@@ -3,7 +3,7 @@ from bookclubs.models import User, Book, Rating
 from bookclubs.forms import RateForm
 
 class RateFormTestCase(TestCase):
-
+    
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
         'bookclubs/tests/fixtures/default_book.json'
