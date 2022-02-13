@@ -12,7 +12,11 @@
                 </div>
                 <div class="col-6">
                   <h2><a href="{% url 'show_book' book.ISBN %}">{{ book.title }}</a></h2>
-                  <h5 style="color:Green">Rating: {{ book.getAverageRate|floatformat:1 }}/10</h5>
+                  {% if book.getAverageRate == None %}
+                    <h5 style="color:Green">No Yet Rated</h5>
+                  {% else %}
+                    <h5 style="color:Green">Rating: {{ book.getAverageRate|floatformat:1 }}/10</h5>
+                  {% endif %}
                   <p><em>Author: {{ book.author }}</em></p>
                   <p><em>ISBN: {{ book.ISBN }}</em></p>
                 </div>
