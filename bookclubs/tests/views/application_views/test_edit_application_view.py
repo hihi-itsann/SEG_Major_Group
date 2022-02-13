@@ -27,7 +27,7 @@ class EditApplicationViewTestCase(TestCase):
     def log_in(self, user):
         self.client.login(username=user.username, password="Password123")
 
-    def test_create_application_url(self):
+    def test_edit_application_url(self):
         self.assertEqual(self.url, f'/club/{self.club.club_name}/edit_application/')
 
     def test_edit_application_redirects_when_not_logged_in(self):
