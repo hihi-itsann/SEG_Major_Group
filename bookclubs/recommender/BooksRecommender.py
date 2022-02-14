@@ -15,12 +15,12 @@ from surprise import Reader
 
 from collections import defaultdict
 
-    
+
 class BooksRecommender:
 
     # def loadData(self):
     #     user_book_rating = zipfile.ZipFile('./dataset/book-review-dataset.zip')
-    #     user_book_rating.extractall("./dataset") 
+    #     user_book_rating.extractall("./dataset")
     #     user_book_rating.close()
     #     # unzip the file cuz its to large to put in
     #     # load user information, get userID and other info
@@ -60,14 +60,14 @@ class BooksRecommender:
 
 
 
-    os.chdir(os.path.dirname(sys.argv[0]))
+    # os.chdir(os.path.dirname(sys.argv[0]))
 
-    
+
     isbn_to_bookTitle = {}
     bookTitle_to_isbn = {}
     ratingsPath = './dataset/BX-Book-Ratings.csv'
     booksPath   = './dataset/BX-Books.csv'
-    
+
     def loadRatingData(self):
         df = pd.read_csv(self.ratingsPath, sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0 )
         return df
@@ -75,7 +75,7 @@ class BooksRecommender:
     def loadBookRecommenderLatestSmall(self):
 
         # Look for files relative to the directory we are running from
-        os.chdir(os.path.dirname(sys.argv[0]))
+        # os.chdir(os.path.dirname(sys.argv[0]))
         ratingsDataset = 0
         self.isbn_to_bookTitle = {}
         self.bookTitle_to_isbn = {}
@@ -109,7 +109,7 @@ class BooksRecommender:
                     hitUser = True
                 if (hitUser and (user != userID)):
                     break
-    
+
     def getPopularityRanks(self):
         ratings = defaultdict(int)
         rankings = defaultdict(int)
@@ -145,7 +145,7 @@ class BooksRecommender:
             return self.isbn_to_bookTitle[isbn]
         else:
             return ""
-        
+
     def getIsbn(self, bookTitle):
         if bookTitle in self.bookTitle_to_isbn:
             return self.bookTitle_to_isbn
@@ -161,6 +161,5 @@ class BooksRecommender:
 
         decoded_text = text.decode("utf-8")
         obj = json.loads(decoded_text) # deserializes decoded_text to a Python object
-        volume_info = obj["items"][0] 
+        volume_info = obj["items"][0]
         return  volume_info["volumeInfo"]["categories"]
-                
