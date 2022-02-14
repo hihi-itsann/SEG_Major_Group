@@ -239,6 +239,12 @@ class Club(models.Model):
         role = Role.objects.get(club=self, user=user)
         role.delete()
 
+    def change_club_status(self, choice):
+        if choice == True:
+            self.public_status = True
+        else:
+            self.status = False
+        self.save()
 
 class Role(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

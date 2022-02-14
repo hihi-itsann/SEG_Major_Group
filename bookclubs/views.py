@@ -383,6 +383,53 @@ def club_list(request):
         clubs = Club.objects.all()
     return render(request, 'club_list.html', {'clubs': clubs})
 
+@login_required
+@club_exists
+@management_required
+def ban_member(request,club_name,user_id):
+    current_club = Club.objects.get(club_name=club_name)
+    try:
+        member = User.objects.get(id=user_id,club__club_name = current_club.club_name, role__club_role = 'MEM')
+        current_club.ban_member(member)
+    except ObjectDoesNotExist:
+        return redirect('feed')
+    else:
+        return members_management_list(request,current_club.club_name)
+
+@login_required
+@club_exists
+@management_required
+def unban_member(request,club_name,user_id):
+    current_club = Club.objects.get(club_name=club_name)
+    try:
+        banned = User.objects.get(id=user_id,club__club_name = current_club.club_name, role__club_role = 'BAN')
+        current_club.unban_member(banned)
+    except ObjectDoesNotExist:
+        return redirect('feed')
+    else:
+        return members_management_list(request,current_club.club_name)
+
+@login_required
+@club_exists
+@management_required
+def remove_member(request,club_name,user_id):
+    current_club = Club.objects.get(club_name=club_name)
+    try:
+        member = User.objects.get(id=user_id,club__club_name = current_club.club_name, role__club_role = 'MEM')
+        current_club.remove_user_from_club(member)
+    except ObjectDoesNotExist:
+        return redirect('feed')
+    else:
+        return members_management_list(request,current_club.club_name)
+
+@login_required
+@club_exists
+@owner_required
+def change_club_to_public_status(request, club_name):
+    """Changes club status to private"""
+    current_club = Club.objects.get(club_name=club_name)
+    current_club.change_club_status(True)
+    return redirect('feed')
 
 class PostCommentView(LoginRequiredMixin, ListView):
     model = Post
