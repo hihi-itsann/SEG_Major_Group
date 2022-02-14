@@ -16,8 +16,9 @@ class RecommenderMetrics:
 
 
         for userID, isbn, actualRating, estimatedRating, _ in predictions:
+            # print(isbn)
             if (estimatedRating >= minimumRating):
-                topN[int(userID)].append((int(isbn), estimatedRating))
+                topN[int(userID)].append((isbn, estimatedRating))
 
         for userID, ratings in topN.items():
             ratings.sort(key=lambda x: x[1], reverse=True)
@@ -36,7 +37,7 @@ class RecommenderMetrics:
             # Is it in the predicted top 10 for this user?
             hit = False
             for isbn, predictedRating in topNPredicted[int(userID)]:
-                if (int(leftOutISBN) == int(isbn)):
+                if (leftOutISBN == isbn):
                     hit = True
                     break
             if (hit) :
@@ -58,7 +59,7 @@ class RecommenderMetrics:
                 # Is it in the predicted top 10 for this user?
                 hit = False
                 for isbn, predictedRating in topNPredicted[int(userID)]:
-                    if (int(leftOutISBN) == isbn):
+                    if (leftOutISBN == isbn):
                         hit = True
                         break
                 if (hit) :
@@ -78,7 +79,7 @@ class RecommenderMetrics:
             # Is it in the predicted top N for this user?
             hit = False
             for isbn, predictedRating in topNPredicted[int(userID)]:
-                if (int(leftOutISBN) == isbn):
+                if (leftOutISBN == isbn):
                     hit = True
                     break
             if (hit) :
@@ -100,7 +101,7 @@ class RecommenderMetrics:
             rank = 0
             for isbn, predictedRating in topNPredicted[int(userID)]:
                 rank = rank + 1
-                if (int(leftOutISBN) == isbn):
+                if (leftOutISBN == isbn):
                     hitRank = rank
                     break
             if (hitRank > 0) :
