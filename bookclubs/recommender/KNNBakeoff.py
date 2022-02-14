@@ -10,6 +10,7 @@ def LoadBooksRecommenderData():
     ml = BooksRecommender()
     print("Loading movie ratings...")
     data = ml.loadBookRecommenderLatestSmall()
+    print(data)
     print("\nComputing movie popularity ranks so we can measure novelty later...")
     rankings = ml.getPopularityRanks()
     return (ml, data, rankings)

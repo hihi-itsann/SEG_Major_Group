@@ -70,7 +70,7 @@ class BooksRecommender:
 
     def loadRatingData(self):
         df = pd.read_csv(self.ratingsPath, sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0 )
-        return df
+        return df.head(10000)
 
     def loadBookRecommenderLatestSmall(self):
 

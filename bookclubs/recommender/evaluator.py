@@ -15,9 +15,11 @@ class Evaluator:
 
     def Evaluate(self, doTopN):
         results = {}
+        print("1")
         for algorithm in self.algorithms:
             print("Evaluating ", algorithm.GetName(), "...")
             results[algorithm.GetName()] = algorithm.Evaluate(self.dataset, doTopN)
+        print("2")
 
         # Print results
         print("\n")
