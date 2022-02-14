@@ -164,15 +164,6 @@ class Club(models.Model):
         role.club_role = 'MEM'
         role.save()
 
-    def toggle_officer(self, user):
-        role = Role.objects.get(club=self, user=user)
-        if role.club_role == 'BAN':
-            return
-        else:
-            role.club_role = 'OFF'
-            role.save()
-            return
-
     def toggle_moderator(self, user):
         role = Role.objects.get(club=self, user=user)
         if role.club_role == 'BAN':
@@ -202,10 +193,10 @@ class Club(models.Model):
     def transfer_ownership(self, old_owner, new_owner):
         new_owner_role = Role.objects.get(club=self, user=new_owner)
         old_owner_role = Role.objects.get(club=self, user=old_owner)
-        if new_owner_role.club_role == 'OFF':
+        if new_owner_role.club_role == 'MOD':
             new_owner_role.club_role = 'OWN'
             new_owner_role.save()
-            old_owner_role.club_role = 'OFF'
+            old_owner_role.club_role = 'MOD'
             old_owner_role.save()
             return
         else:
@@ -224,11 +215,6 @@ class Club(models.Model):
         return self.club_members.all().filter(
             club__club_name=self.club_name,
             role__club_role='BAN')
-
-    def get_officers(self):
-        return User.objects.all().filter(
-            club__club_name=self.club_name,
-            role__club_role='OFF')
 
     def get_owner(self):
         return User.objects.all().filter(
@@ -252,7 +238,6 @@ class Role(models.Model):
 
     class RoleOptions(models.TextChoices):
         MEMBER = 'MEM', _('Member')
-        OFFICER = 'OFF', _('Officer')
         MODERATOR = 'MOD', _('Moderator')
         OWNER = 'OWN', _('Owner')
         BANNED = 'BAN', _('BannedMember')
