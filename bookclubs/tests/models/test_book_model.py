@@ -15,10 +15,7 @@ class BookModelTestCase(TestCase):
         self.book = Book.objects.get(ISBN='0195153448')
 
     def _assert_book_is_valid(self):
-        try:
-            self.book.full_clean()
-        except ValidationError:
-            self.fail('Test book should be valid')
+        self.book.full_clean()
 
     def _assert_book_is_invalid(self):
         with self.assertRaises(ValidationError):

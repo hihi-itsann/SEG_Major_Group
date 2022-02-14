@@ -25,10 +25,7 @@ class RatingModelTestCase(TestCase):
        self.assertEqual(self.rating.user, self.user)
 
     def _assert_rating_is_valid(self):
-        try:
-            self.rating.full_clean()
-        except ValidationError:
-            self.fail('Test rating should be valid')
+        self.rating.full_clean()
 
     def _assert_rating_is_invalid(self):
         with self.assertRaises(ValidationError):
