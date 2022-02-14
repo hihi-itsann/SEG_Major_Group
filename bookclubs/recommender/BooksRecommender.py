@@ -1,3 +1,4 @@
+from getpass import getuser
 import os
 import csv
 from posixpath import sep
@@ -70,6 +71,7 @@ class BooksRecommender:
     
     def loadRatingData(self):
         df = pd.read_csv(self.ratingsPath, sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0 )
+        #df.to_csv("test.csv", index = False)
         return df
 
     def loadBookRecommenderLatestSmall(self):
@@ -80,7 +82,7 @@ class BooksRecommender:
         self.isbn_to_bookTitle = {}
         self.bookTitle_to_isbn = {}
 
-        reader = Reader(line_format = 'user item rating', sep = ';', skip_lines = 1, rating_scale=(1,10))
+        reader = Reader(line_format = 'user item rating', sep = ',',skip_lines = 1, rating_scale=(1,10))
 
         ratingsDataset = Dataset.load_from_df(self.loadRatingData(), reader = reader)
 
