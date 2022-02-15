@@ -265,6 +265,22 @@ def delete_club(request, club_name):
     current_club.delete()
     return feed(request)
 
+class ClubDetailsUpdateView(LoginRequiredMixin, UpdateView, club_name):
+    """View to update club ClubDetailsUpdateView."""
+
+    model = UpdateClubForm
+    template_name = "club_details_update.html"
+    form_class = UpdateClubForm
+
+    def get_object(self):
+        """Return the object (user) to be updated."""
+        current_club = Club.objects.get(club_name=club_name)
+        return user
+
+    def get_success_url(self):
+        """Return redirect URL after successful update."""
+        messages.add_message(self.request, messages.SUCCESS, "Deatils updated!")
+        return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
 @login_required
 @club_exists
