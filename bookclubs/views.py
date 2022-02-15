@@ -431,6 +431,21 @@ def change_club_to_public_status(request, club_name):
     current_club.change_club_status(True)
     return redirect('feed')
 
+@login_required
+@club_exists
+def member_list(request,club_name):
+    is_owner = False
+    club = Club.objects.get(club_name=club_name)
+    cur_user=request.user
+    roles=Role.objects.filter(club=club).exclude(club_role='BAN')
+    club_role = club.get_club_role(cur_user)
+    if club_role== 'OWN':
+        is_owner = True
+    context = {'club': club, 'roles': roles, 'is_owner': is_owner}
+    return render(request, "member_list.html", context)
+
+
+
 class PostCommentView(LoginRequiredMixin, ListView):
     model = Post
     template_name = 'post_comment.html'
