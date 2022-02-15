@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu May  3 10:22:34 2018
+
+@author: Frank
+"""
 from EvaluationData import EvaluationData
 from EvaluatedAlgorithm import EvaluatedAlgorithm
 
@@ -70,4 +76,4 @@ class Evaluator:
             recommendations.sort(key=lambda x: x[1], reverse=True)
             
             for ratings in recommendations[:10]:
-                print(ml.getMovieName(ratings[0]), ratings[1])
+                print(ml.getBookName(ratings[0]), ratings[1])

@@ -1,4 +1,5 @@
 from getpass import getuser
+from operator import index
 import os
 import csv
 from posixpath import sep
@@ -6,9 +7,6 @@ import sys
 import re
 import urllib.request
 import json
-import textwrap
-import zipfile
-import codecs
 import pandas as pd
 # Part of getGenra code comes from https://gist.github.com/AO8/faa3f52d3d5eac63820cfa7ec2b24aa7
 from surprise import Dataset
@@ -70,14 +68,21 @@ class BooksRecommender:
     booksPath   = './dataset/BX-Books.csv'
     
     def loadRatingData(self):
+            df = pd.read_csv(self.ratingsPath, sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0)
+            new_df = df[df.loc[:]!=0].dropna()
+            new_df.to_csv('./dataset/BX-Books.csv')
+            return new_df.head(10000)
+
+    """     def loadRatingData(self):
+        
         df = pd.read_csv(self.ratingsPath, sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0 )
         #df.to_csv("test.csv", index = False)
-        return df
+        return df.sample(frac=1).reset_index(drop=True).head(10000) """
 
     def loadBookRecommenderLatestSmall(self):
 
         # Look for files relative to the directory we are running from
-        os.chdir(os.path.dirname(sys.argv[0]))
+        #os.chdir(os.path.dirname(sys.argv[0]))
         ratingsDataset = 0
         self.isbn_to_bookTitle = {}
         self.bookTitle_to_isbn = {}
@@ -106,8 +111,9 @@ class BooksRecommender:
                 userID = int(row[0])
                 if (user == userID):
                     isbn = row[1]
-                    rating = float(row[2].strip('"'))
-                    userRatings.append((isbn, rating))
+                    rating = float(row[2])
+                    if rating != 0:
+                        userRatings.append((isbn, rating))
                     hitUser = True
                 if (hitUser and (user != userID)):
                     break

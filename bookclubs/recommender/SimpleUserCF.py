@@ -4,7 +4,7 @@ import heapq
 from collections import defaultdict
 from operator import itemgetter
         
-testSubject = '60'
+testSubject = '85'
 k = 10
 
 # Load our data set and compute the user similarity matrix

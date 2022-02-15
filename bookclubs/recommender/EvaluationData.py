@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu May  3 10:48:02 2018
+
+@author: Frank
+"""
 from surprise.model_selection import train_test_split
 from surprise.model_selection import LeaveOneOut
 from surprise import KNNBaseline

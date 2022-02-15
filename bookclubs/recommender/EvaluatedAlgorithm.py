@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu May  3 10:45:33 2018
+
+@author: Frank
+"""
 from RecommenderMetrics import RecommenderMetrics
 from EvaluationData import EvaluationData
 
@@ -29,9 +35,9 @@ class EvaluatedAlgorithm:
             topNPredicted = RecommenderMetrics.GetTopN(allPredictions, n)
             if (verbose):
                 print("Computing hit-rate and rank metrics...")
-            # See how often we recommended a movie the user actually rated
+            # See how often we recommended a book the user actually rated
             metrics["HR"] = RecommenderMetrics.HitRate(topNPredicted, leftOutPredictions)   
-            # See how often we recommended a movie the user actually liked
+            # See how often we recommended a book the user actually liked
             metrics["cHR"] = RecommenderMetrics.CumulativeHitRate(topNPredicted, leftOutPredictions)
             # Compute ARHR
             metrics["ARHR"] = RecommenderMetrics.AverageReciprocalHitRank(topNPredicted, leftOutPredictions)
