@@ -71,8 +71,9 @@ class BooksRecommender:
             df = pd.read_csv(self.ratingsPath, sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0)
             new_df = df[df.loc[:]!=0].dropna()
             # checking the data 
-            # new_df.to_csv('test.csv',index = False)
-            return new_df.head(1000)
+            new_df.to_csv('test.csv',index = False)
+            self.new_ratingsPath = './test.csv'
+            return new_df.head(100000)
 
     """     def loadRatingData(self):
         
@@ -105,8 +106,8 @@ class BooksRecommender:
     def getUserratings(self, user):
         userRatings = []
         hitUser = False
-        with open(self.ratingsPath, newLine = '') as csvfile:
-            ratingReader = csv.reader(csvfile, delimiter = ';', quotechar = '"')
+        with open(self.new_ratingsPath, newLine = '') as csvfile:
+            ratingReader = csv.reader(csvfile, delimiter = ',')
             next(ratingReader)
             for row in ratingReader:
                 userID = int(row[0])
@@ -122,8 +123,8 @@ class BooksRecommender:
     def getPopularityRanks(self):
         ratings = defaultdict(int)
         rankings = defaultdict(int)
-        with open(self.ratingsPath, newline = '', encoding='ISO-8859-1') as csvfile:
-            ratingReader = csv.reader(csvfile, delimiter = ';')
+        with open(self.new_ratingsPath, newline = '', encoding='ISO-8859-1') as csvfile:
+            ratingReader = csv.reader(csvfile, delimiter = ',')
             next(ratingReader)
             for row in ratingReader:
                 isbn = row[1]
