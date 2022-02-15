@@ -9,6 +9,7 @@ from BookLens import BookLens
 from surprise import SVD
 from surprise import NormalPredictor
 from Evaluator import Evaluator
+# from ContentKNNAlgorithm import ContentKNNAlgorithm
 
 import random
 import numpy as np
@@ -19,13 +20,13 @@ def LoadBookLensData():
     data = ml.loadBookLensLatestSmall()
     print("\nComputing book popularity ranks so we can measure novelty later...")
     rankings = ml.getPopularityRanks()
-    return (data, rankings)
+    return (ml, data, rankings)
 
 np.random.seed(0)
 random.seed(0)
 
 # Load up common data set for the recommender algorithms
-(evaluationData, rankings) = LoadBookLensData()
+(ml, evaluationData, rankings) = LoadBookLensData()
 
 # Construct an Evaluator to, you know, evaluate them
 evaluator = Evaluator(evaluationData, rankings)
@@ -34,10 +35,15 @@ evaluator = Evaluator(evaluationData, rankings)
 SVDAlgorithm = SVD(random_state=10)
 evaluator.AddAlgorithm(SVDAlgorithm, "SVD")
 
+# contentKNN = ContentKNNAlgorithm()
+# evaluator.AddAlgorithm(contentKNN, "ContentKNN")
+
 # Just make random recommendations
 Random = NormalPredictor()
 evaluator.AddAlgorithm(Random, "Random")
 
 
 # Fight!
-evaluator.Evaluate(True)
+evaluator.Evaluate(False)
+
+evaluator.SampleTopNRecs(ml)
