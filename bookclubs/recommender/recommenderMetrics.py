@@ -15,9 +15,9 @@ class RecommenderMetrics:
         topN = defaultdict(list)
 
 
-        for userID, isbn, actualRating, estimatedRating, _ in predictions:
+        for userID, bookISBN, actualRating, estimatedRating, _ in predictions:
             if (estimatedRating >= minimumRating):
-                topN[int(userID)].append((int(isbn), estimatedRating))
+                topN[int(userID)].append((int(bookISBN), estimatedRating))
 
         for userID, ratings in topN.items():
             ratings.sort(key=lambda x: x[1], reverse=True)
@@ -32,11 +32,11 @@ class RecommenderMetrics:
         # For each left-out rating
         for leftOut in leftOutPredictions:
             userID = leftOut[0]
-            leftOutISBN = leftOut[1]
+            leftOutbookISBN = leftOut[1]
             # Is it in the predicted top 10 for this user?
             hit = False
-            for isbn, predictedRating in topNPredicted[int(userID)]:
-                if (int(leftOutISBN) == int(isbn)):
+            for bookISBN, predictedRating in topNPredicted[int(userID)]:
+                if (int(leftOutbookISBN) == int(bookISBN)):
                     hit = True
                     break
             if (hit) :
@@ -52,13 +52,13 @@ class RecommenderMetrics:
         total = 0
 
         # For each left-out rating
-        for userID, leftOutISBN, actualRating, estimatedRating, _ in leftOutPredictions:
+        for userID, leftOutbookISBN, actualRating, estimatedRating, _ in leftOutPredictions:
             # Only look at ability to recommend things the users actually liked...
             if (actualRating >= ratingCutoff):
                 # Is it in the predicted top 10 for this user?
                 hit = False
-                for isbn, predictedRating in topNPredicted[int(userID)]:
-                    if (int(leftOutISBN) == isbn):
+                for bookISBN, predictedRating in topNPredicted[int(userID)]:
+                    if (int(leftOutbookISBN) == bookISBN):
                         hit = True
                         break
                 if (hit) :
@@ -74,11 +74,11 @@ class RecommenderMetrics:
         total = defaultdict(float)
 
         # For each left-out rating
-        for userID, leftOutISBN, actualRating, estimatedRating, _ in leftOutPredictions:
+        for userID, leftOutbookISBN, actualRating, estimatedRating, _ in leftOutPredictions:
             # Is it in the predicted top N for this user?
             hit = False
-            for isbn, predictedRating in topNPredicted[int(userID)]:
-                if (int(leftOutISBN) == isbn):
+            for bookISBN, predictedRating in topNPredicted[int(userID)]:
+                if (int(leftOutbookISBN) == bookISBN):
                     hit = True
                     break
             if (hit) :
@@ -94,13 +94,13 @@ class RecommenderMetrics:
         summation = 0
         total = 0
         # For each left-out rating
-        for userID, leftOutISBN, actualRating, estimatedRating, _ in leftOutPredictions:
+        for userID, leftOutbookISBN, actualRating, estimatedRating, _ in leftOutPredictions:
             # Is it in the predicted top N for this user?
             hitRank = 0
             rank = 0
-            for isbn, predictedRating in topNPredicted[int(userID)]:
+            for bookISBN, predictedRating in topNPredicted[int(userID)]:
                 rank = rank + 1
-                if (int(leftOutISBN) == isbn):
+                if (int(leftOutbookISBN) == bookISBN):
                     hitRank = rank
                     break
             if (hitRank > 0) :
@@ -115,7 +115,7 @@ class RecommenderMetrics:
         hits = 0
         for userID in topNPredicted.keys():
             hit = False
-            for isbn, predictedRating in topNPredicted[userID]:
+            for bookISBN, predictedRating in topNPredicted[userID]:
                 if (predictedRating >= ratingThreshold):
                     hit = True
                     break
@@ -147,8 +147,8 @@ class RecommenderMetrics:
         total = 0
         for userID in topNPredicted.keys():
             for rating in topNPredicted[userID]:
-                isbn = rating[0]
-                rank = rankings[isbn]
+                bookISBN = rating[0]
+                rank = rankings[bookISBN]
                 total += rank
                 n += 1
         return total / n

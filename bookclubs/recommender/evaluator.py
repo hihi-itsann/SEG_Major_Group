@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu May  3 10:22:34 2018
+
+@author: Frank
+"""
 from EvaluationData import EvaluationData
 from EvaluatedAlgorithm import EvaluatedAlgorithm
 
@@ -8,6 +14,7 @@ class Evaluator:
     def __init__(self, dataset, rankings):
         ed = EvaluationData(dataset, rankings)
         self.dataset = ed
+        print("inside evaluator init")
         
     def AddAlgorithm(self, algorithm, name):
         alg = EvaluatedAlgorithm(algorithm, name)
@@ -63,11 +70,17 @@ class Evaluator:
             recommendations = []
             
             print ("\nWe recommend:")
-            for userID, isbn, actualRating, estimatedRating, _ in predictions:
-                intISBN = int(isbn)
-                recommendations.append((intISBN, estimatedRating))
+            for userID, bookISBN, actualRating, estimatedRating, _ in predictions:
+                intbookISBN = int(bookISBN)
+                recommendations.append((intBookISBN, estimatedRating))
             
             recommendations.sort(key=lambda x: x[1], reverse=True)
             
             for ratings in recommendations[:10]:
-                print(ml.getMovieName(ratings[0]), ratings[1])
+                print(ml.getBookName(ratings[0]), ratings[1])
+                
+
+            
+            
+    
+    

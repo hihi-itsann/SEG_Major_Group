@@ -1,15 +1,22 @@
-from BooksRecommender import BooksRecommender
+# -*- coding: utf-8 -*-
+"""
+Created on Wed May  9 10:10:04 2018
+
+@author: Frank
+"""
+
+from MovieLens import MovieLens
 from surprise import KNNBasic
 import heapq
 from collections import defaultdict
 from operator import itemgetter
         
-testSubject = '60'
+testSubject = '85'
 k = 10
 
 # Load our data set and compute the user similarity matrix
-ml = BooksRecommender()
-data = ml.loadBookRecommenderLatestSmall()
+ml = MovieLens()
+data = ml.loadMovieLensLatestSmall()
 
 trainSet = data.build_full_trainset()
 
@@ -51,8 +58,11 @@ for itemID, rating in trainSet.ur[testUserInnerID]:
 pos = 0
 for itemID, ratingSum in sorted(candidates.items(), key=itemgetter(1), reverse=True):
     if not itemID in watched:
-        isbn = trainSet.to_raw_iid(itemID)
-        print(ml.getMovieName(isbn), ratingSum)
+        movieID = trainSet.to_raw_iid(itemID)
+        print(ml.getMovieName(int(movieID)), ratingSum)
         pos += 1
         if (pos > 10):
             break
+
+
+
