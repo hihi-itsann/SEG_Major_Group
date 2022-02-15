@@ -70,7 +70,7 @@ class BooksRecommender:
     def loadRatingData(self):
             df = pd.read_csv(self.ratingsPath, sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0)
             new_df = df[df.loc[:]!=0].dropna()
-            new_df.to_csv('./dataset/BX-Books.csv')
+            new_df.to_csv('./dataset/BX-Book-Ratings.csv')
             return new_df.head(10000)
 
     """     def loadRatingData(self):
