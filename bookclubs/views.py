@@ -12,7 +12,7 @@ from django.views.generic.edit import FormView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.shortcuts import redirect, render, get_object_or_404
 from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm, \
-    UpdateApplicationForm, CommentForm, RateForm, PostForm
+    UpdateApplicationForm, CommentForm, RateForm, PostForm, UpdateClubForm
 from .helpers import *
 from .models import User, Book, Application, Comment, Post, Rating
 
@@ -265,17 +265,18 @@ def delete_club(request, club_name):
     current_club.delete()
     return feed(request)
 
-class ClubDetailsUpdateView(LoginRequiredMixin, UpdateView, club_name):
+#to-do: fix the club_name (not finished)
+class ClubDetailsUpdateView(LoginRequiredMixin, UpdateView):
     """View to update club ClubDetailsUpdateView."""
 
     model = UpdateClubForm
     template_name = "club_details_update.html"
     form_class = UpdateClubForm
 
-    def get_object(self):
-        """Return the object (user) to be updated."""
+    def get_object(club_name):
+        """Return the club to be updated."""
         current_club = Club.objects.get(club_name=club_name)
-        return user
+        return current_club
 
     def get_success_url(self):
         """Return redirect URL after successful update."""
@@ -398,6 +399,22 @@ def club_list(request):
     else:
         clubs = Club.objects.all()
     return render(request, 'club_list.html', {'clubs': clubs})
+
+@login_required
+@club_exists
+@management_required
+def members_management_list(request,club_name):
+    banned_is_empty = False
+    member_is_empty = False
+    current_club = Club.objects.get(club_name=club_name)
+    members = current_club.get_members()
+    banned = current_club.get_banned_members()
+    if members.count() == 0:
+        member_is_empty = True
+    if banned.count() == 0:
+        banned_is_empty = True
+    return render(request,'member_management.html', {'banned':banned,'members':members, 'banned_is_empty':banned_is_empty,'member_is_empty':member_is_empty, 'current_club':current_club})
+
 
 @login_required
 @club_exists
