@@ -21,7 +21,7 @@ class BookLens:
     def loadRatingData(self):
         df = pd.read_csv(self.ratingsPath, sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0 )
 
-        return df.head(1000)
+        return df
 
     def loadBookLensLatestSmall(self):
 

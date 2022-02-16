@@ -24,7 +24,9 @@ if __name__ == "__main__":
         .config("spark.executor.cores", '4')\
         .getOrCreate()
 
-    df = pd.read_csv('../dataset/BX-Book-Ratings.csv', sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0 ).head(200000)
+    print("yes")
+
+    df = pd.read_csv('../dataset/BX-Book-Ratings.csv', sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0 )
 
     # df = pd.read_csv('../dataset/BX-Book-Ratings.csv', sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0 )
     # books = pd.read_csv('../dataset/BX-Books.csv', sep = ';',names = ['ISBN'], quotechar = '"', encoding = 'latin-1',header = 0 )
@@ -34,16 +36,19 @@ if __name__ == "__main__":
     # df.ISBN = df.ISBN.apply(lambda x: x[:-1] + "10" if x[-1] == "X" else x)
     # df = df[df.ISBN.str.isdecimal()]
     # df.ISBN = df.ISBN.apply(lambda x: int(x))
+    print("yes")
+
     df = spark.createDataFrame(df)
+    print("yes")
 
     indexer = StringIndexer(inputCol="ISBN", outputCol="bookID").fit(df)
+    print("yes")
+
     indexed = indexer.transform(df)
-    indexed.show()
+    print("yes")
 
-    print(indexed.rdd.getNumPartitions())
-    indexed = indexed.repartition(1000)
-    print(indexed.rdd.getNumPartitions())
-
+    indexed = indexed.repartition(100)
+    print("yes")
 
     lines = indexed.rdd
 
@@ -57,17 +62,21 @@ if __name__ == "__main__":
 
     ratings = spark.createDataFrame(ratingsRDD)
 
+    ratings = ratings.repartition(100)
 
     (training, test) = ratings.randomSplit([0.8, 0.2])
     print("yes")
 
     als = ALS(maxIter=5, regParam=0.01, userCol="userId", itemCol="bookID", ratingCol="rating",
               coldStartStrategy="drop")
+    print("yes")
 
     model = als.fit(training)
     print("yes")
 
     predictions = model.transform(test)
+    print("yes")
+
 
     labelConverter = IndexToString(inputCol="bookID", outputCol="ISBN",
                                labels=indexer.labels)
@@ -85,12 +94,14 @@ if __name__ == "__main__":
 
     userRecs = model.recommendForAllUsers(10)
 
+    print("yes")
 
     flatUserRecs = userRecs.withColumn("songAndRating", explode(userRecs. recommendations)) \
     .select ( "userId", "songAndRating.*")
 
     flatUserRecs = labelConverter.transform(flatUserRecs)
-    flatUserRecs.show()
+    print("yes")
+
 
     user85Recs = flatUserRecs.filter(userRecs['userId'] == 276725).collect()
     # user85Recs.show()
