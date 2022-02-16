@@ -73,7 +73,7 @@ class BooksRecommender:
             # checking the data 
             new_df.to_csv('test.csv',index = False)
             self.new_ratingsPath = './test.csv'
-            return new_df.head(100000)
+            return new_df
 
     """     def loadRatingData(self):
         
