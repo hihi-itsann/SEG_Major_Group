@@ -50,5 +50,8 @@ urlpatterns = [
     path('article/delete/<int:pk>', views.DeletePostView.as_view(), name='delete_post'),
     path('create_comment/<int:pk>', views.CreateCommentView.as_view(), name='create_comment'),
     path('delete_comment/<int:pk>', views.DeleteCommentView.as_view(), name='delete_comment'),
-    path('club_details_update/', views.ClubDetailsUpdateView.as_view(), name='club_details_update'),
+    path('<str:club_name>/club_details_update', views.ClubDetailsUpdateView.as_view(), name='club_details_update'),
+    path('club/<str:club_name>/remove/<int:user_id>/', views.remove_member, name='remove_applicant'),
+    path('club/<str:club_name>/moderator_management/',views.moderator_list,name='moderator_list'),
+    path('club/<str:club_name>/moderator_management/new_owner/<int:user_id>/', views.transfer_ownership,name='transfer_ownership'),
 ]

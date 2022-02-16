@@ -14,7 +14,7 @@ from django.shortcuts import redirect, render, get_object_or_404
 from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm, \
     UpdateApplicationForm, CommentForm, RateForm, PostForm, UpdateClubForm
 from .helpers import *
-from .models import User, Book, Application, Comment, Post, Rating
+from .models import User, Book, Application, Comment, Post, Rating, Club
 
 
 @login_prohibited
@@ -268,14 +268,13 @@ def delete_club(request, club_name):
 #to-do: fix the club_name (not finished)
 class ClubDetailsUpdateView(LoginRequiredMixin, UpdateView):
     """View to update club ClubDetailsUpdateView."""
-
     model = UpdateClubForm
     template_name = "club_details_update.html"
     form_class = UpdateClubForm
 
-    def get_object(club_name):
+    def get_object(self):
         """Return the club to be updated."""
-        current_club = Club.objects.get(club_name=club_name)
+        current_club = Club.objects.get(self.get_club_name==club_name)
         return current_club
 
     def get_success_url(self):
@@ -451,6 +450,53 @@ def remove_member(request,club_name,user_id):
         member = User.objects.get(id=user_id,club__club_name = current_club.club_name, role__club_role = 'MEM')
         current_club.remove_user_from_club(member)
     except ObjectDoesNotExist:
+        return redirect('feed')
+    else:
+        return members_management_list(request,current_club.club_name)
+
+@login_required
+@club_exists
+@owner_required
+def moderator_list(request,club_name):
+    current_club = Club.objects.get(club_name=club_name)
+    moderators = current_club.get_moderators()
+    return render(request,'moderator_list.html', {'moderators':moderators, 'current_club':current_club})
+
+@login_required
+@club_exists
+@owner_required
+def transfer_ownership(request,club_name,user_id):
+    current_club = Club.objects.get(club_name=club_name)
+    try:
+        moderator = User.objects.get(id=user_id,club__club_name = current_club.club_name, role__club_role = 'MOD')
+        current_club.transfer_ownership(request.user,moderator)
+    except (ObjectDoesNotExist):
+        return redirect('feed')
+    else:
+        return moderator_list(request,current_club.club_name)
+
+@login_required
+@club_exists
+@owner_required
+def demote_moderator(request,club_name,user_id):
+    current_club = Club.objects.get(club_name=club_name)
+    try:
+        moderator = User.objects.get(id=user_id,club__club_name = current_club.club_name, role__club_role = 'MOD')
+        current_club.toggle_member(moderator)
+    except (ObjectDoesNotExist):
+        return redirect('feed')
+    else:
+        return moderator_list(request,current_club.club_name)
+
+@login_required
+@club_exists
+@management_required
+def promote_member(request,club_name,user_id):
+    current_club = Club.objects.get(club_name=club_name)
+    try:
+        member = User.objects.get(id=user_id,club__club_name = current_club.club_name, role__club_role = 'MEM')
+        current_club.toggle_moderator(member)
+    except (ObjectDoesNotExist):
         return redirect('feed')
     else:
         return members_management_list(request,current_club.club_name)
