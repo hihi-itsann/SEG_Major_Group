@@ -21,9 +21,10 @@ if __name__ == "__main__":
     spark = SparkSession\
         .builder\
         .appName("ALSExample")\
+        .config("spark.executor.cores", '4')\
         .getOrCreate()
 
-    df = pd.read_csv('../dataset/BX-Book-Ratings.csv', sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0 ).head(1000)
+    df = pd.read_csv('../dataset/BX-Book-Ratings.csv', sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0 ).head(200000)
 
     # df = pd.read_csv('../dataset/BX-Book-Ratings.csv', sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0 )
     # books = pd.read_csv('../dataset/BX-Books.csv', sep = ';',names = ['ISBN'], quotechar = '"', encoding = 'latin-1',header = 0 )
@@ -39,25 +40,32 @@ if __name__ == "__main__":
     indexed = indexer.transform(df)
     indexed.show()
 
+    print(indexed.rdd.getNumPartitions())
+    indexed = indexed.repartition(1000)
+    print(indexed.rdd.getNumPartitions())
+
 
     lines = indexed.rdd
 
-    # print("yes")
+    print("yes")
 
     ratingsRDD = lines.map(lambda p: Row(userId=int(p[0]), bookID=int(p[3]),
                                          rating=float(p[2])))
 
-    # print("yes")
+
+    print("yes")
 
     ratings = spark.createDataFrame(ratingsRDD)
 
+
     (training, test) = ratings.randomSplit([0.8, 0.2])
-    # print("yes")
+    print("yes")
 
     als = ALS(maxIter=5, regParam=0.01, userCol="userId", itemCol="bookID", ratingCol="rating",
               coldStartStrategy="drop")
+
     model = als.fit(training)
-    # print("yes")
+    print("yes")
 
     predictions = model.transform(test)
 
@@ -86,7 +94,7 @@ if __name__ == "__main__":
 
     user85Recs = flatUserRecs.filter(userRecs['userId'] == 276725).collect()
     # user85Recs.show()
-    print(user85Recs)
+
 
     spark.stop()
 
