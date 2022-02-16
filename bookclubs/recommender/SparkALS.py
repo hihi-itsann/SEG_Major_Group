@@ -27,6 +27,7 @@ if __name__ == "__main__":
     print("yes")
 
     df = pd.read_csv('../dataset/BX-Book-Ratings.csv', sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0 )
+    df = df[df.loc[:]!=0].dropna()
 
     # df = pd.read_csv('../dataset/BX-Book-Ratings.csv', sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0 )
     # books = pd.read_csv('../dataset/BX-Books.csv', sep = ';',names = ['ISBN'], quotechar = '"', encoding = 'latin-1',header = 0 )
@@ -47,7 +48,7 @@ if __name__ == "__main__":
     indexed = indexer.transform(df)
     print("yes")
 
-    indexed = indexed.repartition(100)
+    indexed = indexed.repartition(1000)
     print("yes")
 
     lines = indexed.rdd
@@ -62,7 +63,7 @@ if __name__ == "__main__":
 
     ratings = spark.createDataFrame(ratingsRDD)
 
-    ratings = ratings.repartition(100)
+    ratings = ratings.repartition(1000)
 
     (training, test) = ratings.randomSplit([0.8, 0.2])
     print("yes")
