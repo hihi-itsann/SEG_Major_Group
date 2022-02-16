@@ -156,6 +156,9 @@ class Club(models.Model):
 
     club_members = models.ManyToManyField(User, through='Role')
 
+    def get_club_name(self):
+        return self.club_name
+        
     def get_club_role(self, user):
         return Role.objects.get(club=self, user=user).club_role
 
@@ -250,7 +253,7 @@ class Role(models.Model):
 
     def get_club_role(self):
         return self.RoleOptions(self.club_role).name.title()
-        
+
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
 
