@@ -11,10 +11,11 @@ from pyspark.ml.evaluation import RegressionEvaluator
 from pyspark.ml.recommendation import ALS
 from pyspark.sql import Row
 
-from pyspark.ml.feature import StringIndexer
+from pyspark.ml.feature import StringIndexer, IndexToString
 
 from BookLens import BookLens
 import pandas as pd
+from pyspark.sql.functions import explode
 
 if __name__ == "__main__":
     spark = SparkSession\
@@ -34,39 +35,58 @@ if __name__ == "__main__":
     # df.ISBN = df.ISBN.apply(lambda x: int(x))
     df = spark.createDataFrame(df)
 
-    indexer = StringIndexer(inputCol="ISBN", outputCol="bookID")
-    indexed = indexer.fit(df).transform(df)
+    indexer = StringIndexer(inputCol="ISBN", outputCol="bookID").fit(df)
+    indexed = indexer.transform(df)
     indexed.show()
 
 
     lines = indexed.rdd
 
-    print("yes")
+    # print("yes")
 
     ratingsRDD = lines.map(lambda p: Row(userId=int(p[0]), bookID=int(p[3]),
                                          rating=float(p[2])))
 
-    print("yes")
+    # print("yes")
 
     ratings = spark.createDataFrame(ratingsRDD)
 
     (training, test) = ratings.randomSplit([0.8, 0.2])
-    print("yes")
+    # print("yes")
 
     als = ALS(maxIter=5, regParam=0.01, userCol="userId", itemCol="bookID", ratingCol="rating",
               coldStartStrategy="drop")
     model = als.fit(training)
-    print("yes")
+    # print("yes")
 
     predictions = model.transform(test)
+
+    labelConverter = IndexToString(inputCol="bookID", outputCol="ISBN",
+                               labels=indexer.labels)
+
+    # predictions = labelConverter.transform(predictions)
+    #
+    # predictions.show(10)
+
+
     evaluator = RegressionEvaluator(metricName="rmse", labelCol="rating",
                                     predictionCol="prediction")
     rmse = evaluator.evaluate(predictions)
     print("Root-mean-square error = " + str(rmse))
 
+
     userRecs = model.recommendForAllUsers(10)
 
-    user85Recs = userRecs.filter(userRecs['userId'] == 85).collect()
+
+    flatUserRecs = userRecs.withColumn("songAndRating", explode(userRecs. recommendations)) \
+    .select ( "userId", "songAndRating.*")
+
+    flatUserRecs = labelConverter.transform(flatUserRecs)
+    flatUserRecs.show()
+
+    user85Recs = flatUserRecs.filter(userRecs['userId'] == 276725).collect()
+    # user85Recs.show()
+    print(user85Recs)
 
     spark.stop()
 
@@ -74,5 +94,4 @@ if __name__ == "__main__":
     ml.loadBookLensLatestSmall()
 
     for row in user85Recs:
-        for rec in row.recommendations:
-            print(ml.getBookName(rec.ISBN))
+        print(ml.getBookName(row.ISBN))
