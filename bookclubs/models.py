@@ -152,7 +152,8 @@ class Club(models.Model):
 
     description = models.CharField(
         max_length=520,
-        blank=False)
+        blank=False
+    )
 
     club_members = models.ManyToManyField(User, through='Role')
 
@@ -276,9 +277,8 @@ class Post(models.Model):
 
 
 class Comment(models.Model):
-    # name = models.CharField(max_length=50, blank=False, default="Unknown")
     author = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    body = models.TextField(max_length=520, blank=False)
+    body = models.CharField(max_length=520, blank=False)
     related_post = models.ForeignKey(Post, related_name="comments", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -287,3 +287,34 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+
+class Meeting(models.Model):
+    MEETING_STATUS_CHOICES = (
+        (True, 'Online'),
+        (False, 'In Person')
+    )
+    club = models.ForeignKey(Club, related_name='meeting_club', on_delete=models.CASCADE)
+    chooser = models.ForeignKey(User, related_name='book_chooser', on_delete=models.CASCADE, null=True)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, null=True, blank=True)
+    topic = models.CharField(max_length=120, default='', blank=False)
+    description = models.TextField(max_length=520, blank=True)
+    meeting_status = models.BooleanField(choices=MEETING_STATUS_CHOICES, default=False)
+    location = models.CharField(max_length=120, blank=False)
+    date = models.DateTimeField(blank=False)
+    time_start = models.TimeField(blank=False)
+    time_end = models.TimeField(blank=False)
+
+    class Meta:
+        ordering = ['-date']
+
+
+class MeetingAttendance(models.Model):
+    MEETING_ROLE_CHOICES = (
+        ('H', 'Host'),
+        ('C', 'Chooser'),
+        ('A', 'Attendee')
+    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    meeting = models.ForeignKey(Meeting, on_delete=models.CASCADE)
+    meeting_role = models.CharField(max_length=1, choices=MEETING_ROLE_CHOICES)
