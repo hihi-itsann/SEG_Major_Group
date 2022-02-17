@@ -22,6 +22,7 @@
               <h1 style="color:Green">Rating: {{ book.getAverageRate|floatformat:1 }}/10</h1>
             {% endif %}
             <button type="button" class="btn btn-outline-primary btn-lg"><a href="{% url 'create_book_rating' book.ISBN %}">Create Your Rate here</a></button>
+            <button type="button" class="btn btn-outline-primary btn-lg"><a href="{% url 'create_book_status' book.ISBN %}">Add to your reading list</a></button>
           </div>
 
         </div>

@@ -89,7 +89,6 @@ class BookStatus(models.Model):
         ('F', 'Finished')
     )
     status = models.CharField(max_length=1, choices=STATUS_CHOICES, blank=False, default='U')
-    added_at = models.DateTimeField(auto_now_add=True)
 
     def change_status(self, choice):
         if choice == 'U':
@@ -99,8 +98,6 @@ class BookStatus(models.Model):
         else:
             self.status = 'F'
         self.save()
-
-
 
 class Application(models.Model):
     STATUS_CHOICES = (

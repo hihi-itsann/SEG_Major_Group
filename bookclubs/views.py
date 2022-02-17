@@ -14,7 +14,7 @@ from django.shortcuts import redirect, render, get_object_or_404
 from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm, \
     UpdateApplicationForm, CommentForm, RateForm, PostForm, NewMeetingForm
 from .helpers import *
-from .models import User, Book, Application, Comment, Post, Rating
+from .models import User, Book, Application, Comment, Post, Rating, BookStatus
 
 
 @login_prohibited
@@ -203,11 +203,28 @@ class CreateBookRateView(LoginRequiredMixin, CreateView):
 
 @login_required
 def create_book_status(request, ISBN):
-    model = BookStatus
-    template_name = 'reading_list.html'
-    ordering = ['-added_at' ]
+    book = Book.objects.get(ISBN=ISBN)
+    try:
+        bookStatus = BookStatus.objects.get(user=request.user, book=book)
+    except ObjectDoesNotExist:
+        bookStatus = BookStatus.objects.create(
+            book=book,
+            user=request.user,
+        )
+        return redirect('reading_book_list')
+    messages.add_message(request, messages.ERROR, "The Book has been added in your reading list!")
+    return redirect('show_book', ISBN)
+    # model = BookStatus
+    # template_name = 'reading_list.html'
+    # ordering = ['-added_at' ]
 
-
+@login_required
+def reading_book_list(request):
+    bookStatuses = BookStatus.objects.filter(user=request.user)
+    books = []
+    for bookStatus in bookStatuses:
+        books.append(bookStatus.book)
+    return render(request, 'reading_book_list.html', {"books": books})
 
 @login_required
 @club_exists

@@ -1,0 +1,18 @@
+{% extends 'base_content.html' %}
+{% block content %}
+    <br>
+    <div class="container">
+        <div class="col-xs-12 col-lg-6 col-xl-8">
+            <h1>Reading List</h1>
+            <hr>
+            {% for book in books%}
+              <div class="col-lg-3 offset-0">
+                <img src="{{ book.image_url_l }}">
+              </div>
+              <h1>{{ book.title }}</h1>
+              <div class="col-lg-6 offset-2">
+            {% endfor %}
+        </div>
+        </div>
+    </div>
+{% endblock %}
