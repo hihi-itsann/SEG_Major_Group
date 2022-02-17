@@ -49,7 +49,8 @@ class Command(BaseCommand):
             bio=bio,
             dob=dob,
             gender=gender,
-            location=location
+            location=location,
+            meeting_preference=meeting_preference
         )
 
 def create_username(first_name, last_name):
