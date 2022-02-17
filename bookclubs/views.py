@@ -12,7 +12,7 @@ from django.views.generic.edit import FormView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.shortcuts import redirect, render, get_object_or_404
 from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm, \
-    UpdateApplicationForm, CommentForm, RateForm, PostForm
+    UpdateApplicationForm, CommentForm, RateForm, PostForm, NewMeetingForm
 from .helpers import *
 from .models import User, Book, Application, Comment, Post, Rating
 
@@ -419,3 +419,20 @@ class DeleteCommentView(LoginRequiredMixin, DeleteView):
     model = Comment
     template_name = 'delete_comment.html'
     success_url = reverse_lazy('post_comment')
+
+
+@login_required
+@club_exists
+@management_required
+def create_meeting(request, club_name):
+    """Creates a new meeting within a club"""
+    current_club = Club.objects.get(club_name=club_name)
+    if request.method == 'POST':
+        form = NewMeetingForm(request.POST)
+        if form.is_valid():
+            form.save(current_club)
+            messages.add_message(request, messages.SUCCESS, "Meeting set up!")
+            return redirect('my_applications')
+    else:
+        form = NewMeetingForm()
+    return render(request, 'create_meeting.html', {'form': form, 'club_name': club_name})

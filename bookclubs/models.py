@@ -295,15 +295,27 @@ class Meeting(models.Model):
         (True, 'Online'),
         (False, 'In Person')
     )
-    host = models.ForeignKey(User, related_name='meeting_host', on_delete=models.CASCADE, null=True)
+    club = models.ForeignKey(Club, related_name='meeting_club', on_delete=models.CASCADE)
     chooser = models.ForeignKey(User, related_name='book_chooser', on_delete=models.CASCADE, null=True)
-    book = models.ForeignKey(Book, on_delete=models.CASCADE, null=True)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, null=True, blank=True)
     topic = models.CharField(max_length=120, default='', blank=False)
     description = models.TextField(max_length=520, blank=True)
     meeting_status = models.BooleanField(choices=MEETING_STATUS_CHOICES, default=False)
+    location = models.CharField(max_length=120, blank=False)
     date = models.DateTimeField(blank=False)
     time_start = models.TimeField(blank=False)
     time_end = models.TimeField(blank=False)
 
     class Meta:
         ordering = ['-date']
+
+
+class MeetingAttendance(models.Model):
+    MEETING_ROLE_CHOICES = (
+        ('H', 'Host'),
+        ('C', 'Chooser'),
+        ('A', 'Attendee')
+    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    meeting = models.ForeignKey(Meeting, on_delete=models.CASCADE)
+    meeting_role = models.CharField(max_length=1, choices=MEETING_ROLE_CHOICES)
