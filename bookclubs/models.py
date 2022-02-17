@@ -276,9 +276,8 @@ class Post(models.Model):
 
 
 class Comment(models.Model):
-    # name = models.CharField(max_length=50, blank=False, default="Unknown")
     author = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    body = models.TextField(max_length=520, blank=False)
+    body = models.CharField(max_length=520, blank=False)
     related_post = models.ForeignKey(Post, related_name="comments", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
