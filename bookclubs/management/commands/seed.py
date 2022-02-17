@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from bookclubs.models import User, Club
+from bookclubs.models import User, Club, Role
 
 import pytz
 from faker import Faker
@@ -10,8 +10,9 @@ from faker.providers import BaseProvider, address, date_time, misc
 
 class Command(BaseCommand):
     USER_COUNT = 100
-    CLUB_COUNT = 20
+    CLUB_COUNT = 10
     DEFAULT_PASSWORD = 'Password123'
+    USER_IN_CLUB_PROBABILITY = 0.2
 
     def __init__(self):
         self.faker = Faker('en_GB')
@@ -21,6 +22,8 @@ class Command(BaseCommand):
         self.users = User.objects.all()
         self._create_clubs()
         self.clubs = Club.objects.all()
+        self._create_roles()
+        self.roles = Role.objects.all()
 
     def create_users(self):
         user_count = 0
@@ -82,6 +85,41 @@ class Command(BaseCommand):
             public_status=public_status,
             genre=genre
         )
+
+    def _create_roles(self):
+        role_count = 0
+        for club in self.clubs:
+            print(f"Seeding userInClub {role_count}/{self.CLUB_COUNT*self.USER_COUNT}", end='\r')
+            self._create_owner_role(club)
+            role_count += 1
+            for user in self.users:
+                try:
+                    self._create_role(user, club)
+                except:
+                    continue
+                role_count += 1
+        print("Role seeding complete.      ")
+
+    def _create_role(self, user, club):
+        if random() < self.USER_IN_CLUB_PROBABILITY:
+            club_role = self.faker.random_choices(elements=('MEM', 'OFF', 'MOD', 'BAN'), length=1)[0]
+            Role.objects.create(
+                user=user,
+                club=club,
+                club_role=club_role
+            )
+
+    def _create_owner_role(self, club):
+        user = self.get_random_user()
+        Role.objects.create(
+            user=user,
+            club=club,
+            club_role='OWN'
+        )
+
+    def get_random_user(self):
+        index = randint(0,self.users.count()-1)
+        return self.users[index]
 
 def create_username(first_name, last_name):
     return '@' + first_name.lower() + last_name.lower()
