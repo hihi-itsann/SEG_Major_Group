@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Application, Club, Role, Book, Rating
+from .models import User, Application, Club, Role, Book, Rating, BookStatus
 
 
 @admin.register(User)
@@ -40,4 +40,10 @@ class BookAdmin(admin.ModelAdmin):
 class RatingAdmin(admin.ModelAdmin):
     list_display = [
         'rate', 'book', 'user'
+    ]
+
+@admin.register(BookStatus)
+class BookStatusAdmin(admin.ModelAdmin):
+    list_display = [
+        'status', 'book', 'user', 'added_at'
     ]

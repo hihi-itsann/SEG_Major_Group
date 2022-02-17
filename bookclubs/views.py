@@ -203,10 +203,23 @@ class CreateBookRateView(LoginRequiredMixin, CreateView):
 
 @login_required
 def create_book_status(request, ISBN):
-    model = BookStatus
-    template_name = 'reading_list.html'
-    ordering = ['-added_at' ]
+    book = Book.objects.get(ISBN=ISBN)
+    bookStatus = BookStatus.objects.create(
+        book=book,
+        user=request.user,
+    )
+    return render(request)
+    # model = BookStatus
+    # template_name = 'reading_list.html'
+    # ordering = ['-added_at' ]
 
+@login_required
+def reading_book_list(request):
+    bookStatuses = Book.objects.filter(user=request.user)
+    books = []
+    for bookStatus in bookStatuses:
+        books.add(bookStatus.book)
+    return render(request, 'reading_list.html', {"books": books})
 
 
 @login_required
