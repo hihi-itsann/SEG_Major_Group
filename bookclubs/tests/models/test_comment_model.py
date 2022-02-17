@@ -29,7 +29,7 @@ class CommentModelTestCase(TestCase):
         except ValidationError:
             self.fail("Test comment should be valid")
 
-    def test_name_must_not_be_blank(self):
+    def test_author_must_not_be_blank(self):
         self.comment.author = None
         with self.assertRaises(ValidationError):
             self.comment.full_clean()
