@@ -196,9 +196,17 @@ class CreateBookRateView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         """Return URL to redirect the user too after valid form handling."""
         return reverse('book_list')
+        #return reverse('book', kwargs={'ISBN': self.kwargs['ISBN']})
 
     def handle_no_permission(self):
         return redirect('log_in')
+
+@login_required
+def create_book_status(request, ISBN):
+    model = BookStatus
+    template_name = 'reading_list.html'
+    ordering = ['-added_at' ]
+
 
 
 @login_required

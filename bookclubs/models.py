@@ -80,6 +80,27 @@ class Rating(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
+class BookStatus(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    STATUS_CHOICES = (
+        ('U', 'Unread'),
+        ('R', 'Reading'),
+        ('F', 'Finished')
+    )
+    status = models.CharField(max_length=1, choices=STATUS_CHOICES, blank=False, default='U')
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    def change_status(self, choice):
+        if choice == 'U':
+            self.status = 'U'
+        elif choice == 'R':
+            self.status = 'R'
+        else:
+            self.status = 'F'
+        self.save()
+
+
 
 class Application(models.Model):
     STATUS_CHOICES = (
