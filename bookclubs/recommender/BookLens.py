@@ -15,12 +15,15 @@ class BookLens:
 
     isbn_to_name = {}
     name_to_isbn = {}
-    ratingsPath = '../dataset/BX-Book-Ratings.csv'
-    booksPath = '../dataset/BX-Books.csv'
+    ratingsPath = 'bookclubs/dataset/BX-Book-Ratings.csv'
+    booksPath = 'bookclubs/dataset/BX-Books.csv'
 
     def loadRatingData(self):
         df = pd.read_csv(self.ratingsPath, sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0 )
-
+        df = df[df.loc[:]!=0].dropna()
+        """         df.ISBN = df.ISBN.apply(lambda x: x[:-1] + "10" if x[-1] == "X" else x)
+        df = df[df.ISBN.str.isdecimal()]
+        df.ISBN = df.ISBN.apply(lambda x: int(x)) """
         return df
 
     def loadBookLensLatestSmall(self):
