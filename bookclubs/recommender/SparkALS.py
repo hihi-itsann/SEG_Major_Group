@@ -26,88 +26,24 @@ if __name__ == "__main__":
 
     spark.sparkContext.setCheckpointDir("/tmp/checkpoints")
 
-
-    print("yes")
-
-    df = pd.read_csv('../dataset/BX-Book-Ratings.csv', sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0 ).head(400000)
+    df = pd.read_csv('../dataset/BX-Book-Ratings.csv', sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0 )
     df = df[df.loc[:]!=0].dropna()
-
-    # min_book_ratings = 50
-    # filter_books = df['ISBN'].value_counts() > min_book_ratings
-    # filter_books = filter_books[filter_books].index.tolist()
-    #
-    # min_user_ratings = 50
-    # filter_users = df['User-ID'].value_counts() > min_user_ratings
-    # filter_users = filter_users[filter_users].index.tolist()
-    #
-    # df = df[(df['ISBN'].isin(filter_books)) & (df['User-ID'].isin(filter_users))]
-
-
-
-    # df = pd.read_csv('../dataset/BX-Book-Ratings.csv', sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0 )
-    # books = pd.read_csv('../dataset/BX-Books.csv', sep = ';',names = ['ISBN'], quotechar = '"', encoding = 'latin-1',header = 0 )
-    # df["bookID"] = books.ISBN[books.ISBN == df.ISBN].index.tolist()[0]
-    # print(df.head)
-
-    # df.ISBN = df.ISBN.apply(lambda x: x[:-1] + "10" if x[-1] == "X" else x)
-    # df = df[df.ISBN.str.isdecimal()]
-    # df.ISBN = df.ISBN.apply(lambda x: int(x))
-    print("yes")
-
     df = spark.createDataFrame(df)
 
-    print("yes")
 
     indexer = StringIndexer(inputCol="ISBN", outputCol="bookID").fit(df)
-    print("yes")
-
     indexed = indexer.transform(df)
-    print("yes")
-
-    # indexed = indexed.repartition(1000)
-
-    indexed = indexed.checkpoint()
-    print("yes")
-
-    lines = indexed.rdd
-
-    print("yes")
-
-    ratingsRDD = lines.map(lambda p: Row(userId=int(p[0]), bookID=int(p[3]),
-                                         rating=float(p[2])))
-
-
-    print("yes")
-
-    ratings = spark.createDataFrame(ratingsRDD)
-
-    # ratings = ratings.repartition(1000)
+    ratings = indexed.drop("ISBN")
 
     (training, test) = ratings.randomSplit([0.8, 0.2])
-    print("yes")
 
-
-
-    als = ALS(maxIter=5, regParam=0.01, userCol="userId", itemCol="bookID", ratingCol="rating",
+    als = ALS(maxIter=5, regParam=0.01, userCol="User-ID", itemCol="bookID", ratingCol="Book-Rating",
               coldStartStrategy="drop")
-    print("yes")
-
     model = als.fit(training)
-    print("yes")
-
     predictions = model.transform(test)
-    print("yes")
-
-
     labelConverter = IndexToString(inputCol="bookID", outputCol="ISBN",
                                labels=indexer.labels)
-
-    # predictions = labelConverter.transform(predictions)
-    #
-    # predictions.show(10)
-
-
-    evaluator = RegressionEvaluator(metricName="rmse", labelCol="rating",
+    evaluator = RegressionEvaluator(metricName="rmse", labelCol="Book-Rating",
                                     predictionCol="prediction")
     rmse = evaluator.evaluate(predictions)
     print("Root-mean-square error = " + str(rmse))
@@ -115,16 +51,11 @@ if __name__ == "__main__":
 
     userRecs = model.recommendForAllUsers(10)
 
-    print("yes")
+    flatUserRecs = userRecs.withColumn("bookAndRating", explode(userRecs.recommendations)) \
+    .select ( "User-ID", "bookAndRating.*")
 
-    flatUserRecs = userRecs.withColumn("songAndRating", explode(userRecs. recommendations)) \
-    .select ( "userId", "songAndRating.*")
-
-    flatUserRecs = labelConverter.transform(flatUserRecs)
-    print("yes")
-
-
-    user85Recs = flatUserRecs.filter(userRecs['userId'] == 276726).collect()
+    flatUserRecs = labelConverter.transform(flatUserRecs).filter(userRecs['User-ID'] == 276726)
+    user85Recs = flatUserRecs.collect()
     # user85Recs.show()
 
 
