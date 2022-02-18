@@ -24,10 +24,25 @@ if __name__ == "__main__":
         .config("spark.executor.cores", '4')\
         .getOrCreate()
 
+    spark.sparkContext.setCheckpointDir("/tmp/checkpoints")
+
+
     print("yes")
 
-    df = pd.read_csv('../dataset/BX-Book-Ratings.csv', sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0 )
+    df = pd.read_csv('../dataset/BX-Book-Ratings.csv', sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0 ).head(400000)
     df = df[df.loc[:]!=0].dropna()
+
+    # min_book_ratings = 50
+    # filter_books = df['ISBN'].value_counts() > min_book_ratings
+    # filter_books = filter_books[filter_books].index.tolist()
+    #
+    # min_user_ratings = 50
+    # filter_users = df['User-ID'].value_counts() > min_user_ratings
+    # filter_users = filter_users[filter_users].index.tolist()
+    #
+    # df = df[(df['ISBN'].isin(filter_books)) & (df['User-ID'].isin(filter_users))]
+
+
 
     # df = pd.read_csv('../dataset/BX-Book-Ratings.csv', sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0 )
     # books = pd.read_csv('../dataset/BX-Books.csv', sep = ';',names = ['ISBN'], quotechar = '"', encoding = 'latin-1',header = 0 )
@@ -40,6 +55,7 @@ if __name__ == "__main__":
     print("yes")
 
     df = spark.createDataFrame(df)
+
     print("yes")
 
     indexer = StringIndexer(inputCol="ISBN", outputCol="bookID").fit(df)
@@ -48,7 +64,9 @@ if __name__ == "__main__":
     indexed = indexer.transform(df)
     print("yes")
 
-    indexed = indexed.repartition(1000)
+    # indexed = indexed.repartition(1000)
+
+    indexed = indexed.checkpoint()
     print("yes")
 
     lines = indexed.rdd
@@ -63,10 +81,12 @@ if __name__ == "__main__":
 
     ratings = spark.createDataFrame(ratingsRDD)
 
-    ratings = ratings.repartition(1000)
+    # ratings = ratings.repartition(1000)
 
     (training, test) = ratings.randomSplit([0.8, 0.2])
     print("yes")
+
+
 
     als = ALS(maxIter=5, regParam=0.01, userCol="userId", itemCol="bookID", ratingCol="rating",
               coldStartStrategy="drop")
@@ -104,7 +124,7 @@ if __name__ == "__main__":
     print("yes")
 
 
-    user85Recs = flatUserRecs.filter(userRecs['userId'] == 276725).collect()
+    user85Recs = flatUserRecs.filter(userRecs['userId'] == 276726).collect()
     # user85Recs.show()
 
 
@@ -112,6 +132,7 @@ if __name__ == "__main__":
 
     ml = BookLens()
     ml.loadBookLensLatestSmall()
+    print(len(user85Recs))
 
     for row in user85Recs:
         print(ml.getBookName(row.ISBN))
