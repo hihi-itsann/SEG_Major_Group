@@ -6,17 +6,24 @@
 
 <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
   <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="offcanvasExampleLabel">Book Club</h5>
+    <h5 class="offcanvas-title" id="offcanvasExampleLabel">Welcome to Book Club</h5>
     <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body">
-    <a class="navbar-brand" href="{% url 'create_post' %}">
-      <span class="bi bi-plus-square text-secondary"></span>&nbsp;Create Post
-    </a>
-    <div class="offcanvas-body">
-      <a class="navbar-brand text-secondary" href="{% url 'club_list' %}">
-        <span class="bi bi-plus-square text-secondary"></span>&nbsp;My Clubs
-      </a>
-    </div>
+    <li><a class="navbar-brand text-secondary" href="{% url 'my_clubs' %}">
+      <span class="bi bi-node-plus text-secondary"></span>&nbsp;My Clubs
+    </a></li>
+    <li><a class="navbar-brand text-secondary" href="{% url 'create_club' %}">
+      <span class="bi bi-plus-square text-secondary"></span>&nbsp;Create Club
+    </a></li>
+    <li><a class="navbar-brand text-secondary" href="{% url 'club_list' %}">
+      <span class="bi bi-search text-secondary"></span>&nbsp;Explore More
+    </a></li>
+    <li><a class="navbar-brand text-secondary"  href="{% url 'create_post' %}">
+      <span class="bi bi-card-text text-secondary"></span>&nbsp;Create Post
+    </a></li>
+    <li><a class="navbar-brand text-secondary" href="{% url 'my_applications' %}">
+      <span class="bi bi-inbox text-secondary"></span>&nbsp;My Applications
+    </a></li>
   </div>
 </div>
