@@ -5,12 +5,12 @@
 <div class="container">
 
     <h1>CREATE A POST</h1>
-
+    <h2>Your every thought is worth to be recorded!</h2>
     <div class="form-group">
         <form method="POST">
           {% csrf_token %}
           {{ form.as_p }}
-          <button type="submit" class="btn btn-secondary">Post publication</button>
+          <button type="submit" class="btn btn-secondary">Let Everyone see your thought!</button>
     </div>
 </div>
 {% endblock %}
