@@ -9,39 +9,33 @@ class CommentModelTestCase(TestCase):
     ]
 
     def setUp(self):
+        super(TestCase,self).setUp()
         self.user = User.objects.get(username='@johndoe')
-        self.post = Post(
+        self.post = Post.objects.create(
             title="this is a title.",
             author=self.user,
             body="The quick brown fox jumps over the lazy dog."
         )
-        self.comment = Comment(
+        self.comment = Comment.objects.create(
+            author=self.user,
             related_post=self.post,
             body="this is a comment."
         )
 
-    #def test_get_post(self):
-    #    self.assertEqual(self.comment.related_post,None)
 
-    #def test_valid_post(self):
-    #    try:
-    #        self.post.full_clean()
-    #    except ValidationError:
-    #        self.fail("Test post should be valid")
-
-    #def test_valid_comment(self):
-    #    try:
-    #        self.comment.full_clean()
-    #    except ValidationError:
-    #        self.fail("Test comment should be valid")
+    def test_valid_comment(self):
+        try:
+            self.comment.full_clean()
+        except ValidationError:
+            self.fail("Test comment should be valid")
 
     def test_name_must_not_be_blank(self):
-        self.comment.name = ''
+        self.comment.author = None
         with self.assertRaises(ValidationError):
             self.comment.full_clean()
 
     def test_post_must_not_be_blank(self):
-        self.comment.post = None
+        self.comment.related_post = None
         with self.assertRaises(ValidationError):
             self.comment.full_clean()
 

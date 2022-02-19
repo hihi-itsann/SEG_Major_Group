@@ -29,7 +29,7 @@ urlpatterns = [
     path('user/<str:username>/', views.show_user, name='show_user'),
     path('password/', views.PasswordView.as_view(), name='password'),
     path('book_list/', views.BookListView.as_view(), name='book_list'),
-    path('show_book/<str:ISBN>/', views.ShowBookView.as_view(), name='show_book'),
+    path('book/<str:ISBN>/', views.ShowBookView.as_view(), name='show_book'),
     path('create_book_rating/<str:ISBN>/', views.CreateBookRateView.as_view(), name='create_book_rating'),
     path('club/<str:club_name>/feed/', views.club_feed, name='club_feed'),
     path('club/<str:club_name>/', views.club_welcome, name='club_welcome'),
@@ -54,4 +54,4 @@ urlpatterns = [
     path('club/<str:club_name>/remove/<int:user_id>/', views.remove_member, name='remove_applicant'),
     path('club/<str:club_name>/moderator_management/',views.moderator_list,name='moderator_list'),
     path('club/<str:club_name>/moderator_management/new_owner/<int:user_id>/', views.transfer_ownership,name='transfer_ownership'),
-]
+    path('club/<str:club_name>/host_meeting', views.create_meeting, name='create_meeting'),
