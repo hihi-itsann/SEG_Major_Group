@@ -92,7 +92,6 @@ class UserForm(forms.ModelForm):
                   'meeting_preference']
         widgets = {'bio': forms.Textarea()}
 
-
 class PasswordForm(NewPasswordMixin):
     """Form enabling users to change their password."""
 
@@ -166,6 +165,29 @@ class NewClubForm(forms.ModelForm):
             description=self.cleaned_data.get('description')
         )
         return club
+
+class UpdateClubForm(forms.ModelForm):
+    """Form to update club details."""
+
+    class Meta:
+        """Form options."""
+
+        model = Club
+        fields = ['club_name', 'meeting_status', 'location', 'public_status', 'genre', 'description']
+        widgets = {'description': forms.Textarea()}
+
+        MEETING_STATUS_CHOICES = (
+            (True, 'In Person'),
+            (False, 'Online')
+        )
+        PUBLIC_STATUS_CHOICES = (
+            (True, 'Public'),
+            (False, 'Private')
+        )
+
+        meeting_status = forms.ChoiceField(widget=forms.Select(), label='Meetings Held', choices=MEETING_STATUS_CHOICES)
+        public_status = forms.ChoiceField(widget=forms.Select(), label='Status', choices=PUBLIC_STATUS_CHOICES)
+
 
 
 class NewApplicationForm(forms.ModelForm):

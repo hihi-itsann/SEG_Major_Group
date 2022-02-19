@@ -7,6 +7,7 @@
 }
 
 
+
 /*
  * Cover page
  */
@@ -64,7 +65,7 @@ p.cover-text {
 body {
   margin: 0;
   padding: 0;
-  background-color: #17a2b8;
+  background-color: #ffffff;
   height: 100vh;
 }
 login .container #login-row #login-column #login-box {
@@ -99,27 +100,6 @@ ul.errorlist {
 .wrapper {
     display: block;
 }
-
-/***** Feed Page Sidebar *****/
-
-.sidebar {
-    width: 250px;
-    height: 100vh;
-    position: fixed;
-    top: 0;
-    left: -255px;
-    z-index: 999;
-    background: #333;
-    color: #fff;
-    transition: all .3s;
-    box-shadow: 3px 3px 3px rgba(51, 51, 51, 0.5);
-    text-align: left;
-}
-
-.sidebar.active {
-    left: 0;
-}
-
 /***** Content *****/
 
 .content {
@@ -198,6 +178,16 @@ h3.profile-title {
 }
 
 /*
+ * Sidebar
+ */
+.sidebar-image {
+  width: 120px;
+  clear:both;
+  float:left;
+}
+
+
+/*
  * Hyperlinks
  */
 .content a {
@@ -217,3 +207,10 @@ h3.profile-title {
   text-decoration: underline;
   color: black;
 }
+
+
+
+/*
+ * Hyperlinks
+ */
+ .card {display:inline-block;}

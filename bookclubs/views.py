@@ -11,10 +11,10 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.shortcuts import redirect, render, get_object_or_404
-from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm, \
+from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm,
     UpdateApplicationForm, CommentForm, RateForm, PostForm, NewMeetingForm
 from .helpers import *
-from .models import User, Book, Application, Comment, Post, Rating
+from .models import User, Book, Application, Comment, Post, Rating, Club
 
 
 @login_prohibited
@@ -265,6 +265,22 @@ def delete_club(request, club_name):
     current_club.delete()
     return feed(request)
 
+#to-do: fix the club_name (not finished)
+class ClubDetailsUpdateView(LoginRequiredMixin, UpdateView):
+    """View to update club ClubDetailsUpdateView."""
+    model = UpdateClubForm
+    template_name = "club_details_update.html"
+    form_class = UpdateClubForm
+
+    def get_object(self):
+        """Return the club to be updated."""
+        current_club = Club.objects.get(self.get_club_name==club_name)
+        return current_club
+
+    def get_success_url(self):
+        """Return redirect URL after successful update."""
+        messages.add_message(self.request, messages.SUCCESS, "Deatils updated!")
+        return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
 @login_required
 @club_exists
@@ -382,6 +398,131 @@ def club_list(request):
     else:
         clubs = Club.objects.all()
     return render(request, 'club_list.html', {'clubs': clubs})
+
+@login_required
+@club_exists
+@management_required
+def members_management_list(request,club_name):
+    banned_is_empty = False
+    member_is_empty = False
+    current_club = Club.objects.get(club_name=club_name)
+    members = current_club.get_members()
+    banned = current_club.get_banned_members()
+    if members.count() == 0:
+        member_is_empty = True
+    if banned.count() == 0:
+        banned_is_empty = True
+    return render(request,'member_management.html', {'banned':banned,'members':members, 'banned_is_empty':banned_is_empty,'member_is_empty':member_is_empty, 'current_club':current_club})
+
+
+@login_required
+@club_exists
+@management_required
+def ban_member(request,club_name,user_id):
+    current_club = Club.objects.get(club_name=club_name)
+    try:
+        member = User.objects.get(id=user_id,club__club_name = current_club.club_name, role__club_role = 'MEM')
+        current_club.ban_member(member)
+    except ObjectDoesNotExist:
+        return redirect('feed')
+    else:
+        return members_management_list(request,current_club.club_name)
+
+@login_required
+@club_exists
+@management_required
+def unban_member(request,club_name,user_id):
+    current_club = Club.objects.get(club_name=club_name)
+    try:
+        banned = User.objects.get(id=user_id,club__club_name = current_club.club_name, role__club_role = 'BAN')
+        current_club.unban_member(banned)
+    except ObjectDoesNotExist:
+        return redirect('feed')
+    else:
+        return members_management_list(request,current_club.club_name)
+
+@login_required
+@club_exists
+@management_required
+def remove_member(request,club_name,user_id):
+    current_club = Club.objects.get(club_name=club_name)
+    try:
+        member = User.objects.get(id=user_id,club__club_name = current_club.club_name, role__club_role = 'MEM')
+        current_club.remove_user_from_club(member)
+    except ObjectDoesNotExist:
+        return redirect('feed')
+    else:
+        return members_management_list(request,current_club.club_name)
+
+@login_required
+@club_exists
+@owner_required
+def moderator_list(request,club_name):
+    current_club = Club.objects.get(club_name=club_name)
+    moderators = current_club.get_moderators()
+    return render(request,'moderator_list.html', {'moderators':moderators, 'current_club':current_club})
+
+@login_required
+@club_exists
+@owner_required
+def transfer_ownership(request,club_name,user_id):
+    current_club = Club.objects.get(club_name=club_name)
+    try:
+        moderator = User.objects.get(id=user_id,club__club_name = current_club.club_name, role__club_role = 'MOD')
+        current_club.transfer_ownership(request.user,moderator)
+    except (ObjectDoesNotExist):
+        return redirect('feed')
+    else:
+        return moderator_list(request,current_club.club_name)
+
+@login_required
+@club_exists
+@owner_required
+def demote_moderator(request,club_name,user_id):
+    current_club = Club.objects.get(club_name=club_name)
+    try:
+        moderator = User.objects.get(id=user_id,club__club_name = current_club.club_name, role__club_role = 'MOD')
+        current_club.toggle_member(moderator)
+    except (ObjectDoesNotExist):
+        return redirect('feed')
+    else:
+        return moderator_list(request,current_club.club_name)
+
+@login_required
+@club_exists
+@management_required
+def promote_member(request,club_name,user_id):
+    current_club = Club.objects.get(club_name=club_name)
+    try:
+        member = User.objects.get(id=user_id,club__club_name = current_club.club_name, role__club_role = 'MEM')
+        current_club.toggle_moderator(member)
+    except (ObjectDoesNotExist):
+        return redirect('feed')
+    else:
+        return members_management_list(request,current_club.club_name)
+
+@login_required
+@club_exists
+@owner_required
+def change_club_to_public_status(request, club_name):
+    """Changes club status to private"""
+    current_club = Club.objects.get(club_name=club_name)
+    current_club.change_club_status(True)
+    return redirect('feed')
+
+@login_required
+@club_exists
+def member_list(request,club_name):
+    is_owner = False
+    club = Club.objects.get(club_name=club_name)
+    cur_user=request.user
+    roles=Role.objects.filter(club=club).exclude(club_role='BAN')
+    club_role = club.get_club_role(cur_user)
+    if club_role== 'OWN':
+        is_owner = True
+    context = {'club': club, 'roles': roles, 'is_owner': is_owner}
+    return render(request, "member_list.html", context)
+
 
 
 class PostCommentView(LoginRequiredMixin, ListView):

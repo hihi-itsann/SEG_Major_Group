@@ -7,14 +7,24 @@
                 <h1>My Clubs</h1>
                 <br>
                 {% for club in clubs %}
-                    <div>
+                    <div class="col d-flex justify-content-center">
+                      <div class="card" style="width: 25rem;">
+                         <div class="card-body card">
                         <tr>
-                            <td><h2>{{ club.club.club_name }}</h2></td>
-                            <p>{{ club.club.description }}</p>
-                            <p>Total Members: {{ club.club.club_members.count }}</p>
+                          <td><h2>{{ club.club.club_name }}</h2></td>
+                          <ul class="list-group list-group-flush">
+                            <li class="list-group-item">Discription:{{ club.club.description }}</li>
+                            <li class="list-group-item">Total Members: {{ club.club.club_members.count }}</li>
+                            <li class="list-group-item"><a href='{% url 'club_feed' club_name=club.club.club_name %}'
+                                   class="btn btn-outline-dark">
+                                View club
+                            </a></li>
+                          </ul>
                         </tr>
-                        <hr>
+                        </div>
+                        </br>
                     </div>
+                  </div>
                 {% endfor %}
             {% else %}
                 <h1>You haven't joined any club yet!</h1>
