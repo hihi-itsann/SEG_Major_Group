@@ -207,3 +207,10 @@ h3.profile-title {
   text-decoration: underline;
   color: black;
 }
+
+
+
+/*
+ * Hyperlinks
+ */
+ .card {display:inline-block;}
