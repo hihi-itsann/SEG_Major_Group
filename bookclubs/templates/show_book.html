@@ -16,7 +16,11 @@
             <h4><em>Year: {{ book.year_of_publication }}</em></h4><br>
             <h4><em>publisher: {{ book.publisher }}</em></h4><br>
             <h4><em>ISBN: {{ book.ISBN }}</em></h4><br>
-            <h1 style="color:Green">Rating: {{ book.getAverageRate|floatformat:1 }}/10</h1>
+            {% if book.getAverageRate == None %}
+              <h1 style="color:Green">Not Yet Rated</h1>
+            {% else %}
+              <h1 style="color:Green">Rating: {{ book.getAverageRate|floatformat:1 }}/10</h1>
+            {% endif %}
             <button type="button" class="btn btn-outline-primary btn-lg"><a href="{% url 'create_book_rating' book.ISBN %}">Create Your Rate here</a></button>
           </div>
 
