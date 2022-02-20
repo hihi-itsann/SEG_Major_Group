@@ -1,31 +1,29 @@
 {% extends 'base_content.html' %}
 {% block content %}
     <div class="container">
-        <div class="col-xs-12 col-lg-6 col-xl-8">
             <br>
             {% if clubs %}
                 <h1>My Clubs</h1>
                 <br>
-                {% for club in clubs %}
-                    <div class="col d-flex justify-content-center">
-                      <div class="card" style="width: 25rem;">
-                         <div class="card-body card">
-                        <tr>
-                          <td><h2>{{ club.club.club_name }}</h2></td>
-                          <ul class="list-group list-group-flush">
-                            <li class="list-group-item">Discription:{{ club.club.description }}</li>
-                            <li class="list-group-item">Total Members: {{ club.club.club_members.count }}</li>
-                            <li class="list-group-item"><a href='{% url 'club_feed' club_name=club.club.club_name %}'
-                                   class="btn btn-outline-dark">
-                                View club
-                            </a></li>
-                          </ul>
-                        </tr>
-                        </div>
-                        </br>
+                <div class="club">
+                  <div class=row row-cols-3">
+                  {% for club in clubs %}
+                  <div class="col-6 card">
+                      <h1 class="card-title">
+                         {{ club.club.club_name }}
+                      </h1>
+                      <div class="card-body">
+                        <p>What do we do? - {{ club.club.description }}</p>
+                        <p>Number of Members: {{ club.club.club_members.count }}</p>
+                        <a href='{% url 'club_feed' club_name=club.club.club_name %}'
+                                 class="btn btn-outline-dark">
+                              View club
+                          </a>
+                      </div>
                     </div>
+                    {% endfor %}
                   </div>
-                {% endfor %}
+                </div>
             {% else %}
                 <h1>You haven't joined any club yet!</h1>
                 <p>Click <a href="{% url 'club_list' %}">here</a> to apply to one of our clubs

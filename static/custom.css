@@ -68,12 +68,12 @@ body {
   background-color: #ffffff;
   height: 100vh;
 }
-login .container #login-row #login-column #login-box {
+login.container #login-row #login-column #login-box {
   margin-top: 120px;
   max-width: 600px;
   height: 320px;
   border: 1px solid #9C9C9C;
-  background-color: #EAEAEA;
+  background-color: #FFFFFF;
 }
 login .container #login-row #login-column #login-box #login-form {
   padding: 20px;
@@ -207,10 +207,3 @@ h3.profile-title {
   text-decoration: underline;
   color: black;
 }
-
-
-
-/*
- * Hyperlinks
- */
- .card {display:inline-block;}
