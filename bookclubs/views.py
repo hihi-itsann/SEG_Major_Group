@@ -11,8 +11,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.shortcuts import redirect, render, get_object_or_404
-from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm,
-    UpdateApplicationForm, CommentForm, RateForm, PostForm, NewMeetingForm
+from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm,UpdateApplicationForm, CommentForm, RateForm, PostForm, NewMeetingForm
 from .helpers import *
 from .models import User, Book, Application, Comment, Post, Rating, Club
 
@@ -265,22 +264,22 @@ def delete_club(request, club_name):
     current_club.delete()
     return feed(request)
 
-#to-do: fix the club_name (not finished)
-class ClubDetailsUpdateView(LoginRequiredMixin, UpdateView):
-    """View to update club ClubDetailsUpdateView."""
-    model = UpdateClubForm
-    template_name = "club_details_update.html"
-    form_class = UpdateClubForm
-
-    def get_object(self):
-        """Return the club to be updated."""
-        current_club = Club.objects.get(self.get_club_name==club_name)
-        return current_club
-
-    def get_success_url(self):
-        """Return redirect URL after successful update."""
-        messages.add_message(self.request, messages.SUCCESS, "Deatils updated!")
-        return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+# #to-do: fix the club_name (not finished)
+# class ClubDetailsUpdateView(LoginRequiredMixin, UpdateView):
+#     """View to update club ClubDetailsUpdateView."""
+#     model = UpdateClubForm
+#     template_name = "club_details_update.html"
+#     form_class = UpdateClubForm
+#
+#     def get_object(self):
+#         """Return the club to be updated."""
+#         current_club = Club.objects.get(self.get_club_name==club_name)
+#         return current_club
+#
+#     def get_success_url(self):
+#         """Return redirect URL after successful update."""
+#         messages.add_message(self.request, messages.SUCCESS, "Deatils updated!")
+#         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
 @login_required
 @club_exists
