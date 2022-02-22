@@ -8,8 +8,6 @@ from bookclubs.tests.helpers import reverse_with_next
 class ChangeBookStatusViewTestCase(TestCase):
     """Tests for changing book reading status"""
 
-    #VIEW = 'change_book_status'
-
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
         'bookclubs/tests/fixtures/default_book.json',
