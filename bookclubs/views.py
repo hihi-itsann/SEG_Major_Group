@@ -210,13 +210,26 @@ def create_book_status(request, ISBN):
             book=book,
             user=request.user,
         )
-        messages.add_message(request, messages.SUCCESS, "Add to your reading_list successfully!")
+        messages.add_message(request, messages.SUCCESS, "Add to your reading list successfully!")
         return redirect('reading_book_list')
     messages.add_message(request, messages.ERROR, "The Book has already been added in your reading list!")
     return redirect('show_book', ISBN)
     # model = BookStatus
     # template_name = 'reading_list.html'
     # ordering = ['-added_at' ]
+
+@login_required
+def change_book_status(request, ISBN, choice):
+    current_book = Book.objects.get(ISBN=ISBN)
+    try:
+        current_book_status = BookStatus.objects.get(user=request.user, book=current_book)
+        current_book_status.change_status(choice)
+    except ObjectDoesNotExist:
+        return redirect('show_book', ISBN)
+    else:
+        messages.add_message(request, messages.SUCCESS, f'Successfully change the book status to {current_book_status.get_status_display()}!')
+        return redirect('show_book', ISBN)
+
 
 @login_required
 def reading_book_list(request):

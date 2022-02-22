@@ -177,7 +177,7 @@ class Club(models.Model):
 
     def get_club_name(self):
         return self.club_name
-        
+
     def get_club_role(self, user):
         return Role.objects.get(club=self, user=user).club_role
 
