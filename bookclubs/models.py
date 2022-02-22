@@ -175,6 +175,9 @@ class Club(models.Model):
 
     club_members = models.ManyToManyField(User, through='Role')
 
+    def get_club_name(self):
+        return self.club_name
+        
     def get_club_role(self, user):
         return Role.objects.get(club=self, user=user).club_role
 
@@ -182,15 +185,6 @@ class Club(models.Model):
         role = Role.objects.get(club=self, user=user)
         role.club_role = 'MEM'
         role.save()
-
-    def toggle_officer(self, user):
-        role = Role.objects.get(club=self, user=user)
-        if role.club_role == 'BAN':
-            return
-        else:
-            role.club_role = 'OFF'
-            role.save()
-            return
 
     def toggle_moderator(self, user):
         role = Role.objects.get(club=self, user=user)
@@ -221,10 +215,10 @@ class Club(models.Model):
     def transfer_ownership(self, old_owner, new_owner):
         new_owner_role = Role.objects.get(club=self, user=new_owner)
         old_owner_role = Role.objects.get(club=self, user=old_owner)
-        if new_owner_role.club_role == 'OFF':
+        if new_owner_role.club_role == 'MOD':
             new_owner_role.club_role = 'OWN'
             new_owner_role.save()
-            old_owner_role.club_role = 'OFF'
+            old_owner_role.club_role = 'MOD'
             old_owner_role.save()
             return
         else:
@@ -244,11 +238,6 @@ class Club(models.Model):
             club__club_name=self.club_name,
             role__club_role='BAN')
 
-    def get_officers(self):
-        return User.objects.all().filter(
-            club__club_name=self.club_name,
-            role__club_role='OFF')
-
     def get_owner(self):
         return User.objects.all().filter(
             club__club_name=self.club_name,
@@ -258,6 +247,12 @@ class Club(models.Model):
         role = Role.objects.get(club=self, user=user)
         role.delete()
 
+    def change_club_status(self, choice):
+        if choice == True:
+            self.public_status = True
+        else:
+            self.status = False
+        self.save()
 
 class Role(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -265,7 +260,6 @@ class Role(models.Model):
 
     class RoleOptions(models.TextChoices):
         MEMBER = 'MEM', _('Member')
-        OFFICER = 'OFF', _('Officer')
         MODERATOR = 'MOD', _('Moderator')
         OWNER = 'OWN', _('Owner')
         BANNED = 'BAN', _('BannedMember')
@@ -278,6 +272,9 @@ class Role(models.Model):
 
     def get_club_role(self):
         return self.RoleOptions(self.club_role).name.title()
+
+    def full_name(self):
+        return f'{self.first_name} {self.last_name}'
 
 
 class Post(models.Model):
