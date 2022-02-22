@@ -1,20 +1,25 @@
+<style>
+  .text-main{
+    color:#123555;
+  }
+</style
 {% extends 'base_content.html' %}
 {% block title %}
-Create new club
 {% endblock %}
 {% block content %}
+<div class="content">
 <div id="newclub-row" class="row justify-content-center align-items-center">
-    <div id="newclub-column" class="col-md-6">
+    <div id="newclub-column" class="col-md-6 text-main">
         <div id="newclub-box" class="col-md-12">
-        <div class="card cover-card offset-sm-6 offset-md-9 offset-lg-3">
-            <h1 class="cover-heading">Create Club</h1>
-            <form action="{% url 'create_club' %}" method="post" class="text-dark">
+            <h1 class="cover-heading text-main">CREATE YOUR OWN CLUB!</h1>
+            <form action="{% url 'create_club' %}" method="post" class="text-main">
               {% csrf_token %}
               {% include 'partials/bootstrap_form.html' with form=form %}
-              <input type="submit" value="Create club!" class="btn btn-dark">
+              <input type="submit" value="Create club!" class="btn btn-outline-dark">
             </form>
-            <p><a href="{% url 'feed' %}" class="text-dark">Changed your mind? Go back to feed here.</a></p>
+            <p><a href="{% url 'feed' %}">Changed your mind? Go back to feed here.</a></p>
           </div>
         </div>
     </div>
+  </div>
 {% endblock %}
