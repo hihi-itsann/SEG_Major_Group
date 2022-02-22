@@ -225,6 +225,7 @@ def change_book_status(request, ISBN, choice):
         current_book_status = BookStatus.objects.get(user=request.user, book=current_book)
         current_book_status.change_status(choice)
     except ObjectDoesNotExist:
+        messages.add_message(request, messages.ERROR, f'Unsuccessfully change the book status!')
         return redirect('show_book', ISBN)
     else:
         messages.add_message(request, messages.SUCCESS, f'Successfully change the book status to {current_book_status.get_status_display()}!')
