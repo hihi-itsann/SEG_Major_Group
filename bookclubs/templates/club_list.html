@@ -1,30 +1,33 @@
 {% extends 'base_content.html' %}
 {% block content %}
-    <br>
     <div class="container">
-        <div class="col-xs-12 col-lg-6 col-xl-8">
-            <h1>Clubs</h1>
             <br>
             {% if clubs %}
-                {% for club in clubs %}
-                    <div>
-                        <tr>
-                            <td><h2>{{ club.club_name }}</h2></td>
-                            <p>{{ club.description }}</p>
-                            <p>Total members: {{ club.club_members.count }}</p>
-                            <td><a href='{% url 'create_application' club.club_name %}' class="btn btn-outline-success">
-                                Apply
-                            </a>
-                            </td>
-                        </tr>
-                        <hr>
+                <h1>More clubs for you to explore!</h1>
+                <br>
+                <div class="club">
+                  <div class=row row-cols-3">
+                  {% for club in clubs %}
+                  <div class="col-6 club-card">
+                      <h2 class="card-title">
+                         {{ club.club_name }}
+                      </h2>
+                      <div class="card-body">
+                        <p>What do we do? - {{ club.club.description }}</p>
+                        <p>Number of Members: {{ club.club.club_members.count }}</p>
+                        <a href= '{% url 'create_application' club.club_name %}'
+                                 class="btn btn-outline-dark">
+                              Apply!
+                          </a>
+                      </div>
                     </div>
-                {% endfor %}
+                    {% endfor %}
+                  </div>
+                </div>
             {% else %}
-                <p>You are currently a member of all the clubs in the system!</p>
-                <a href='{% url 'my_clubs' %}' class="btn btn-outline-success">
-                    See my clubs
-                </a>
+                <h1>You are currently a member of all the clubs in the system!</h1>
+                <p>Click <a href="{% url 'club_list' %}">View My Clubs</a> to view your clubs list
+                    or <a href="{% url 'create_club' %}">HERE</a> to create a new club.</p>
             {% endif %}
         </div>
     </div>
