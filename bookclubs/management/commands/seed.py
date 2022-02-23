@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from bookclubs.models import User, Club, Role, Book,Rating
+from bookclubs.models import User, Club, Role, Book, Rating
 
 import pytz
 from faker import Faker
@@ -55,16 +55,18 @@ class Command(BaseCommand):
         self.users = User.objects.all()
         self.create_ratings()
 
-        self._create_clubs()
+        self.create_clubs()
         self.clubs = Club.objects.all()
-        self._create_roles()
+
+        self.create_roles()
         self.roles = Role.objects.all()
+
     def create_ratings(self):
-        for index, rating in self.df_ratings.iterrows():
-            print(f"Seeding rating {index}/{len(self.df_ratings)}", end='\r')
-
+        for index, rating in self.df_ratings[:10].iterrows():
+        # for index, rating in self.df_ratings.iterrows():
+            # print(f"Seeding rating {index}/{len(self.df_ratings)}", end='\r')
+            print(f"Seeding rating {index}/10", end='\r')
             try:
-
                 self.create_rating(rating)
             except:
                 continue
@@ -74,13 +76,15 @@ class Command(BaseCommand):
         Rating.objects.create(
             rate = rating['Book-Rating'],
             book = self.books.get(ISBN=rating['ISBN']),
-            user = self.users.get(userID=rating['User-ID']
-            )
+            user = self.users.get(userID=rating['User-ID'])
+        )
 
 
     def create_books(self):
-        for index, book in self.df_books.iterrows():
-            print(f"Seeding book {index}/{len(self.df_books)}", end='\r')
+        for index, book in self.df_books[:10].iterrows():
+        # for index, book in self.df_books.iterrows():
+            # print(f"Seeding book {index}/{len(self.df_books)}", end='\r')
+            print(f"Seeding book {index}/10", end='\r')
             try:
 
                 self.create_book(book)
@@ -113,16 +117,18 @@ class Command(BaseCommand):
     #             continue
     #         user_count += 1
     #     print("User seeding complete.      ")
+
     def create_users(self):
-        for index, user in self.df_users.iterrows():
-            print(f"Seeding user {index}/{len(self.df_users)}", end='\r')
+        for index, user in self.df_users[:10].iterrows():
+        # for index, user in self.df_users.iterrows():
+        #     print(f"Seeding user {index}/{len(self.df_users)}", end='\r')
+            print(f"Seeding user {index}/10", end='\r')
             try:
 
                 self.create_user(user)
             except:
                 continue
         print("User seeding complete.      ")
-
 
     #the csv file has only user id, location and age so Other information are created with Faker
     def create_user(self,user):
@@ -162,18 +168,18 @@ class Command(BaseCommand):
             return self.faker.date_between(start_date=start_date, end_date=end_date)
 
 
-    def _create_clubs(self):
+    def create_clubs(self):
         club_count = 0
         while club_count < self.CLUB_COUNT:
             print(f"Seeding club {club_count}/{self.CLUB_COUNT}", end='\r')
             try:
-                club = self._create_club()
+                club = self.create_club()
             except:
                 continue
             club_count += 1
         print("Club seeding complete.      ")
 
-    def _create_club(self):
+    def create_club(self):
         description = self.faker.text(max_nb_chars=520)
         meeting_status = self.faker.boolean()
         location = self.faker.street_name()
@@ -189,30 +195,30 @@ class Command(BaseCommand):
             genre=genre
         )
 
-    def _create_roles(self):
+    def create_roles(self):
         role_count = 0
         for club in self.clubs:
             print(f"Seeding userInClub {role_count}/{self.CLUB_COUNT*self.USER_COUNT}", end='\r')
-            self._create_owner_role(club)
+            self.create_owner_role(club)
             role_count += 1
             for user in self.users:
                 try:
-                    self._create_role(user, club)
+                    self.create_role(user, club)
                 except:
                     continue
                 role_count += 1
         print("Role seeding complete.      ")
 
-    def _create_role(self, user, club):
+    def create_role(self, user, club):
         if random() < self.USER_IN_CLUB_PROBABILITY:
-            club_role = self.faker.random_choices(elements=('MEM', 'OFF', 'MOD', 'BAN'), length=1)[0]
+            club_role = self.faker.random_choices(elements=('MEM', 'MOD', 'BAN'), length=1)[0]
             Role.objects.create(
                 user=user,
                 club=club,
                 club_role=club_role
             )
 
-    def _create_owner_role(self, club):
+    def create_owner_role(self, club):
         user = self.get_random_user()
         Role.objects.create(
             user=user,

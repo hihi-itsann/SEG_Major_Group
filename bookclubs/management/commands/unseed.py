@@ -1,11 +1,13 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from bookclubs.models import User, Post, Comment, Club, Role
+from bookclubs.models import User, Post, Comment, Club, Role, Book, Rating
 
 class Command(BaseCommand):
     help = 'Seeds the database with sample data'
 
     def handle(self, *args, **options):
+        Rating.objects.all().delete()
+        Book.objects.all().delete()
         Role.objects.all().delete()
         Club.objects.all().delete()
         Comment.objects.all().delete()
