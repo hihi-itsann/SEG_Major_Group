@@ -55,7 +55,7 @@ class CommentAdmin(admin.ModelAdmin):
     ]
 
 @admin.register(Post)
-class CommentAdmin(admin.ModelAdmin):
+class PostAdmin(admin.ModelAdmin):
     list_display = [
         'title', 'author', 'body', 'post_date', 'post_datetime'
     ]

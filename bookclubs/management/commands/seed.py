@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from bookclubs.models import User, Club, Role, Book, Rating
+from bookclubs.models import User, Club, Role, Book, Rating, Post
 
 import pytz
 from faker import Faker
@@ -14,7 +14,7 @@ import urllib.request
 import json
 import textwrap
 class Command(BaseCommand):
-    USER_COUNT = 100
+    POST_COUNT = 100
     CLUB_COUNT = 10
     DEFAULT_PASSWORD = 'Password123'
     USER_IN_CLUB_PROBABILITY = 0.2
@@ -24,6 +24,24 @@ class Command(BaseCommand):
     # df_ratings=[]
     # df_users=[]
     # df_books=[]
+    def __init__(self):
+        self.faker = Faker('en_GB')
+
+    def handle(self, *args, **options):
+        self.load_data_from_csv()
+        self.create_books()
+        self.books = Book.objects.all()
+
+        self.create_users()
+        self.users = User.objects.all()
+        self.create_ratings()
+        self.create_posts()
+
+        self.create_clubs()
+        self.clubs = Club.objects.all()
+
+        self.create_roles()
+        self.roles = Role.objects.all()
 
     def load_data_from_csv(self):
         self.df_users= pd.read_csv(self.usersPath, sep = ';',names = ['User-ID', 'Location', 'Age'], quotechar = '"', encoding = 'latin-1',header = 0)
@@ -42,24 +60,6 @@ class Command(BaseCommand):
         volume_info = obj["items"][0]
 
         return  volume_info["volumeInfo"]["categories"]
-
-    def __init__(self):
-        self.faker = Faker('en_GB')
-
-    def handle(self, *args, **options):
-        self.load_data_from_csv()
-        self.create_books()
-        self.books = Book.objects.all()
-
-        self.create_users()
-        self.users = User.objects.all()
-        self.create_ratings()
-
-        self.create_clubs()
-        self.clubs = Club.objects.all()
-
-        self.create_roles()
-        self.roles = Role.objects.all()
 
     def create_ratings(self):
         for index, rating in self.df_ratings[:10].iterrows():
@@ -105,19 +105,6 @@ class Command(BaseCommand):
             genra=self.getGenra(book['ISBN'])[0]
         )
 
-
-
-    # def create_users(self):
-    #     user_count = 0
-    #     while user_count < self.USER_COUNT:
-    #         print(f"Seeding user {user_count}/{self.USER_COUNT}", end='\r')
-    #         try:
-    #             self.create_user()
-    #         except:
-    #             continue
-    #         user_count += 1
-    #     print("User seeding complete.      ")
-
     def create_users(self):
         for index, user in self.df_users[:10].iterrows():
         # for index, user in self.df_users.iterrows():
@@ -137,10 +124,8 @@ class Command(BaseCommand):
         email = create_email(first_name, last_name)
         username = create_username(first_name, last_name)
         bio = self.faker.text(max_nb_chars=520)
-        #dob = self.faker.date_of_birth(minimum_age = 8, maximum_age = 100)
         dob=self.get_dob_from_age(user['Age'])
         gender = self.faker.random_choices(elements=('M', 'F', 'O'), length=1)[0]
-        #location = self.faker.city()
         meeting_preference = self.faker.random_choices(elements=('O', 'P'), length=1)[0]
         User.objects.create_user(
             userID=user['User-ID'],
@@ -198,7 +183,8 @@ class Command(BaseCommand):
     def create_roles(self):
         role_count = 0
         for club in self.clubs:
-            print(f"Seeding userInClub {role_count}/{self.CLUB_COUNT*self.USER_COUNT}", end='\r')
+            # print(f"Seeding role {role_count}/{self.CLUB_COUNT*len(self.df_users)}", end='\r')
+            print(f"Seeding role {role_count}/{self.CLUB_COUNT*10}", end='\r')
             self.create_owner_role(club)
             role_count += 1
             for user in self.users:
@@ -229,6 +215,21 @@ class Command(BaseCommand):
     def get_random_user(self):
         index = randint(0,self.users.count()-1)
         return self.users[index]
+
+    def create_posts(self):
+        for i in range(self.POST_COUNT):
+            print(f"Seeding post {i}/{self.POST_COUNT}", end='\r')
+            self.create_post()
+        print("Post seeding complete.      ")
+
+    def create_post(self):
+        post = Post()
+        post.title = self.faker.text(max_nb_chars=255)
+        post.author = self.get_random_user()
+        post.body = self.faker.text(max_nb_chars=280)
+        post.save()
+        datetime = self.faker.past_datetime(start_date='-365d', tzinfo=pytz.UTC)
+        Post.objects.filter(id=post.id).update(post_datetime = datetime)
 
 def create_username(first_name, last_name):
     return '@' + first_name.lower() + last_name.lower()
