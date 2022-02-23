@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from bookclubs.models import User, Club, Role, Book, Rating, Post
+from bookclubs.models import User, Post, Comment, Club, Role, Book, Rating
 
 import pytz
 from faker import Faker
@@ -15,6 +15,7 @@ import json
 import textwrap
 class Command(BaseCommand):
     POST_COUNT = 100
+    COMMENT_COUNT = 100
     CLUB_COUNT = 10
     DEFAULT_PASSWORD = 'Password123'
     USER_IN_CLUB_PROBABILITY = 0.2
@@ -29,13 +30,19 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.load_data_from_csv()
+
         self.create_books()
         self.books = Book.objects.all()
 
         self.create_users()
         self.users = User.objects.all()
+
         self.create_ratings()
+
         self.create_posts()
+        self.posts = Post.objects.all()
+
+        self.create_comments()
 
         self.create_clubs()
         self.clubs = Club.objects.all()
@@ -230,6 +237,25 @@ class Command(BaseCommand):
         post.save()
         datetime = self.faker.past_datetime(start_date='-365d', tzinfo=pytz.UTC)
         Post.objects.filter(id=post.id).update(post_datetime = datetime)
+
+    def create_comments(self):
+        for i in range(self.COMMENT_COUNT):
+            print(f"Seeding comment {i}/{self.COMMENT_COUNT}", end='\r')
+            self.create_comment()
+        print("Comment seeding complete.      ")
+
+    def create_comment(self):
+        comment = Comment()
+        comment.author = self.get_random_user()
+        comment.body = self.faker.text(max_nb_chars=280)
+        comment.related_post = self.get_random_post()
+        comment.save()
+        datetime = self.faker.past_datetime(start_date='-365d', tzinfo=pytz.UTC)
+        Comment.objects.filter(id=comment.id).update(created_at = datetime)
+
+    def get_random_post(self):
+        index = randint(0,self.posts.count()-1)
+        return self.posts[index]
 
 def create_username(first_name, last_name):
     return '@' + first_name.lower() + last_name.lower()
