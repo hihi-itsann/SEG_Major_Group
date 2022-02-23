@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from bookclubs.models import User, Post, Comment, Club, Role, Book, Rating
+from bookclubs.models import User, Post, Comment, Club, Role, Book, Rating, Meeting
 
 import pytz
 from faker import Faker
@@ -17,6 +17,7 @@ class Command(BaseCommand):
     POST_COUNT = 100
     COMMENT_COUNT = 100
     CLUB_COUNT = 10
+    MEETING_COUNT = 10
     DEFAULT_PASSWORD = 'Password123'
     USER_IN_CLUB_PROBABILITY = 0.2
     ratingsPath = 'bookclubs/recommender/dataset/BX-Book-Ratings.csv'
@@ -48,7 +49,8 @@ class Command(BaseCommand):
         self.clubs = Club.objects.all()
 
         self.create_roles()
-        self.roles = Role.objects.all()
+
+        self.create_meetings()
 
     def load_data_from_csv(self):
         self.df_users= pd.read_csv(self.usersPath, sep = ';',names = ['User-ID', 'Location', 'Age'], quotechar = '"', encoding = 'latin-1',header = 0)
@@ -256,6 +258,43 @@ class Command(BaseCommand):
     def get_random_post(self):
         index = randint(0,self.posts.count()-1)
         return self.posts[index]
+
+    def create_meetings(self):
+        meeting_count = 0
+        while meeting_count < self.MEETING_COUNT:
+            print(f"Seeding meeting {meeting_count}/{self.MEETING_COUNT}", end='\r')
+            try:
+                meeting = self.create_meeting()
+            except:
+                continue
+            meeting_count += 1
+        print("Club seeding complete.      ")
+
+    def create_meeting(self):
+        club = self.get_random_club()
+        chooser = self.get_random_user()
+        topic = self.faker.text(max_nb_chars=120)
+        description = self.faker.text(max_nb_chars=520)
+        meeting_status = self.faker.boolean()
+        location = self.faker.street_name()
+        date = self.faker.past_datetime(start_date='-365d', tzinfo=pytz.UTC)
+        time_start = self.faker.time()
+        time_end = self.faker.time()
+        meeting = Meeting.objects.create(
+            club=club,
+            chooser=chooser,
+            topic=topic,
+            description=description,
+            meeting_status=meeting_status,
+            location=location,
+            date=date,
+            time_start=time_start,
+            time_end=time_end
+        )
+
+    def get_random_club(self):
+        index = randint(0,self.clubs.count()-1)
+        return self.clubs[index]
 
 def create_username(first_name, last_name):
     return '@' + first_name.lower() + last_name.lower()

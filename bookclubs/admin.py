@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Application, Club, Role, Book, Rating, BookStatus, Comment, Post
+from .models import User, Application, Club, Role, Book, Rating, BookStatus, Comment, Post, Meeting
 
 
 @admin.register(User)
@@ -58,4 +58,10 @@ class CommentAdmin(admin.ModelAdmin):
 class PostAdmin(admin.ModelAdmin):
     list_display = [
         'title', 'author', 'body', 'post_date', 'post_datetime'
+    ]
+
+@admin.register(Meeting)
+class MeetingAdmin(admin.ModelAdmin):
+    list_display = [
+        'club', 'chooser', 'book', 'topic', 'description', 'meeting_status', 'location', 'date', 'time_start', 'time_end'
     ]
