@@ -9,6 +9,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 class User(AbstractUser):
+    userID=models.IntegerField(unique=True, null=True)
     username = models.CharField(
         max_length=30,
         unique=True,
@@ -70,7 +71,10 @@ class Book(models.Model):
     image_url_s = models.URLField(blank=False)
     image_url_m = models.URLField(blank=False)
     image_url_l = models.URLField(blank=False)
-
+    # image_url_s = models.CharField(max_length=100, blank=False)
+    # image_url_m = models.CharField(max_length=100, blank=False)
+    # image_url_l = models.CharField(max_length=100, blank=False)
+    genra=models.CharField(max_length=100, blank=True)
     def getAverageRate(self):
         return self.rating_set.all().aggregate(Avg('rate'))['rate__avg']
 

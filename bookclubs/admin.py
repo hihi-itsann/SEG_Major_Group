@@ -4,8 +4,8 @@ from .models import User, Application, Club, Role, Book, Rating, BookStatus, Com
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ['username',
-                    'email']
+    list_display = ['userID','username',
+                    'email','location']
 
 
 @admin.register(Club)
@@ -32,7 +32,7 @@ class ApplicationAdmin(admin.ModelAdmin):
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
     list_display = [
-        'ISBN', 'title', 'author', 'year_of_publication', 'publisher', 'image_url_s', 'image_url_m', 'image_url_l'
+        'ISBN', 'title', 'genra','author', 'year_of_publication', 'publisher', 'image_url_s', 'image_url_m', 'image_url_l'
     ]
 
 

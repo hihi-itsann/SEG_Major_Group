@@ -1,56 +1,143 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from bookclubs.models import User, Post, Comment, Club, Role
+from bookclubs.models import User, Club, Role, Book,Rating
 
 import pytz
 from faker import Faker
 from random import randint, random
 from faker.providers import BaseProvider, address, date_time, misc
-
-
+import pandas as pd
+import datetime
+import numpy
+#from bookclubs.recommender.BooksRecommender import getGenra
+import urllib.request
+import json
+import textwrap
 class Command(BaseCommand):
     USER_COUNT = 100
-    POST_COUNT = 2000
     CLUB_COUNT = 10
-    COMMENT_COUNT = 2000
     DEFAULT_PASSWORD = 'Password123'
     USER_IN_CLUB_PROBABILITY = 0.2
+    ratingsPath = 'bookclubs/recommender/dataset/BX-Book-Ratings.csv'
+    booksPath   = 'bookclubs/recommender/dataset/BX-Books.csv'
+    usersPath   = 'bookclubs/recommender/dataset/BX-Users.csv'
+    # df_ratings=[]
+    # df_users=[]
+    # df_books=[]
+
+    def load_data_from_csv(self):
+        self.df_users= pd.read_csv(self.usersPath, sep = ';',names = ['User-ID', 'Location', 'Age'], quotechar = '"', encoding = 'latin-1',header = 0)
+        self.df_books= pd.read_csv(self.booksPath, sep = ';',names = ['ISBN','Book-Title','Book-Author','Year-Of-Publication','Publisher','Image-URL-S','Image-URL-M','Image-URL-L'], quotechar = '"', encoding = 'latin-1',header = 0)
+        self.df_ratings= pd.read_csv(self.ratingsPath, sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0)
+
+
+    def getGenra(self, isbn):
+        base_api_link = "https://www.googleapis.com/books/v1/volumes?q=isbn:"
+
+        with urllib.request.urlopen(base_api_link + isbn) as f:
+            text = f.read()
+
+        decoded_text = text.decode("utf-8")
+        obj = json.loads(decoded_text) # deserializes decoded_text to a Python object
+        volume_info = obj["items"][0]
+
+        return  volume_info["volumeInfo"]["categories"]
 
     def __init__(self):
         self.faker = Faker('en_GB')
 
     def handle(self, *args, **options):
+        self.load_data_from_csv()
+        self.create_books()
+        self.books = Book.objects.all()
+
         self.create_users()
         self.users = User.objects.all()
-        self.create_posts()
-        self.posts = Post.objects.all()
-        # self.create_comments()
-        self.create_clubs()
-        self.clubs = Club.objects.all()
-        self.create_roles()
+        self.create_ratings()
 
-    def create_users(self):
-        user_count = 0
-        while user_count < self.USER_COUNT:
-            print(f"Seeding user {user_count}/{self.USER_COUNT}", end='\r')
+        self._create_clubs()
+        self.clubs = Club.objects.all()
+        self._create_roles()
+        self.roles = Role.objects.all()
+    def create_ratings(self):
+        for index, rating in self.df_ratings.iterrows():
+            print(f"Seeding rating {index}/{len(self.df_ratings)}", end='\r')
+
             try:
-                self.create_user()
+
+                self.create_rating(rating)
             except:
                 continue
-            user_count += 1
+        print("Rating seeding complete.      ")
+
+    def create_rating(self,rating):
+        Rating.objects.create(
+            rate = rating['Book-Rating'],
+            book = self.books.get(ISBN=rating['ISBN']),
+            user = self.users.get(userID=rating['User-ID']
+            )
+
+
+    def create_books(self):
+        for index, book in self.df_books.iterrows():
+            print(f"Seeding book {index}/{len(self.df_books)}", end='\r')
+            try:
+
+                self.create_book(book)
+            except:
+                continue
+        print("Book seeding complete.      ")
+
+    def create_book(self,book):
+        Book.objects.create(
+            ISBN=book['ISBN'],
+            title =book['Book-Title'],
+            author = book['Book-Author'],
+            year_of_publication =book['Year-Of-Publication'],
+            publisher =book['Publisher'],
+            image_url_s = book['Image-URL-S'],
+            image_url_m =book['Image-URL-M'],
+            image_url_l = book['Image-URL-L'],
+            genra=self.getGenra(book['ISBN'])[0]
+        )
+
+
+
+    # def create_users(self):
+    #     user_count = 0
+    #     while user_count < self.USER_COUNT:
+    #         print(f"Seeding user {user_count}/{self.USER_COUNT}", end='\r')
+    #         try:
+    #             self.create_user()
+    #         except:
+    #             continue
+    #         user_count += 1
+    #     print("User seeding complete.      ")
+    def create_users(self):
+        for index, user in self.df_users.iterrows():
+            print(f"Seeding user {index}/{len(self.df_users)}", end='\r')
+            try:
+
+                self.create_user(user)
+            except:
+                continue
         print("User seeding complete.      ")
 
-    def create_user(self):
+
+    #the csv file has only user id, location and age so Other information are created with Faker
+    def create_user(self,user):
         first_name = self.faker.first_name()
         last_name = self.faker.last_name()
         email = create_email(first_name, last_name)
         username = create_username(first_name, last_name)
         bio = self.faker.text(max_nb_chars=520)
-        dob = self.faker.date_of_birth(minimum_age = 8, maximum_age = 100)
+        #dob = self.faker.date_of_birth(minimum_age = 8, maximum_age = 100)
+        dob=self.get_dob_from_age(user['Age'])
         gender = self.faker.random_choices(elements=('M', 'F', 'O'), length=1)[0]
-        location = self.faker.city()
+        #location = self.faker.city()
         meeting_preference = self.faker.random_choices(elements=('O', 'P'), length=1)[0]
         User.objects.create_user(
+            userID=user['User-ID'],
             username=username,
             email=email,
             password=Command.DEFAULT_PASSWORD,
@@ -59,37 +146,34 @@ class Command(BaseCommand):
             bio=bio,
             dob=dob,
             gender=gender,
-            location=location,
+            location=user['Location'],
             meeting_preference=meeting_preference
         )
 
-    def create_posts(self):
-        for i in range(self.POST_COUNT):
-            print(f"Seeding post {i}/{self.POST_COUNT}", end='\r')
-            self.create_post()
-        print("Post seeding complete.      ")
+    def get_dob_from_age(self, age):
+        if numpy.isnan(age) :
+            return None
+        else:
+            now = datetime.datetime.now()
+            current_year = now.year
+            year_of_birth=int(current_year-age)
+            start_date = datetime.date(year=year_of_birth, month=1, day=1)
+            end_date = datetime.date(year=year_of_birth, month=12, day=31)
+            return self.faker.date_between(start_date=start_date, end_date=end_date)
 
-    def create_post(self):
-        post = Post()
-        post.title = self.faker.text(max_nb_chars=255)
-        post.author = self.get_random_user()
-        post.body = self.faker.text(max_nb_chars=280)
-        post.save()
-        datetime = self.faker.past_datetime(start_date='-365d', tzinfo=pytz.UTC)
-        Post.objects.filter(id=post.id).update(post_datetime = datetime)
 
-    def create_clubs(self):
+    def _create_clubs(self):
         club_count = 0
         while club_count < self.CLUB_COUNT:
             print(f"Seeding club {club_count}/{self.CLUB_COUNT}", end='\r')
             try:
-                club = self.create_club()
+                club = self._create_club()
             except:
                 continue
             club_count += 1
         print("Club seeding complete.      ")
 
-    def create_club(self):
+    def _create_club(self):
         description = self.faker.text(max_nb_chars=520)
         meeting_status = self.faker.boolean()
         location = self.faker.street_name()
@@ -105,30 +189,30 @@ class Command(BaseCommand):
             genre=genre
         )
 
-    def create_roles(self):
+    def _create_roles(self):
         role_count = 0
         for club in self.clubs:
             print(f"Seeding userInClub {role_count}/{self.CLUB_COUNT*self.USER_COUNT}", end='\r')
-            self.create_owner_role(club)
+            self._create_owner_role(club)
             role_count += 1
             for user in self.users:
                 try:
-                    self.create_role(user, club)
+                    self._create_role(user, club)
                 except:
                     continue
                 role_count += 1
         print("Role seeding complete.      ")
 
-    def create_role(self, user, club):
+    def _create_role(self, user, club):
         if random() < self.USER_IN_CLUB_PROBABILITY:
-            club_role = self.faker.random_choices(elements=('MEM', 'MOD', 'BAN'), length=1)[0]
+            club_role = self.faker.random_choices(elements=('MEM', 'OFF', 'MOD', 'BAN'), length=1)[0]
             Role.objects.create(
                 user=user,
                 club=club,
                 club_role=club_role
             )
 
-    def create_owner_role(self, club):
+    def _create_owner_role(self, club):
         user = self.get_random_user()
         Role.objects.create(
             user=user,
@@ -139,25 +223,6 @@ class Command(BaseCommand):
     def get_random_user(self):
         index = randint(0,self.users.count()-1)
         return self.users[index]
-
-    def create_comments(self):
-        for i in range(self.COMMENT_COUNT):
-            print(f"Seeding comment {i}/{self.COMMENT_COUNT}", end='\r')
-            self.create_comment()
-        print("Comment seeding complete.      ")
-
-    def create_comment(self):
-        comment = Comment()
-        comment.author = self.get_random_user()
-        comment.body = self.faker.text(max_nb_chars=280)
-        comment.related_post = self.get_random_post()
-        comment.save()
-        datetime = self.faker.past_datetime(start_date='-365d', tzinfo=pytz.UTC)
-        Comment.objects.filter(id=comment.id).update(created_at = datetime)
-
-    def get_random_post(self):
-        index = randint(0,self.posts.count()-1)
-        return self.posts[index]
 
 def create_username(first_name, last_name):
     return '@' + first_name.lower() + last_name.lower()
