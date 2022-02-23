@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from bookclubs.models import User, Post, Club, Role
+from bookclubs.models import User, Post, Comment, Club, Role
 
 import pytz
 from faker import Faker
@@ -9,9 +9,10 @@ from faker.providers import BaseProvider, address, date_time, misc
 
 
 class Command(BaseCommand):
-    USER_COUNT = 10
+    USER_COUNT = 100
     POST_COUNT = 2000
     CLUB_COUNT = 10
+    COMMENT_COUNT = 2000
     DEFAULT_PASSWORD = 'Password123'
     USER_IN_CLUB_PROBABILITY = 0.2
 
@@ -22,10 +23,11 @@ class Command(BaseCommand):
         self.create_users()
         self.users = User.objects.all()
         self.create_posts()
-        self._create_clubs()
+        self.posts = Post.objects.all()
+        # self.create_comments()
+        self.create_clubs()
         self.clubs = Club.objects.all()
-        self._create_roles()
-        self.roles = Role.objects.all()
+        self.create_roles()
 
     def create_users(self):
         user_count = 0
@@ -76,18 +78,18 @@ class Command(BaseCommand):
         datetime = self.faker.past_datetime(start_date='-365d', tzinfo=pytz.UTC)
         Post.objects.filter(id=post.id).update(post_datetime = datetime)
 
-    def _create_clubs(self):
+    def create_clubs(self):
         club_count = 0
         while club_count < self.CLUB_COUNT:
             print(f"Seeding club {club_count}/{self.CLUB_COUNT}", end='\r')
             try:
-                club = self._create_club()
+                club = self.create_club()
             except:
                 continue
             club_count += 1
         print("Club seeding complete.      ")
 
-    def _create_club(self):
+    def create_club(self):
         description = self.faker.text(max_nb_chars=520)
         meeting_status = self.faker.boolean()
         location = self.faker.street_name()
@@ -103,21 +105,21 @@ class Command(BaseCommand):
             genre=genre
         )
 
-    def _create_roles(self):
+    def create_roles(self):
         role_count = 0
         for club in self.clubs:
             print(f"Seeding userInClub {role_count}/{self.CLUB_COUNT*self.USER_COUNT}", end='\r')
-            self._create_owner_role(club)
+            self.create_owner_role(club)
             role_count += 1
             for user in self.users:
                 try:
-                    self._create_role(user, club)
+                    self.create_role(user, club)
                 except:
                     continue
                 role_count += 1
         print("Role seeding complete.      ")
 
-    def _create_role(self, user, club):
+    def create_role(self, user, club):
         if random() < self.USER_IN_CLUB_PROBABILITY:
             club_role = self.faker.random_choices(elements=('MEM', 'MOD', 'BAN'), length=1)[0]
             Role.objects.create(
@@ -126,7 +128,7 @@ class Command(BaseCommand):
                 club_role=club_role
             )
 
-    def _create_owner_role(self, club):
+    def create_owner_role(self, club):
         user = self.get_random_user()
         Role.objects.create(
             user=user,
@@ -137,6 +139,25 @@ class Command(BaseCommand):
     def get_random_user(self):
         index = randint(0,self.users.count()-1)
         return self.users[index]
+
+    def create_comments(self):
+        for i in range(self.COMMENT_COUNT):
+            print(f"Seeding comment {i}/{self.COMMENT_COUNT}", end='\r')
+            self.create_comment()
+        print("Comment seeding complete.      ")
+
+    def create_comment(self):
+        comment = Comment()
+        comment.author = self.get_random_user()
+        comment.body = self.faker.text(max_nb_chars=280)
+        comment.related_post = self.get_random_post()
+        comment.save()
+        datetime = self.faker.past_datetime(start_date='-365d', tzinfo=pytz.UTC)
+        Comment.objects.filter(id=comment.id).update(created_at = datetime)
+
+    def get_random_post(self):
+        index = randint(0,self.posts.count()-1)
+        return self.posts[index]
 
 def create_username(first_name, last_name):
     return '@' + first_name.lower() + last_name.lower()

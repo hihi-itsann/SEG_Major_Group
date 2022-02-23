@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from bookclubs.models import User, Club, Role
+from bookclubs.models import User, Post, Comment, Club, Role
 
 class Command(BaseCommand):
     help = 'Seeds the database with sample data'
@@ -8,4 +8,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         Role.objects.all().delete()
         Club.objects.all().delete()
+        Comment.objects.all().delete()
+        Post.objects.all().delete()
         User.objects.filter(is_staff=False).delete()
