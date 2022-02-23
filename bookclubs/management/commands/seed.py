@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from bookclubs.models import User, Club, Role
+from bookclubs.models import User, Post, Club, Role
 
 import pytz
 from faker import Faker
@@ -9,7 +9,8 @@ from faker.providers import BaseProvider, address, date_time, misc
 
 
 class Command(BaseCommand):
-    USER_COUNT = 100
+    USER_COUNT = 10
+    POST_COUNT = 2000
     CLUB_COUNT = 10
     DEFAULT_PASSWORD = 'Password123'
     USER_IN_CLUB_PROBABILITY = 0.2
@@ -20,6 +21,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.create_users()
         self.users = User.objects.all()
+        self.create_posts()
         self._create_clubs()
         self.clubs = Club.objects.all()
         self._create_roles()
@@ -58,6 +60,21 @@ class Command(BaseCommand):
             location=location,
             meeting_preference=meeting_preference
         )
+
+    def create_posts(self):
+        for i in range(self.POST_COUNT):
+            print(f"Seeding post {i}/{self.POST_COUNT}", end='\r')
+            self.create_post()
+        print("Post seeding complete.      ")
+
+    def create_post(self):
+        post = Post()
+        post.title = self.faker.text(max_nb_chars=255)
+        post.author = self.get_random_user()
+        post.body = self.faker.text(max_nb_chars=280)
+        post.save()
+        datetime = self.faker.past_datetime(start_date='-365d', tzinfo=pytz.UTC)
+        Post.objects.filter(id=post.id).update(post_datetime = datetime)
 
     def _create_clubs(self):
         club_count = 0
@@ -102,7 +119,7 @@ class Command(BaseCommand):
 
     def _create_role(self, user, club):
         if random() < self.USER_IN_CLUB_PROBABILITY:
-            club_role = self.faker.random_choices(elements=('MEM', 'OFF', 'MOD', 'BAN'), length=1)[0]
+            club_role = self.faker.random_choices(elements=('MEM', 'MOD', 'BAN'), length=1)[0]
             Role.objects.create(
                 user=user,
                 club=club,
