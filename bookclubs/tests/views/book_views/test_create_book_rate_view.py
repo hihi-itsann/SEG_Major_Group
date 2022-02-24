@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from bookclubs.forms import RateForm
 from bookclubs.models import User, Book, Rating
+from bookclubs.tests.helpers import reverse_with_next
 
 class CreateBookRateViewTestCase(TestCase):
     """Tests of the create book rate view."""
@@ -41,3 +42,8 @@ class CreateBookRateViewTestCase(TestCase):
         self.assertEqual(after_count, before_count+1)
         book = Book.objects.get(ISBN='0195153448')
         self.assertTemplateUsed(response, 'book_list.html')
+
+    def test_redirects_when_not_logged_in(self):
+        redirect_url = reverse_with_next('log_in', self.url)
+        response = self.client.get(self.url)
+        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)

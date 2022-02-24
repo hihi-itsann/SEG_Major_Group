@@ -197,9 +197,6 @@ class CreateBookRateView(LoginRequiredMixin, CreateView):
         return reverse('book_list')
         #return reverse('book', kwargs={'ISBN': self.kwargs['ISBN']})
 
-    def handle_no_permission(self):
-        return redirect('log_in')
-
 @login_required
 def create_book_status(request, ISBN):
     book = Book.objects.get(ISBN=ISBN)
