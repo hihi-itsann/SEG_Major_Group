@@ -231,11 +231,21 @@ def change_book_status(request, ISBN, choice):
 
 @login_required
 def reading_book_list(request):
-    bookStatuses = BookStatus.objects.filter(user=request.user)
-    books = []
-    for bookStatus in bookStatuses:
-        books.append(bookStatus.book)
-    return render(request, 'reading_book_list.html', {"books": books})
+    unreadBookStatuses = BookStatus.objects.filter(user=request.user, status='U')
+    readingBookStatuses = BookStatus.objects.filter(user=request.user, status='R')
+    finishedBookStatuses = BookStatus.objects.filter(user=request.user, status='F')
+    unreadBooks = []
+    readingBooks = []
+    finishedBooks = []
+    for bookStatus in unreadBookStatuses:
+        unreadBooks.append(bookStatus.book)
+    for bookStatus in readingBookStatuses:
+        readingBooks.append(bookStatus.book)
+    for bookStatus in finishedBookStatuses:
+        finishedBooks.append(bookStatus.book)
+
+    args = {'unreadBooks': unreadBooks, 'readingBooks': readingBooks, 'finishedBooks':finishedBooks}
+    return render(request, 'reading_book_list.html', args)
 
 @login_required
 @club_exists

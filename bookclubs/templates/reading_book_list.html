@@ -2,17 +2,35 @@
 {% block content %}
     <br>
     <div class="container">
-        <div class="col-xs-12 col-lg-6 col-xl-8">
-            <h1>Reading List</h1>
-            <hr>
-            {% for book in books%}
-              <div class="col-lg-3 offset-0">
-                <img src="{{ book.image_url_l }}">
-              </div>
-              <h2><a href="{% url 'show_book' book.ISBN %}">{{ book.title }}</a></h2>
-              <div class="col-lg-6 offset-2">
-            {% endfor %}
+      <div class = "row">
+        <h1>Reading List</h1>
+        <hr>
+        <div class="col-sm-4" style="background-color: #FFFFE0">
+          <h2>Unread Books</h2><br>
+          {% for book in unreadBooks%}
+              <img src="{{ book.image_url_m }}" class="center">
+              <h5><a href="{% url 'show_book' book.ISBN %}">{{ book.title }}</a></h5>
+              <br>
+          {% endfor %}
         </div>
+
+        <div class="col-sm-4"style="background-color: #FFFACD">
+          <h2>Reading Books</h2><br>
+          {% for book in readingBooks%}
+              <img src="{{ book.image_url_m }}">
+              <h5><a href="{% url 'show_book' book.ISBN %}">{{ book.title }}</a></h5>
+              <br>
+          {% endfor %}
         </div>
+
+        <div class="col-sm-4" style="background-color: #FAFAD2">
+          <h2>Finished Books</h2><br>
+          {% for book in finishedBooks%}
+              <img src="{{ book.image_url_m }}">
+              <h5><a href="{% url 'show_book' book.ISBN %}">{{ book.title }}</a></h5>
+              <br>
+          {% endfor %}
+        </div>
+      </div>
     </div>
 {% endblock %}
