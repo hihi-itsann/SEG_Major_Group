@@ -243,7 +243,6 @@ def reading_book_list(request):
         readingBooks.append(bookStatus.book)
     for bookStatus in finishedBookStatuses:
         finishedBooks.append(bookStatus.book)
-
     args = {'unreadBooks': unreadBooks, 'readingBooks': readingBooks, 'finishedBooks':finishedBooks}
     return render(request, 'reading_book_list.html', args)
 
