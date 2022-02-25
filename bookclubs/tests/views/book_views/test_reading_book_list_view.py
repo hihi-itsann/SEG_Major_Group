@@ -24,7 +24,7 @@ class BookListViewTest(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'reading_book_list.html')
-        self.assertEqual(len(response.context['books']), 9)
+        self.assertEqual(len(response.context['unreadBooks']), 9)
         for book_id in range(9):
             book = Book.objects.get(ISBN=f'XXXXXXXXX{book_id}')
             book_url = reverse('show_book', kwargs={'ISBN': book.pk})
