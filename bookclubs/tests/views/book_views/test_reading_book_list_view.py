@@ -6,12 +6,9 @@ from bookclubs.tests.helpers import reverse_with_next
 class BookListViewTest(TestCase):
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
-        'bookclubs/tests/fixtures/default_book.json'
     ]
 
     def setUp(self):
-        self.book = Book.objects.get(ISBN='0195153448')
-        # self.url = reverse('reading_book_list', kwargs={'book_genra': self.book.genra})
         self.url = reverse('reading_book_list', kwargs={'book_genra': 'All'})
         self.user = User.objects.get(username='@johndoe')
 
