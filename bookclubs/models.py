@@ -8,6 +8,8 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 
+
+
 class User(AbstractUser):
     userID=models.IntegerField(unique=True, null=True)
     username = models.CharField(
@@ -36,6 +38,9 @@ class User(AbstractUser):
         ('P', 'In-person')
     )
     meeting_preference = models.CharField(max_length=1, choices=MEETING_CHOICES, blank=True)
+
+    def get_rated_books(self):
+        return Rating.objects.all().filter(user=self)
 
     class Meta:
         """Model options."""
@@ -77,12 +82,14 @@ class Book(models.Model):
     genra=models.CharField(max_length=100, blank=True)
     def getAverageRate(self):
         return self.rating_set.all().aggregate(Avg('rate'))['rate__avg']
-
+    def get_ISBN(self):
+        return self.ISBN
 
 class Rating(models.Model):
     rate = models.FloatField(default=0, validators=[MinValueValidator(0.0), MaxValueValidator(10.0)])
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+
 
 class BookStatus(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
@@ -179,6 +186,28 @@ class Club(models.Model):
 
     club_members = models.ManyToManyField(User, through='Role')
 
+    # def get_club_books_average_rating(self):
+    #     """return a list of average rating of books read by members of this club """
+    #
+    #     members=self.get_moderators()|self.get_members()|self.get_management()
+    #     #club_books={}
+    #     number_of_ratings={}
+    #     for user in members:
+    #         for rating in user.get_rated_books():
+    #             ISBN=rating.book.get_ISBN()
+    #             if ISBN in club_books.keys():
+    #                 temp=club_books[ISBN]
+    #                 club_books[ISBN]=temp+rating.rate
+    #                 temp=number_of_ratings[ISBN]
+    #                 number_of_ratings[ISBN]=temp+1
+    #             else:
+    #                 club_books[ISBN]=rating.rate
+    #                 number_of_ratings[ISBN]=1
+    #     for (ISBN, total_rating) in club_books.items():
+    #         club_books[ISBN]=total_rating/number_of_ratings[ISBN]
+    #     return club_books
+
+
     def get_club_name(self):
         return self.club_name
 
@@ -231,6 +260,9 @@ class Club(models.Model):
     def get_members(self):
         return self.club_members.all().filter(
             club__club_name=self.club_name, role__club_role='MEM')
+    def get_moderators(self):
+        return self.club_members.all().filter(
+            club__club_name=self.club_name, role__club_role='MOD')
 
     def get_management(self):
         return self.club_members.all().filter(
@@ -257,6 +289,18 @@ class Club(models.Model):
         else:
             self.status = False
         self.save()
+        
+class ClubBookAverageRating(models.Model):
+    club = models.ForeignKey(Club, on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    rate = models.FloatField(default=0, validators=[MinValueValidator(0.0), MaxValueValidator(10.0)])
+    number_of_ratings=models.IntegerField()
+
+    def add_rating(self, rate):
+        self.rate+=rate
+
+    def increment_number_of_ratings(self):
+        self.number_of_ratings+=1
 
 class Role(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

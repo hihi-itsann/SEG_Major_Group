@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from bookclubs.models import User, Club, Role, Book,Rating
+from bookclubs.models import User, Club, Role, Book,Rating,ClubBookAverageRating
 
 import pytz
 from faker import Faker
@@ -18,17 +18,20 @@ class Command(BaseCommand):
     CLUB_COUNT = 10
     DEFAULT_PASSWORD = 'Password123'
     USER_IN_CLUB_PROBABILITY = 0.2
-    ratingsPath = 'bookclubs/recommender/dataset/BX-Book-Ratings.csv'
+    USER_RATE_BOOK_PROBABILITY= 0.3
+    #ratingsPath = 'bookclubs/recommender/dataset/BX-Book-Ratings.csv'
     booksPath   = 'bookclubs/recommender/dataset/BX-Books.csv'
-    usersPath   = 'bookclubs/recommender/dataset/BX-Users.csv'
+    #usersPath   = 'bookclubs/recommender/dataset/BX-Users.csv'
     # df_ratings=[]
     # df_users=[]
     # df_books=[]
+    
+
 
     def load_data_from_csv(self):
-        self.df_users= pd.read_csv(self.usersPath, sep = ';',names = ['User-ID', 'Location', 'Age'], quotechar = '"', encoding = 'latin-1',header = 0)
+        #self.df_users= pd.read_csv(self.usersPath, sep = ';',names = ['User-ID', 'Location', 'Age'], quotechar = '"', encoding = 'latin-1',header = 0)
         self.df_books= pd.read_csv(self.booksPath, sep = ';',names = ['ISBN','Book-Title','Book-Author','Year-Of-Publication','Publisher','Image-URL-S','Image-URL-M','Image-URL-L'], quotechar = '"', encoding = 'latin-1',header = 0)
-        self.df_ratings= pd.read_csv(self.ratingsPath, sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0)
+        #self.df_ratings= pd.read_csv(self.ratingsPath, sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0)
 
 
     def getGenra(self, isbn):
@@ -52,34 +55,49 @@ class Command(BaseCommand):
         self.books = Book.objects.all()
 
         self.create_users()
-        self.users = User.objects.all()
-        self.create_ratings()
-
-        self._create_clubs()
-        self.clubs = Club.objects.all()
-        self._create_roles()
-        self.roles = Role.objects.all()
-    def create_ratings(self):
-        for index, rating in self.df_ratings.iterrows():
-            print(f"Seeding rating {index}/{len(self.df_ratings)}", end='\r')
-
-            try:
-
-                self.create_rating(rating)
-            except:
-                continue
+        # self.users = User.objects.all()
+        # self.create_ratings()
+        #
+        # self._create_clubs()
+        # self.clubs = Club.objects.all()
+        # self._create_roles()
+        # self.roles = Role.objects.all()
+    # def create_ratings(self):
+    #     for index, rating in self.df_ratings.iterrows():
+    #         print(f"Seeding rating {index}/{len(self.df_ratings)}", end='\r')
+    #
+    #         try:
+    #
+    #             self.create_rating(rating)
+    #         except:
+    #             continue
+    #     print("Rating seeding complete.      ")
+    #
+    # def create_rating(self,rating):
+    #     Rating.objects.create(
+    #         rate = rating['Book-Rating'],
+    #         book = self.books.get(ISBN=rating['ISBN']),
+    #         user = self.users.get(userID=rating['User-ID']  ))
+    def create_ratings (self):
+        for book in self.books:
+            print(f"Seeding user ratings ......", end='\r')
+            for user in self.users:
+                try:
+                    if random()<self.USER_RATE_BOOK_PROBABILITY:
+                        self.create_rating(user, book)
+                except:
+                    continue
         print("Rating seeding complete.      ")
 
-    def create_rating(self,rating):
+    def create_rating(self, user, book):
+        rate = self.faker.random_int(min=0, max=10)
         Rating.objects.create(
-            rate = rating['Book-Rating'],
-            book = self.books.get(ISBN=rating['ISBN']),
-            user = self.users.get(userID=rating['User-ID']
-            )
-
-
+            rate=rate,
+            book=book,
+            user=user
+        )
     def create_books(self):
-        for index, book in self.df_books.iterrows():
+        for index, book in self.df_books.head(3).iterrows():
             print(f"Seeding book {index}/{len(self.df_books)}", end='\r')
             try:
 
@@ -103,41 +121,65 @@ class Command(BaseCommand):
 
 
 
-    # def create_users(self):
-    #     user_count = 0
-    #     while user_count < self.USER_COUNT:
-    #         print(f"Seeding user {user_count}/{self.USER_COUNT}", end='\r')
-    #         try:
-    #             self.create_user()
-    #         except:
-    #             continue
-    #         user_count += 1
-    #     print("User seeding complete.      ")
     def create_users(self):
-        for index, user in self.df_users.iterrows():
-            print(f"Seeding user {index}/{len(self.df_users)}", end='\r')
+        user_count = 0
+        while user_count < self.USER_COUNT:
+            print(f"Seeding user {user_count}/{self.USER_COUNT}", end='\r')
             try:
-
-                self.create_user(user)
+                self.create_user(user_count)
             except:
                 continue
+            user_count += 1
         print("User seeding complete.      ")
+    # def create_users(self):
+    #     for index, user in self.df_users.iterrows():
+    #         print(f"Seeding user {index}/{len(self.df_users)}", end='\r')
+    #         try:
+    #
+    #             self.create_user(user)
+    #         except:
+    #             continue
+    #     print("User seeding complete.      ")
 
 
     #the csv file has only user id, location and age so Other information are created with Faker
-    def create_user(self,user):
+    # def create_user(self,user):
+    #     first_name = self.faker.first_name()
+    #     last_name = self.faker.last_name()
+    #     email = create_email(first_name, last_name)
+    #     username = create_username(first_name, last_name)
+    #     bio = self.faker.text(max_nb_chars=520)
+    #     #dob = self.faker.date_of_birth(minimum_age = 8, maximum_age = 100)
+    #     dob=self.get_dob_from_age(user['Age'])
+    #     gender = self.faker.random_choices(elements=('M', 'F', 'O'), length=1)[0]
+    #     #location = self.faker.city()
+    #     meeting_preference = self.faker.random_choices(elements=('O', 'P'), length=1)[0]
+    #     User.objects.create_user(
+    #         userID=user['User-ID'],
+    #         username=username,
+    #         email=email,
+    #         password=Command.DEFAULT_PASSWORD,
+    #         first_name=first_name,
+    #         last_name=last_name,
+    #         bio=bio,
+    #         dob=dob,
+    #         gender=gender,
+    #         location=user['Location'],
+    #         meeting_preference=meeting_preference
+    #     )
+    def create_user(self,userID):
         first_name = self.faker.first_name()
         last_name = self.faker.last_name()
         email = create_email(first_name, last_name)
         username = create_username(first_name, last_name)
         bio = self.faker.text(max_nb_chars=520)
-        #dob = self.faker.date_of_birth(minimum_age = 8, maximum_age = 100)
-        dob=self.get_dob_from_age(user['Age'])
+        dob = self.faker.date_of_birth(minimum_age = 8, maximum_age = 100)
+        #dob=self.get_dob_from_age(user['Age'])
         gender = self.faker.random_choices(elements=('M', 'F', 'O'), length=1)[0]
-        #location = self.faker.city()
+        location = self.faker.city()
         meeting_preference = self.faker.random_choices(elements=('O', 'P'), length=1)[0]
         User.objects.create_user(
-            userID=user['User-ID'],
+            userID=userID+1,
             username=username,
             email=email,
             password=Command.DEFAULT_PASSWORD,
@@ -146,20 +188,20 @@ class Command(BaseCommand):
             bio=bio,
             dob=dob,
             gender=gender,
-            location=user['Location'],
+            location=location,
             meeting_preference=meeting_preference
         )
 
-    def get_dob_from_age(self, age):
-        if numpy.isnan(age) :
-            return None
-        else:
-            now = datetime.datetime.now()
-            current_year = now.year
-            year_of_birth=int(current_year-age)
-            start_date = datetime.date(year=year_of_birth, month=1, day=1)
-            end_date = datetime.date(year=year_of_birth, month=12, day=31)
-            return self.faker.date_between(start_date=start_date, end_date=end_date)
+    # def get_dob_from_age(self, age):
+    #     if numpy.isnan(age) :
+    #         return None
+    #     else:
+    #         now = datetime.datetime.now()
+    #         current_year = now.year
+    #         year_of_birth=int(current_year-age)
+    #         start_date = datetime.date(year=year_of_birth, month=1, day=1)
+    #         end_date = datetime.date(year=year_of_birth, month=12, day=31)
+    #         return self.faker.date_between(start_date=start_date, end_date=end_date)
 
 
     def _create_clubs(self):

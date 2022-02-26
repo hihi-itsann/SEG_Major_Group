@@ -6,8 +6,8 @@ from django.contrib.auth import authenticate
 from django.db import IntegrityError
 import datetime
 
-from .models import Post
-
+from .models import Post, Book
+from bookclubs.recommender.fakeRecommender import get_recommendations
 
 # from django.forms.widgets import DateInput
 
@@ -250,7 +250,41 @@ class CommentForm(forms.ModelForm):
         }
 
 
+# class NewMeetingForm(forms.ModelForm):
+#     class Meta:
+#         model = Meeting
+#         # !!! Chooser and Book should be got through algorithms
+#         fields = (
+#             'chooser', 'book', 'topic', 'description', 'meeting_status', 'location', 'date', 'time_start', 'time_end')
+#
+#         widgets = {
+#             'chooser': forms.Select(attrs={'class': 'form-control'}),
+#             'book': forms.TextInput(attrs={'class': 'form-control',
+#                                            'placeholder': 'Book assigned to this meeting'}),
+#             'topic': forms.TextInput(attrs={'class': 'form-control',
+#                                             'placeholder': 'Topic'}),
+#             'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Agenda'}),
+#             'meeting_status': forms.Select(attrs={'class': 'form-control'}),
+#             'date': forms.DateInput(attrs={'class': 'form-control', 'placeholder': 'dd/mm/yyyy'}),
+#             'time_start': forms.TimeInput(attrs={'class': 'form-control', 'placeholder': 'hh:mm'}),
+#             'time_end': forms.TimeInput(attrs={'class': 'form-control', 'placeholder': 'hh:mm'})
+#         }
+#
+#     MEETING_STATUS_CHOICES = (
+#         (True, 'Online'),
+#         (False, 'In Person')
+#     )
 class NewMeetingForm(forms.ModelForm):
+    def __init__(self,club_subject,*args,**kwargs):
+          # call standard __init__
+          super().__init__(*args,**kwargs)
+          print(club_subject)
+          #extend __init__
+          recommendations=get_recommendations(club_subject)
+          #self.fields['city'].queryset = City.objects.none()
+
+          self.fields['book'].queryset= Book.objects.all().filter(ISBN__in=recommendations)
+
     class Meta:
         model = Meeting
         # !!! Chooser and Book should be got through algorithms
@@ -259,8 +293,7 @@ class NewMeetingForm(forms.ModelForm):
 
         widgets = {
             'chooser': forms.Select(attrs={'class': 'form-control'}),
-            'book': forms.TextInput(attrs={'class': 'form-control',
-                                           'placeholder': 'Book assigned to this meeting'}),
+            'book': forms.Select(attrs={'class': 'form-control'}),
             'topic': forms.TextInput(attrs={'class': 'form-control',
                                             'placeholder': 'Topic'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Agenda'}),
@@ -270,10 +303,10 @@ class NewMeetingForm(forms.ModelForm):
             'time_end': forms.TimeInput(attrs={'class': 'form-control', 'placeholder': 'hh:mm'})
         }
 
-    MEETING_STATUS_CHOICES = (
-        (True, 'Online'),
-        (False, 'In Person')
-    )
+    # MEETING_STATUS_CHOICES = (
+    #     (True, 'Online'),
+    #     (False, 'In Person')
+    # )
 
     # meeting_status = forms.ChoiceField(widget=forms.Select(), label='Meetings Held', choices=MEETING_STATUS_CHOICES)
 
