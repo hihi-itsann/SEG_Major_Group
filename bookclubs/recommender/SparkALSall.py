@@ -5,8 +5,8 @@ from pyspark.sql import SparkSession
 from pyspark.ml.feature import StringIndexer, IndexToString
 from pyspark.ml.evaluation import RegressionEvaluator
 from pyspark.ml.recommendation import ALS
-from pyspark.context import SparkContext
 from pyspark.sql.functions import explode
+from BookLens import BookLens
 
 import pandas as pd
 import csv
@@ -19,74 +19,55 @@ if __name__ == "__main__":
         .builder\
         .appName("ALSExample")\
         .config("spark.executor.cores", '4')\
-        .config("spark.executor.memory", '10G')\
-        .config("spark.executor.memoryOverhead", '1G')\
         .getOrCreate()
 
-    df = pd.read_csv('bookclubs/dataset/BX-Book-Ratings.csv', sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0)
-    df = df[df.loc[:]!=0].dropna()
-    # df = pd.read_csv('../dataset/BX-Book-Ratings.csv', sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0 )
-    # books = pd.read_csv('../dataset/BX-Books.csv', sep = ';',names = ['ISBN'], quotechar = '"', encoding = 'latin-1',header = 0 )
-    # df["bookID"] = books.ISBN[books.ISBN == df.ISBN].index.tolist()[0]
-    # print(df.head)
+    spark.sparkContext.setCheckpointDir("/tmp/checkpoints")
 
-    # df.ISBN = df.ISBN.apply(lambda x: x[:-1] + "10" if x[-1] == "X" else x)
-    # df = df[df.ISBN.str.isdecimal()]
-    # df.ISBN = df.ISBN.apply(lambda x: int(x))
-    df = spark.createDataFrame(df).repartition(1000)
+    df = pd.read_csv('bookclubs/dataset/BX-Book-Ratings.csv', sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0 )
+    df = df[df.loc[:]!=0].dropna()
+    df.ISBN = df.ISBN.apply(lambda x: x[:-1] + "10" if x[-1] == "X" else x)
+    df = df[df.ISBN.str.len() <= 11]
+    df = spark.createDataFrame(df)
+
 
     indexer = StringIndexer(inputCol="ISBN", outputCol="bookID").fit(df)
     indexed = indexer.transform(df)
-    indexed.show()
+    ratings = indexed.drop("ISBN")
 
+    (training, test) = ratings.randomSplit([0.8, 0.2])
 
-    lines = indexed.rdd
-
-    # print("yes")
-
-    ratingsRDD = lines.map(lambda p: Row(userId=int(p[0]), bookID=int(p[3]),
-                                         rating=float(p[2])))
-
-    ratings = spark.createDataFrame(ratingsRDD)
-
-    (training, test) = ratings.randomSplit([0.75, 0.25])
-
-    training.cache()
-    test.cache()
-
-    als = ALS(maxIter=5, regParam=0.01, userCol="userId", itemCol="bookID", ratingCol="rating",
+    als = ALS(maxIter=40, regParam=0.3,rank=10, userCol="User-ID", itemCol="bookID", ratingCol="Book-Rating",
               coldStartStrategy="drop")
-
     model = als.fit(training)
-
-    predictions = model.transform(test)
-
+    predictions_test = model.transform(test)
+    predictions_train = model.transform(training)
     labelConverter = IndexToString(inputCol="bookID", outputCol="ISBN",
                                labels=indexer.labels)
-
-    evaluator = RegressionEvaluator(metricName="rmse", labelCol="rating",
+    evaluator = RegressionEvaluator(metricName="rmse", labelCol="Book-Rating",
                                     predictionCol="prediction")
+    rmse_test = evaluator.evaluate(predictions_test)
+    rmse_train = evaluator.evaluate(predictions_train)
+    print("Root-mean-square error for test = " + str(rmse_test))
+    print("Root-mean-square error for train = " + str(rmse_train))
 
-    rmse = evaluator.evaluate(predictions)
-
-    print("Root-mean-square error = " + str(rmse))
 
     userRecs = model.recommendForAllUsers(10)
 
-    flatUserRecs = userRecs.withColumn("songAndRating", explode(userRecs. recommendations)) \
-    .select ( "userId", "songAndRating.*")
+    flatUserRecs = userRecs.withColumn("bookAndRating", explode(userRecs.recommendations)) \
+    .select ( "User-ID", "bookAndRating.*")
 
-    flatUserRecs = labelConverter.transform(flatUserRecs)
-    flatUserRecs.show()
-    user85Recs = flatUserRecs.filter(userRecs['userId'] == 85).collect()
+    flatUserRecs = labelConverter.transform(flatUserRecs).filter(userRecs['User-ID'] == 222906)
+    user85Recs = flatUserRecs.collect()
     # user85Recs.show()
-    # print(user85Recs)
+
 
     spark.stop()
-    
+
     ml = BookLens()
     ml.loadBookLensLatestSmall()
- 
+    print(len(user85Recs))
+    
+
     for row in user85Recs:
-        print(ml.getBookName(row.ISBN)+ ", ISBN：" + (row.ISBN))
+        print(ml.getBookName(row.ISBN))
 
