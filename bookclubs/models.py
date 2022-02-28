@@ -80,6 +80,24 @@ class Rating(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
+class BookStatus(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    STATUS_CHOICES = (
+        ('U', 'Unread'),
+        ('R', 'Reading'),
+        ('F', 'Finished')
+    )
+    status = models.CharField(max_length=1, choices=STATUS_CHOICES, blank=False, default='U')
+
+    def change_status(self, choice):
+        if choice == 'U':
+            self.status = 'U'
+        elif choice == 'R':
+            self.status = 'R'
+        else:
+            self.status = 'F'
+        self.save()
 
 class Application(models.Model):
     STATUS_CHOICES = (
@@ -157,6 +175,9 @@ class Club(models.Model):
 
     club_members = models.ManyToManyField(User, through='Role')
 
+    def get_club_name(self):
+        return self.club_name
+
     def get_club_role(self, user):
         return Role.objects.get(club=self, user=user).club_role
 
@@ -164,15 +185,6 @@ class Club(models.Model):
         role = Role.objects.get(club=self, user=user)
         role.club_role = 'MEM'
         role.save()
-
-    def toggle_officer(self, user):
-        role = Role.objects.get(club=self, user=user)
-        if role.club_role == 'BAN':
-            return
-        else:
-            role.club_role = 'OFF'
-            role.save()
-            return
 
     def toggle_moderator(self, user):
         role = Role.objects.get(club=self, user=user)
@@ -203,10 +215,10 @@ class Club(models.Model):
     def transfer_ownership(self, old_owner, new_owner):
         new_owner_role = Role.objects.get(club=self, user=new_owner)
         old_owner_role = Role.objects.get(club=self, user=old_owner)
-        if new_owner_role.club_role == 'OFF':
+        if new_owner_role.club_role == 'MOD':
             new_owner_role.club_role = 'OWN'
             new_owner_role.save()
-            old_owner_role.club_role = 'OFF'
+            old_owner_role.club_role = 'MOD'
             old_owner_role.save()
             return
         else:
@@ -226,11 +238,6 @@ class Club(models.Model):
             club__club_name=self.club_name,
             role__club_role='BAN')
 
-    def get_officers(self):
-        return User.objects.all().filter(
-            club__club_name=self.club_name,
-            role__club_role='OFF')
-
     def get_owner(self):
         return User.objects.all().filter(
             club__club_name=self.club_name,
@@ -240,6 +247,12 @@ class Club(models.Model):
         role = Role.objects.get(club=self, user=user)
         role.delete()
 
+    def change_club_status(self, choice):
+        if choice == True:
+            self.public_status = True
+        else:
+            self.status = False
+        self.save()
 
 class Role(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -247,7 +260,6 @@ class Role(models.Model):
 
     class RoleOptions(models.TextChoices):
         MEMBER = 'MEM', _('Member')
-        OFFICER = 'OFF', _('Officer')
         MODERATOR = 'MOD', _('Moderator')
         OWNER = 'OWN', _('Owner')
         BANNED = 'BAN', _('BannedMember')
@@ -260,6 +272,9 @@ class Role(models.Model):
 
     def get_club_role(self):
         return self.RoleOptions(self.club_role).name.title()
+
+    def full_name(self):
+        return f'{self.first_name} {self.last_name}'
 
 
 class Post(models.Model):
@@ -277,9 +292,8 @@ class Post(models.Model):
 
 
 class Comment(models.Model):
-    # name = models.CharField(max_length=50, blank=False, default="Unknown")
     author = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    body = models.TextField(max_length=520, blank=False)
+    body = models.CharField(max_length=520, blank=False)
     related_post = models.ForeignKey(Post, related_name="comments", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 

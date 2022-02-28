@@ -22,7 +22,25 @@
               <h1 style="color:Green">Rating: {{ book.getAverageRate|floatformat:1 }}/10</h1>
             {% endif %}
             <button type="button" class="btn btn-outline-primary btn-lg"><a href="{% url 'create_book_rating' book.ISBN %}">Create Your Rate here</a></button>
+            <button type="button" class="btn btn-outline-primary btn-lg"><a href="{% url 'create_book_status' book.ISBN %}">Add to your reading list</a></button>
+            <br><br>
+            <div class="dropdown">
+              <a class="btn btn-outline-primary dropdown-toggle btn-lg" role="button" data-bs-toggle="dropdown">
+                Change Reading Status
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                <li><a class="dropdown-item" href="{% url 'change_book_status' book.ISBN  'U'%}">Unread</a></li>
+                <li><a class="dropdown-item" href="{% url 'change_book_status' book.ISBN  'R'%}">Reading</a></li>
+                <li><a class="dropdown-item" href="{% url 'change_book_status' book.ISBN  'F'%}">Finished</a></li>
+              </ul>
+            </div>
+
           </div>
+
+          <form class="row justify-content-center">
+            <input type="button" class="btn-close btn-lg" aria-label="Close" onclick="history.back()">
+          </form>
+
 
         </div>
       </div>
