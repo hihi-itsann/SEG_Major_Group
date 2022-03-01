@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from pyspark import Row
+from curses import BUTTON1_DOUBLE_CLICKED
+from email import header
+from os import sep
+from pyspark.sql import Row
 from pyspark.sql import SparkSession
 from pyspark.ml.feature import StringIndexer, IndexToString
 from pyspark.ml.evaluation import RegressionEvaluator
@@ -29,14 +32,17 @@ if __name__ == "__main__":
     df = df[df.ISBN.str.len() <= 11]
     df = spark.createDataFrame(df)
 
-
     indexer = StringIndexer(inputCol="ISBN", outputCol="bookID").fit(df)
     indexed = indexer.transform(df)
     ratings = indexed.drop("ISBN")
+    """ lines = indexed.rdd
+    ratingsRDD = lines.map(lambda p: Row(userId=int(p[0]), bookID=int(p[3]),
+                                         rating=float(p[2])))
+    ratings = spark.createDataFrame(ratingsRDD) """
 
     (training, test) = ratings.randomSplit([0.8, 0.2])
 
-    als = ALS(maxIter=40, regParam=0.3,rank=10, userCol="User-ID", itemCol="bookID", ratingCol="Book-Rating",
+    als = ALS(maxIter=30, regParam=0.3,rank=40,userCol="User-ID", itemCol="bookID", ratingCol="Book-Rating",
               coldStartStrategy="drop")
     model = als.fit(training)
     predictions_test = model.transform(test)
@@ -71,3 +77,4 @@ if __name__ == "__main__":
     for row in user85Recs:
         print(ml.getBookName(row.ISBN))
 
+        

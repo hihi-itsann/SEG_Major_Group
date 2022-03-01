@@ -20,10 +20,6 @@ class BookLens:
 
     def loadRatingData(self):
         df = pd.read_csv(self.ratingsPath, sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0 )
-        df.to_csv('drop_0_rankings.csv')
-        """df.ISBN = df.ISBN.apply(lambda x: x[:-1] + "10" if x[-1] == "X" else x)
-        df = df[df.ISBN.str.isdecimal()]
-        df.ISBN = df.ISBN.apply(lambda x: int(x)) """
         return df
 
     def loadBookLensLatestSmall(self):
