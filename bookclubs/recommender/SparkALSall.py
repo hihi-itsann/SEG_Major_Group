@@ -26,7 +26,7 @@ if __name__ == "__main__":
     df = pd.read_csv('bookclubs/dataset/BX-Book-Ratings.csv', sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0 )
     df = df[df.loc[:]!=0].dropna()
     df.ISBN = df.ISBN.apply(lambda x: x[:-1] + "10" if x[-1] == "X" else x)
-    df = df[df.ISBN.str.len() <= 11]
+    df = df[df['ISBN'].map(lambda x: len(x) <= 11 & len(x) >= 9)]
     df = spark.createDataFrame(df)
 
     indexer = StringIndexer(inputCol="ISBN", outputCol="bookID").fit(df)
@@ -68,7 +68,7 @@ if __name__ == "__main__":
 
     ml = BookLens()
     ml.loadBookLensLatestSmall()
-    print(len(user85Recs))
+    #print(len(user85Recs))
     
 
     for row in user85Recs:
