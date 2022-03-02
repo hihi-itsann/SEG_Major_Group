@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from curses import BUTTON1_DOUBLE_CLICKED
-from email import header
-from os import sep
 from pyspark.sql import Row
 from pyspark.sql import SparkSession
 from pyspark.ml.feature import StringIndexer, IndexToString
