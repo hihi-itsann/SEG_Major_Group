@@ -28,7 +28,6 @@ class CreateMeetingApplicationViewTestCase(TestCase):
         Role.objects.create(user=self.owner, club=self.club, club_role='OWN')
         self.form_input = {
             'club': self.club,
-            'chooser': self.member,
             'book': self.book,
             'topic': 'alpha bravo charlie',
             'description': 'delta foxtrot golf hotel india',
@@ -53,7 +52,7 @@ class CreateMeetingApplicationViewTestCase(TestCase):
         after_count = Meeting.objects.count()
         self.assertEqual(after_count, before_count)
 
-    def test_create_application_redirects_when_a_banned_user(self):
+    def test_create_meeting_redirects_when_a_banned_user(self):
         self.log_in(self.member)
         Role.objects.create(user=self.member, club=self.club, club_role='BAN')
         before_count = Meeting.objects.count()
@@ -63,26 +62,27 @@ class CreateMeetingApplicationViewTestCase(TestCase):
         after_count = Meeting.objects.count()
         self.assertEqual(after_count, before_count)
 
-    def test_create_application_redirects_when_a_member(self):
+    def test_create_meeting_redirects_when_a_member(self):
         self.log_in(self.member)
         Role.objects.create(user=self.member, club=self.club, club_role='MEM')
         before_count = Meeting.objects.count()
-        redirect_url = reverse('feed')
+        redirect_url = reverse('club_feed', kwargs={'club_name': self.club.club_name})
         response = self.client.get(self.url)
+
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
         after_count = Meeting.objects.count()
         self.assertEqual(after_count, before_count)
 
     ## TODO: Find out why this is not working.
-    # def test_create_meeting_is_successful_when_owner(self):
-    #     self.log_in(self.owner)
-    #     before_count = Meeting.objects.count()
-    #     response = self.client.post(self.url, self.form_input, follow=True)
-    #     after_count = Meeting.objects.count()
-    #     self.assertEqual(after_count, before_count + 1)
-    #     response_url = reverse('club_feed', kwargs={'club_name': self.club.club_name})
-    #     self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-    #     self.assertTemplateUsed(response, 'club_feed.html')
+    def test_create_meeting_is_successful_when_owner(self):
+        self.log_in(self.owner)
+        before_count = Meeting.objects.count()
+        response = self.client.post(self.url, self.form_input, follow=True)
+        after_count = Meeting.objects.count()
+        self.assertEqual(after_count, before_count + 1)
+        response_url = reverse('club_feed', kwargs={'club_name': self.club.club_name})
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+        self.assertTemplateUsed(response, 'club_feed.html')
 
     def test_create_meeting_shows_form(self):
         self.log_in(self.owner)

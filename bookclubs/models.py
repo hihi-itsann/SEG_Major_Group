@@ -319,8 +319,7 @@ class Meeting(models.Model):
         (False, 'In Person')
     )
     club = models.ForeignKey(Club, related_name='meeting_club', on_delete=models.CASCADE)
-    chooser = models.ForeignKey(User, related_name='book_chooser', on_delete=models.CASCADE, null=True)
-    book = models.ForeignKey(Book, on_delete=models.CASCADE, null=True, blank=True)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, null=True, blank=True, )
     topic = models.CharField(max_length=120, default='', blank=False)
     description = models.TextField(max_length=520, blank=True)
     meeting_status = models.BooleanField(choices=MEETING_STATUS_CHOICES, default=False)
@@ -336,7 +335,6 @@ class Meeting(models.Model):
 class MeetingAttendance(models.Model):
     MEETING_ROLE_CHOICES = (
         ('H', 'Host'),
-        ('C', 'Chooser'),
         ('A', 'Attendee')
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE)

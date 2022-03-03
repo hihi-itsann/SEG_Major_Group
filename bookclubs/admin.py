@@ -63,6 +63,6 @@ class PostAdmin(admin.ModelAdmin):
 @admin.register(Meeting)
 class MeetingAdmin(admin.ModelAdmin):
     list_display = [
-        'club', 'chooser', 'book', 'topic', 'description', 'meeting_status', 'location', 'date', 'time_start', 'time_end'
+        'club', 'book', 'topic', 'description', 'meeting_status', 'location', 'date', 'time_start', 'time_end'
     ]
 

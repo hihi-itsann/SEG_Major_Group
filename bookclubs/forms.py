@@ -1,6 +1,6 @@
 from django import forms
 from django.core.validators import RegexValidator
-from .models import User, Club, Application, Role, Post, Comment, Rating, Meeting
+from .models import User, Club, Application, Role, Post, Comment, Rating, Meeting, MeetingAttendance, Book
 from django.contrib.auth import authenticate
 # from django.forms.widgets import DateInput
 from django.db import IntegrityError
@@ -251,20 +251,20 @@ class CommentForm(forms.ModelForm):
 
 
 class NewMeetingForm(forms.ModelForm):
+
+    book = forms.ModelChoiceField(queryset=Book.objects.all(), to_field_name='title')
+
     class Meta:
-        model = Meeting
         # !!! Chooser and Book should be got through algorithms
-        fields = (
-            'chooser', 'book', 'topic', 'description', 'meeting_status', 'location', 'date', 'time_start', 'time_end')
+        fields = ('book', 'topic', 'description', 'meeting_status', 'location', 'date', 'time_start', 'time_end')
 
         widgets = {
-            'chooser': forms.Select(attrs={'class': 'form-control'}),
-            'book': forms.Select(attrs={'class': 'form-control',
-                                        'placeholder': 'Book assigned to this meeting'}),
+            'book': forms.Select(attrs={'class': 'form-control'}),
             'topic': forms.TextInput(attrs={'class': 'form-control',
                                             'placeholder': 'Topic'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Agenda'}),
             'meeting_status': forms.Select(attrs={'class': 'form-control'}),
+            'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Location'}),
             'date': forms.DateInput(attrs={'class': 'form-control', 'placeholder': 'dd/mm/yyyy'}),
             'time_start': forms.TimeInput(attrs={'class': 'form-control', 'placeholder': 'hh:mm'}),
             'time_end': forms.TimeInput(attrs={'class': 'form-control', 'placeholder': 'hh:mm'})
@@ -281,7 +281,6 @@ class NewMeetingForm(forms.ModelForm):
         super().save(commit=False)
         meeting = Meeting.objects.create(
             club=club,
-            chooser=self.cleaned_data.get('chooser'),
             book=self.cleaned_data.get('book'),
             topic=self.cleaned_data.get('topic'),
             description=self.cleaned_data.get('description'),
@@ -290,5 +289,10 @@ class NewMeetingForm(forms.ModelForm):
             date=self.cleaned_data.get('date'),
             time_start=self.cleaned_data.get('time_start'),
             time_end=self.cleaned_data.get('time_end')
+        )
+        host = MeetingAttendance.objects.create(
+            user=user,
+            meeting=meeting,
+            meeting_role='H'
         )
         return meeting
