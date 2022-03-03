@@ -79,6 +79,12 @@ class Book(models.Model):
     def getAverageRate(self):
         return self.bookratingreview_set.all().aggregate(Avg('rate'))['rate__avg']
 
+    def getReview(self):
+        return BookRatingReview.objects.filter(book=self).exclude(review__exact='')
+
+    def getReadingStatus(self,user):
+        return BookStatus.objects.get(book=self, user=user).status
+
 
 class BookRatingReview(models.Model):
     rate = models.FloatField(default=0, validators=[MinValueValidator(0.0), MaxValueValidator(10.0)])

@@ -16,14 +16,16 @@
             <h4><em>Year: {{ book.year_of_publication }}</em></h4><br>
             <h4><em>publisher: {{ book.publisher }}</em></h4><br>
             <h4><em>ISBN: {{ book.ISBN }}</em></h4><br>
+
             {% if book.getAverageRate == None %}
               <h1 style="color:Green">Not Yet Rated</h1>
             {% else %}
               <h1 style="color:Green">Rating: {{ book.getAverageRate|floatformat:1 }}/10</h1>
             {% endif %}
-            <button type="button" class="btn btn-outline-primary btn-lg"><a href="{% url 'create_book_rating_review' book.ISBN %}">Create Your Rate here</a></button>
             <button type="button" class="btn btn-outline-primary btn-lg"><a href="{% url 'create_book_status' book.ISBN %}">Add to your reading list</a></button>
+
             <br><br>
+
             <div class="dropdown">
               <a class="btn btn-outline-primary dropdown-toggle btn-lg" role="button" data-bs-toggle="dropdown">
                 Change Reading Status
@@ -35,11 +37,30 @@
               </ul>
             </div>
 
+            <br>
+            
+            <button type="button" class="btn btn-outline-primary btn-lg"><a href="{% url 'create_book_rating_review' book.ISBN %}">Create Your Rate and Review here</a></button>
+
           </div>
 
-          <form class="row justify-content-center">
-            <input type="button" class="btn-close btn-lg" aria-label="Close" onclick="history.back()">
-          </form>
+          <div>
+            {% if not book.getReview.all %}
+                <h2>No Reviews Yet.</h2>
+            {% else %}
+                <h2>Reviews:</h2>
+                {% for review in book.getReview%}
+                    <b><i>{{ review.user.username }}</i>- <i>{{ review.created_at }}</i></b>
+                    <p>{{ review.review }}</p>
+                {%endfor%}
+
+            {%endif%}
+          </div>
+
+          <div>
+            <form class="row justify-content-center">
+              <input type="button" class="btn-close btn-lg" aria-label="Close" onclick="history.back()">
+            </form>
+        </div>
 
 
         </div>
