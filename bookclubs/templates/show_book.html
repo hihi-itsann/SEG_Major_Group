@@ -38,8 +38,12 @@
             </div>
 
             <br>
-            
-            <button type="button" class="btn btn-outline-primary btn-lg"><a href="{% url 'create_book_rating_review' book.ISBN %}">Create Your Rate and Review here</a></button>
+            {% if user.is_authenticated %}
+                {% if readingStatus == 'F'%}
+                    <button type="button" class="btn btn-outline-primary btn-lg"><a href="{% url 'create_book_rating_review' book.ISBN %}">Create Your Rate and Review here</a></button>
+                {% endif %}
+            {% endif %}
+
 
           </div>
 
