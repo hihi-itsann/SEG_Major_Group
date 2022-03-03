@@ -1,3 +1,4 @@
+from django.db.models import Q  #filter exception
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -14,6 +15,7 @@ from django.shortcuts import redirect, render, get_object_or_404
 from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm,UpdateApplicationForm, CommentForm, RateForm, PostForm, NewMeetingForm
 from .helpers import *
 from .models import User, Book, Application, Comment, Post, Rating, BookStatus, Club
+
 
 
 @login_prohibited
@@ -436,7 +438,7 @@ def reject_applicant(request, club_name, user_id):
 
 @login_required
 def my_clubs(request):
-    clubs = Role.objects.filter(user=request.user)
+    clubs = Role.objects.filter(~Q(club_role='BAN'), user=request.user)
     return render(request, 'my_clubs.html', {'clubs': clubs})
 
 
@@ -565,7 +567,8 @@ def change_club_to_public_status(request, club_name):
 
 @login_required
 @club_exists
-def member_list(request,club_name):
+@membership_required
+def member_list(request, club_name):
     is_owner = False
     club = Club.objects.get(club_name=club_name)
     cur_user=request.user
