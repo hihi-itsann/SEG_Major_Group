@@ -22,7 +22,7 @@ class CreateCommentTest(TestCase):
         self.data = { 'body': 'The quick brown fox jumps over the lazy dog.' }
 
     def test_create_comment_url(self):
-        self.assertEqual(self.url, f'/create_comment/{self.post.id}')
+        self.assertEqual(self.url, f'/create_comment/{self.post.id}/')
 
     def test_create_comment_redirects_when_not_logged_in(self):
         redirect_url = reverse_with_next('log_in', self.url)

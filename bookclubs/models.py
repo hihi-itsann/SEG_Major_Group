@@ -97,11 +97,16 @@ class BookStatus(models.Model):
     def change_status(self, choice):
         if choice == 'U':
             self.status = 'U'
+            self.save()
         elif choice == 'R':
             self.status = 'R'
-        else:
+            self.save()
+        elif choice == 'F':
             self.status = 'F'
-        self.save()
+            self.save()
+        else:
+            pass
+
 
 class Application(models.Model):
     STATUS_CHOICES = (
