@@ -18,9 +18,8 @@ def login_prohibited(view_function):
     return modified_view_function
 
 
-# TODO: Change officer to moderator?
 def management_required(view_function):
-    """check whether the user is an officer or an owner"""
+    """check whether the user is an moderator or an owner"""
 
     def modified_view_function(request, club_name, *args, **kwargs):
         try:
@@ -65,7 +64,7 @@ def membership_required(view_function):
         except ObjectDoesNotExist:
             return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
         else:
-            if role.club_role == 'MEM' or role.club_role == 'OFF' or role.club_role == 'OWN':
+            if role.club_role == 'MEM' or role.club_role == 'MOD' or role.club_role == 'OWN':
                 return view_function(request, club_name, *args, **kwargs)
             else:
                 return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
