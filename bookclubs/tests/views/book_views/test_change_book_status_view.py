@@ -32,13 +32,26 @@ class ChangeBookStatusViewTestCase(TestCase):
         response = self.client.get(self.url)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
-    # def test_change_book_status_is_successful(self):
-    #     self.client.login(username=self.user.username, password="Password123")
-    #     status_before = self.book_status.status
-    #     self.assertEqual(status_before, 'U')
-    #     response = self.client.get(self.url)
-    #     response_url = reverse('show_book',kwargs={'ISBN': self.book.ISBN})
-    #     self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-    #     status_after = self.book_status.status
-    #     self.assertNotEqual(status_before, status_after)
-    #     self.assertEqual(status_after, 'F')
+    def test_change_book_status_is_successful(self):
+        self.client.login(username=self.user.username, password="Password123")
+        status_before = self.book_status.status
+        self.assertEqual(status_before, 'U')
+        response = self.client.post(self.url, follow=True)
+        status_after = BookStatus.objects.get(user=self.user, book=self.book).status
+        self.assertEqual(status_after, 'F')
+        self.assertNotEqual(status_before, status_after)
+        response_url = reverse('show_book',kwargs={'ISBN': self.book.ISBN})
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+
+    def test_change_book_status_is_unsuccessful_when_choice_is_invalid(self):
+        self.client.login(username=self.user.username, password="Password123")
+        status_before = self.book_status.status
+        self.assertEqual(status_before, 'U')
+        url=f'/change_book_status/{self.book.ISBN}/A/'
+        response = self.client.post(url, follow=True)
+        status_after = BookStatus.objects.get(user=self.user, book=self.book).status
+        self.assertNotEqual(status_after, 'F')
+        self.assertEqual(status_after, 'U')
+        self.assertEqual(status_before, status_after)
+        response_url = reverse('show_book',kwargs={'ISBN': self.book.ISBN})
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
