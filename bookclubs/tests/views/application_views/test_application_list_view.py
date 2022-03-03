@@ -48,16 +48,16 @@ class ApplicationListViewTestCase(TestCase):
         response = self.client.get(self.url)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
-    # def test_application_list_is_successful_when_moderator(self):
-    #     self.log_in(self.owner)
-    #     Role.objects.get(user=self.owner, club=self.club).club_role = 'MOD'
-    #     before_count = Application.objects.count()
-    #     response = self.client.get(self.url)
-    #     self.assertEqual(response.status_code, 200)
-    #     after_count = Application.objects.count()
-    #     self.assertEqual(after_count, before_count)
-    #     self.assertTemplateUsed(response, f'{self.VIEW}.html')
-    #     self.assertContains(response, self.applicant)
+    def test_application_list_is_successful_when_moderator(self):
+        self.log_in(self.owner)
+        Role.objects.get(user=self.owner, club=self.club).club_role = 'MOD'
+        before_count = Application.objects.count()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        after_count = Application.objects.count()
+        self.assertEqual(after_count, before_count)
+        self.assertTemplateUsed(response, f'{self.VIEW}.html')
+        self.assertContains(response, self.applicant)
 
     def test_application_list_is_successful_when_owner(self):
         self.log_in(self.owner)
