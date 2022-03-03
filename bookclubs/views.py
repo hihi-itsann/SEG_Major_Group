@@ -612,7 +612,7 @@ def create_meeting(request, club_name):
         if form.is_valid():
             form.save(current_club)
             messages.add_message(request, messages.SUCCESS, "Meeting set up!")
-            return redirect('my_applications')
+            return redirect(f'/club/{club_name}/feed/')
     else:
         form = NewMeetingForm()
     return render(request, 'create_meeting.html', {'form': form, 'club_name': club_name})

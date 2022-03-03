@@ -259,8 +259,8 @@ class NewMeetingForm(forms.ModelForm):
 
         widgets = {
             'chooser': forms.Select(attrs={'class': 'form-control'}),
-            'book': forms.TextInput(attrs={'class': 'form-control',
-                                           'placeholder': 'Book assigned to this meeting'}),
+            'book': forms.Select(attrs={'class': 'form-control',
+                                        'placeholder': 'Book assigned to this meeting'}),
             'topic': forms.TextInput(attrs={'class': 'form-control',
                                             'placeholder': 'Topic'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Agenda'}),

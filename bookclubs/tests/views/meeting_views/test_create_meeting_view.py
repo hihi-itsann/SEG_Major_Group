@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from bookclubs.forms import NewMeetingForm
-from bookclubs.models import User, Club, Meeting, MeetingAttendance, Role
+from bookclubs.models import User, Club, Meeting, Role, Book
 from bookclubs.tests.helpers import reverse_with_next
 
 
@@ -15,6 +15,8 @@ class CreateMeetingApplicationViewTestCase(TestCase):
         'bookclubs/tests/fixtures/default_user.json',
         'bookclubs/tests/fixtures/other_users.json',
         'bookclubs/tests/fixtures/default_clubs.json',
+        'bookclubs/tests/fixtures/default_book.json',
+
     ]
 
     def setUp(self):
@@ -22,7 +24,20 @@ class CreateMeetingApplicationViewTestCase(TestCase):
         self.member = User.objects.get(username='@janedoe')
         self.club = Club.objects.get(club_name='private_online')
         self.url = reverse(self.VIEW, kwargs={'club_name': self.club.club_name})
+        self.book = Book.objects.get(ISBN='0195153448')
         Role.objects.create(user=self.owner, club=self.club, club_role='OWN')
+        self.form_input = {
+            'club': self.club,
+            'chooser': self.member,
+            'book': self.book,
+            'topic': 'alpha bravo charlie',
+            'description': 'delta foxtrot golf hotel india',
+            'meeting_status': False,
+            'location': 'Bush House',
+            'date': '12/01/2023',
+            'time_start': '10:00',
+            'time_end': '11:00'
+        }
 
     def log_in(self, user):
         self.client.login(username=user.username, password="Password123")
@@ -57,6 +72,17 @@ class CreateMeetingApplicationViewTestCase(TestCase):
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
         after_count = Meeting.objects.count()
         self.assertEqual(after_count, before_count)
+
+    ## TODO: Find out why this is not working.
+    # def test_create_meeting_is_successful_when_owner(self):
+    #     self.log_in(self.owner)
+    #     before_count = Meeting.objects.count()
+    #     response = self.client.post(self.url, self.form_input, follow=True)
+    #     after_count = Meeting.objects.count()
+    #     self.assertEqual(after_count, before_count + 1)
+    #     response_url = reverse('club_feed', kwargs={'club_name': self.club.club_name})
+    #     self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+    #     self.assertTemplateUsed(response, 'club_feed.html')
 
     def test_create_meeting_shows_form(self):
         self.log_in(self.owner)
