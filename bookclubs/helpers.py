@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect
 
-from .models import User, Club, Role, Application, Book
+from .models import Club, Role, Application
 
 
 def login_prohibited(view_function):
@@ -18,9 +18,8 @@ def login_prohibited(view_function):
     return modified_view_function
 
 
-# TODO: Change officer to moderator?
 def management_required(view_function):
-    """check whether the user is an officer or an owner"""
+    """check whether the user is an officer or the owner"""
 
     def modified_view_function(request, club_name, *args, **kwargs):
         current_club = Club.objects.get(club_name=club_name)
@@ -35,12 +34,15 @@ def management_required(view_function):
                 messages.add_message(request, messages.WARNING, "You do not have the permissions required to access "
                                                                 "this content!")
                 return redirect(f'/club/{club_name}/feed/')
+        else:
+            messages.add_message(request, messages.WARNING, "You are not part of this club yet!")
+            return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
     return modified_view_function
 
 
 def owner_required(view_function):
-    """check whether the user is an owner"""
+    """check whether the user is the owner"""
 
     def modified_view_function(request, club_name, *args, **kwargs):
         current_club = Club.objects.get(club_name=club_name)
@@ -55,6 +57,9 @@ def owner_required(view_function):
                 messages.add_message(request, messages.WARNING, "You do not have the permissions required to access "
                                                                 "this content!")
                 return redirect(f'/club/{club_name}/feed/')
+        else:
+            messages.add_message(request, messages.WARNING, "You are not part of this club yet!")
+            return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
     return modified_view_function
 
@@ -89,7 +94,7 @@ def non_applicant_required(view_function):
                 messages.add_message(request, messages.WARNING, "You are the owner!")
                 return redirect(f'/club/{club_name}/feed/')
             elif role == 'BAN':
-                messages.add_message(request, messages.ERROR, "You have been banned from this club!")
+                messages.add_message(request, messages.WARNING, "You have been banned from this club!")
                 return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
             else:
                 messages.add_message(request, messages.WARNING, "You are already a member!")
@@ -124,7 +129,7 @@ def applicant_required(view_function):
                 messages.add_message(request, messages.WARNING, "You are the owner!")
                 return redirect(f'/club/{club_name}/feed/')
             elif role == 'BAN':
-                messages.add_message(request, messages.ERROR, "You have been banned from this club!")
+                messages.add_message(request, messages.WARNING, "You have been banned from this club!")
                 return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
             else:
                 messages.add_message(request, messages.WARNING, "You are already a member!")
