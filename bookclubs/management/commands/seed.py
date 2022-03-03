@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from bookclubs.models import User, Post, Comment, Club, Role, Book, Rating, Meeting
+from bookclubs.models import User, Post, Comment, Club, Role, Book, BookRatingReview, Meeting
 
 import pytz
 from faker import Faker
@@ -82,7 +82,7 @@ class Command(BaseCommand):
         print("Rating seeding complete.      ")
 
     def create_rating(self,rating):
-        Rating.objects.create(
+        BookRatingReview.objects.create(
             rate = rating['Book-Rating'],
             book = self.books.get(ISBN=rating['ISBN']),
             user = self.users.get(userID=rating['User-ID'])
