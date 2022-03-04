@@ -137,17 +137,17 @@ class NewClubForm(forms.ModelForm):
         fields = ['club_name', 'meeting_status', 'location', 'public_status', 'genre', 'description']
         widgets = {'description': forms.Textarea()}
 
-    MEETING_STATUS_CHOICES = (
-        (True, 'In Person'),
-        (False, 'Online')
+    MEETING_CHOICES = (
+        ('ONL', 'Online'),
+        ('OFF', 'In-person')
     )
-    PUBLIC_STATUS_CHOICES = (
-        (True, 'Public'),
-        (False, 'Private')
+    PRIVACY_CHOICES = (
+        ('PUB', 'Public'),
+        ('PRI', 'Private')
     )
 
-    meeting_status = forms.ChoiceField(widget=forms.Select(), label='Meetings Held', choices=MEETING_STATUS_CHOICES)
-    public_status = forms.ChoiceField(widget=forms.Select(), label='Status', choices=PUBLIC_STATUS_CHOICES)
+    meeting_status = forms.ChoiceField(widget=forms.Select(), label='Meetings Held', choices=MEETING_CHOICES)
+    public_status = forms.ChoiceField(widget=forms.Select(), label='Status', choices=PRIVACY_CHOICES)
 
     def clean(self):
         """Clean the data and generate messages for any errors."""
@@ -176,17 +176,17 @@ class UpdateClubForm(forms.ModelForm):
         fields = ['club_name', 'meeting_status', 'location', 'public_status', 'genre', 'description']
         widgets = {'description': forms.Textarea()}
 
-        MEETING_STATUS_CHOICES = (
-            (True, 'In Person'),
-            (False, 'Online')
+        MEETING_CHOICES = (
+            ('ONL', 'Online'),
+            ('OFF', 'In-person')
         )
-        PUBLIC_STATUS_CHOICES = (
-            (True, 'Public'),
-            (False, 'Private')
+        PRIVACY_CHOICES = (
+            ('PUB', 'Public'),
+            ('PRI', 'Private')
         )
 
-        meeting_status = forms.ChoiceField(widget=forms.Select(), label='Meetings Held', choices=MEETING_STATUS_CHOICES)
-        public_status = forms.ChoiceField(widget=forms.Select(), label='Status', choices=PUBLIC_STATUS_CHOICES)
+        meeting_status = forms.ChoiceField(widget=forms.Select(), label='Meetings Held', choices=MEETING_CHOICES)
+        public_status = forms.ChoiceField(widget=forms.Select(), label='Status', choices=PRIVACY_CHOICES)
 
 
 
@@ -252,16 +252,12 @@ class CommentForm(forms.ModelForm):
 
 class NewMeetingForm(forms.ModelForm):
 
-    book = forms.ModelChoiceField(queryset=Book.objects.all(), to_field_name='title')
-
     class Meta:
         # !!! Chooser and Book should be got through algorithms
-        fields = ('book', 'topic', 'description', 'meeting_status', 'location', 'date', 'time_start', 'time_end')
+        fields = ('topic', 'description', 'meeting_status', 'location', 'date', 'time_start', 'time_end')
 
         widgets = {
-            'book': forms.Select(attrs={'class': 'form-control'}),
-            'topic': forms.TextInput(attrs={'class': 'form-control',
-                                            'placeholder': 'Topic'}),
+            'topic': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Topic'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Agenda'}),
             'meeting_status': forms.Select(attrs={'class': 'form-control'}),
             'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Location'}),
@@ -270,18 +266,18 @@ class NewMeetingForm(forms.ModelForm):
             'time_end': forms.TimeInput(attrs={'class': 'form-control', 'placeholder': 'hh:mm'})
         }
 
-    MEETING_STATUS_CHOICES = (
-        (True, 'Online'),
-        (False, 'In Person')
+    MEETING_CHOICES = (
+        ('ONL', 'Online'),
+        ('OFF', 'In-person')
     )
 
-    # meeting_status = forms.ChoiceField(widget=forms.Select(), label='Meetings Held', choices=MEETING_STATUS_CHOICES)
+    meeting_status = forms.ChoiceField(widget=forms.Select(), label='Meetings Held', choices=MEETING_CHOICES)
 
-    def save(self, user=None, club=None):
+    def save(self, user=None, club=None, book=None):
         super().save(commit=False)
         meeting = Meeting.objects.create(
             club=club,
-            book=self.cleaned_data.get('book'),
+            book=book,
             topic=self.cleaned_data.get('topic'),
             description=self.cleaned_data.get('description'),
             meeting_status=self.cleaned_data.get('meeting_status'),
@@ -296,3 +292,4 @@ class NewMeetingForm(forms.ModelForm):
             meeting_role='H'
         )
         return meeting
+

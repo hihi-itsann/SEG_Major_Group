@@ -135,13 +135,13 @@ class Application(models.Model):
 
 
 class Club(models.Model):
-    MEETING_STATUS_CHOICES = (
-        (True, 'Online'),
-        (False, 'In Person')
+    MEETING_CHOICES = (
+        ('ONL', 'Online'),
+        ('OFF', 'In-person')
     )
-    PUBLIC_STATUS_CHOICES = (
-        (True, 'Public'),
-        (False, 'Private')
+    PRIVACY_CHOICES = (
+        ('PUB', 'Public'),
+        ('PRI', 'Private')
     )
 
     club_name = models.CharField(
@@ -157,8 +157,8 @@ class Club(models.Model):
     )
 
     meeting_status = models.BooleanField(
-        choices=MEETING_STATUS_CHOICES,
-        default=False
+        choices=MEETING_CHOICES,
+        default='OFF'
     )
 
     location = models.CharField(
@@ -167,8 +167,8 @@ class Club(models.Model):
     )
 
     public_status = models.BooleanField(
-        choices=PUBLIC_STATUS_CHOICES,
-        default=False
+        choices=PRIVACY_CHOICES,
+        default='PRI'
     )
 
     genre = models.CharField(
@@ -314,15 +314,16 @@ class Comment(models.Model):
 
 
 class Meeting(models.Model):
-    MEETING_STATUS_CHOICES = (
-        (True, 'Online'),
-        (False, 'In Person')
+    MEETING_CHOICES = (
+        ('ONL', 'Online'),
+        ('OFF', 'In-person')
     )
+
     club = models.ForeignKey(Club, related_name='meeting_club', on_delete=models.CASCADE)
     book = models.ForeignKey(Book, on_delete=models.CASCADE, null=True, blank=True, )
     topic = models.CharField(max_length=120, default='', blank=False)
     description = models.TextField(max_length=520, blank=True)
-    meeting_status = models.BooleanField(choices=MEETING_STATUS_CHOICES, default=False)
+    meeting_status = models.BooleanField(choices=MEETING_CHOICES, default='OFF')
     location = models.CharField(max_length=120, blank=False)
     date = models.DateTimeField(blank=False)
     time_start = models.TimeField(blank=False)
