@@ -1,18 +1,20 @@
-{% extends 'base_content.html' %}
-{% block content %}
-    <br>
-    <br>
-    <div class="container">
-        <div class="row">
-          <h1>Rate this book</h1>
-          <div class="form-group">
-           <form method="POST">
-             {% csrf_token %}
-            {% include 'partials/bootstrap_form.html' with form=form %}
-             <button type="submit" class="btn btn-secondary">Post</button>
-           </div>
-
-        </div>
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Rate this Book</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+      <div class="modal-body">
+        <form action ="{% url 'create_book_rating_review' book.ISBN %}" method="post" id="BookRateReviewForm">
+          {% csrf_token %}
+          {% include 'partials/bootstrap_form.html' with form=form %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary" id="BookRateReviewForm">Submit</button>
+      </div>
+      </form>
     </div>
-{% endblock %}
+  </div>
+</div>

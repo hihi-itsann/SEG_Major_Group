@@ -186,6 +186,7 @@ class ShowBookView(LoginRequiredMixin, DetailView):
             # context['readingStatus'] = book.getReadingStatus(self.request.user)
             context['readingStatus'] = bookStatus.status
             context['isInReadingList'] = True
+            context['form'] = RateReviewForm()
         return context
 
     def get(self, request, *args, **kwargs):
@@ -200,7 +201,9 @@ class ShowBookView(LoginRequiredMixin, DetailView):
 class CreateBookRateReviewView(LoginRequiredMixin, CreateView):
     model = BookRatingReview
     form_class = RateReviewForm
-    template_name = 'create_book_rating_review.html'
+    template_name = 'show_book.html'
+    http_method_names = ['post']
+    pk_url_kwarg = 'ISBN'
 
     def form_valid(self, form):
         """Process a valid form."""
@@ -208,10 +211,15 @@ class CreateBookRateReviewView(LoginRequiredMixin, CreateView):
         form.instance.book_id = self.kwargs['ISBN']
         return super().form_valid(form)
 
+    def get_context_data(self, **kwargs):
+        book = Book.objects.get(ISBN=self.kwargs['ISBN'])
+        context = super().get_context_data(**kwargs)
+        context['book'] = book
+        return context
+
     def get_success_url(self):
-        """Return URL to redirect the user too after valid form handling."""
         return reverse('book_list')
-        #return reverse('book', kwargs={'ISBN': self.kwargs['ISBN']})
+        # return reverse('show_book', self.kwargs['ISBN'])
 
 @login_required
 def create_book_status(request, ISBN):

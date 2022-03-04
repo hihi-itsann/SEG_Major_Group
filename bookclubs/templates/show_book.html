@@ -25,26 +25,26 @@
             {% endif %}
 
             {% if user.is_authenticated %}
-                {% if readingStatus == 'F'%}
-                    <button type="button" class="btn btn-outline-primary btn-lg"><a href="{% url 'create_book_rating_review' book.ISBN %}">Rate this book here</a></button>
-                {% endif %}
-                <br>
-                {% if isInReadingList == True %}
-                    <br>
-                    <div class="dropdown">
-                      <a class="btn btn-outline-primary dropdown-toggle btn-lg" role="button" data-bs-toggle="dropdown">
-                        Change Reading Status
-                      </a>
-                      <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                        <li><a class="dropdown-item" href="{% url 'change_book_status' book.ISBN  'U'%}">Unread</a></li>
-                        <li><a class="dropdown-item" href="{% url 'change_book_status' book.ISBN  'R'%}">Reading</a></li>
-                        <li><a class="dropdown-item" href="{% url 'change_book_status' book.ISBN  'F'%}">Finished</a></li>
-                      </ul>
-                    </div>
-                    <br>
-                    <button type="button" class="btn btn-outline-primary btn-lg"><i class="bi bi-bookmark-check-fill"></i>&emsp;<a href="{% url 'delete_book_status' book.ISBN %}">Delete from your reading list</a></button>
+                {% if isInReadingList == False %}
+                  <button type="button" class="btn btn-outline-primary btn-lg"><i class="bi bi-bookmark"></i>&emsp;<a href="{% url 'create_book_status' book.ISBN %}">Add to your reading list</a></button>
                 {% else %}
-                <button type="button" class="btn btn-outline-primary btn-lg"><i class="bi bi-bookmark"></i>&emsp;<a href="{% url 'create_book_status' book.ISBN %}">Add to your reading list</a></button>
+                <br>
+                <button type="button" class="btn btn-outline-primary btn-lg"><i class="bi bi-bookmark-check-fill"></i>&emsp;<a href="{% url 'delete_book_status' book.ISBN %}">Delete from your reading list</a></button>
+                <br><br>
+                <div class="dropdown">
+                  <a class="btn btn-outline-primary dropdown-toggle btn-lg" role="button" data-bs-toggle="dropdown">
+                    Change Reading Status
+                  </a>
+                  <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                    <li><a class="dropdown-item" href="{% url 'change_book_status' book.ISBN  'U'%}">Unread</a></li>
+                    <li><a class="dropdown-item" href="{% url 'change_book_status' book.ISBN  'R'%}">Reading</a></li>
+                    <li><a class="dropdown-item" href="{% url 'change_book_status' book.ISBN  'F'%}">Finished</a></li>
+                  </ul>
+                </div>
+                {% endif %}
+                {% if readingStatus == 'F'%}
+                    <br><button type="button" class="btn btn-outline-primary btn-lg" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="Create Review">Rate this book here</a></button>
+                    {% include 'create_book_rating_review.html' %}
                 {% endif %}
             {% endif %}
 
