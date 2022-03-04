@@ -37,6 +37,8 @@ class ShowBookViewTestCase(TestCase):
         self.assertContains(response, "Clara Callan")
         reading_status = response.context['readingStatus']
         self.assertEqual(reading_status, 'U')
+        is_in_reading_list = response.context['isInReadingList']
+        self.assertTrue(is_in_reading_list)
 
     def test_get_show_book_with_invalid_id(self):
         self.client.login(username=self.user.username, password='Password123')

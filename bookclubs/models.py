@@ -83,7 +83,7 @@ class Book(models.Model):
         return BookRatingReview.objects.filter(book=self).exclude(review__exact='')
 
     def getReadingStatus(self,user):
-        return BookStatus.objects.get(book=self, user=user).status
+        return BookStatus.objects.get(user=user, book=self).status
 
 
 class BookRatingReview(models.Model):

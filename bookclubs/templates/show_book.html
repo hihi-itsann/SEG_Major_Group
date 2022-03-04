@@ -24,26 +24,28 @@
             {% endif %}
             <button type="button" class="btn btn-outline-primary btn-lg"><a href="{% url 'create_book_status' book.ISBN %}">Add to your reading list</a></button>
 
-            <br><br>
-
-            <div class="dropdown">
-              <a class="btn btn-outline-primary dropdown-toggle btn-lg" role="button" data-bs-toggle="dropdown">
-                Change Reading Status
-              </a>
-              <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                <li><a class="dropdown-item" href="{% url 'change_book_status' book.ISBN  'U'%}">Unread</a></li>
-                <li><a class="dropdown-item" href="{% url 'change_book_status' book.ISBN  'R'%}">Reading</a></li>
-                <li><a class="dropdown-item" href="{% url 'change_book_status' book.ISBN  'F'%}">Finished</a></li>
-              </ul>
-            </div>
-
-            <br>
             {% if user.is_authenticated %}
-                {% if readingStatus == 'F'%}
-                    <button type="button" class="btn btn-outline-primary btn-lg"><a href="{% url 'create_book_rating_review' book.ISBN %}">Create Your Rate and Review here</a></button>
+                {% if isInReadingList == True %}
+                    <br><br>
+                    <div class="dropdown">
+                      <a class="btn btn-outline-primary dropdown-toggle btn-lg" role="button" data-bs-toggle="dropdown">
+                        Change Reading Status
+                      </a>
+                      <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                        <li><a class="dropdown-item" href="{% url 'change_book_status' book.ISBN  'U'%}">Unread</a></li>
+                        <li><a class="dropdown-item" href="{% url 'change_book_status' book.ISBN  'R'%}">Reading</a></li>
+                        <li><a class="dropdown-item" href="{% url 'change_book_status' book.ISBN  'F'%}">Finished</a></li>
+                      </ul>
+                    </div>
                 {% endif %}
             {% endif %}
 
+            {% if user.is_authenticated %}
+                {% if readingStatus == 'F'%}
+                    <br>
+                    <button type="button" class="btn btn-outline-primary btn-lg"><a href="{% url 'create_book_rating_review' book.ISBN %}">Create Your Rate and Review here</a></button>
+                {% endif %}
+            {% endif %}
 
           </div>
 

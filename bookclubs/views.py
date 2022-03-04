@@ -177,7 +177,14 @@ class ShowBookView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         book = self.get_object()
         context = super().get_context_data(**kwargs)
-        context['readingStatus'] = book.getReadingStatus(self.request.user)
+        try:
+            bookStatus = BookStatus.objects.get(user=self.request.user, book=book)
+        except ObjectDoesNotExist:
+            context['readingStatus'] = 'U'  #default is U (unread)
+            context['isInReadingList'] = False
+        else:
+            context['readingStatus'] = book.getReadingStatus(self.request.user)
+            context['isInReadingList'] = True
         return context
 
     def get(self, request, *args, **kwargs):
