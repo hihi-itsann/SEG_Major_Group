@@ -71,9 +71,6 @@ class Book(models.Model):
     image_url_s = models.URLField(blank=False)
     image_url_m = models.URLField(blank=False)
     image_url_l = models.URLField(blank=False)
-    # image_url_s = models.CharField(max_length=100, blank=False)
-    # image_url_m = models.CharField(max_length=100, blank=False)
-    # image_url_l = models.CharField(max_length=100, blank=False)
     genra=models.CharField(max_length=100, blank=True)
 
     def getAverageRate(self):
@@ -82,8 +79,8 @@ class Book(models.Model):
     def getReview(self):
         return BookRatingReview.objects.filter(book=self).exclude(review__exact='')
 
-    def getReadingStatus(self,user):
-        return BookStatus.objects.get(user=user, book=self).status
+    # def getReadingStatus(self,user):
+    #     return BookStatus.objects.get(user=user, book=self).status
 
 
 class BookRatingReview(models.Model):

@@ -183,7 +183,8 @@ class ShowBookView(LoginRequiredMixin, DetailView):
             context['readingStatus'] = 'U'  #default is U (unread)
             context['isInReadingList'] = False
         else:
-            context['readingStatus'] = book.getReadingStatus(self.request.user)
+            # context['readingStatus'] = book.getReadingStatus(self.request.user)
+            context['readingStatus'] = bookStatus.status
             context['isInReadingList'] = True
         return context
 
