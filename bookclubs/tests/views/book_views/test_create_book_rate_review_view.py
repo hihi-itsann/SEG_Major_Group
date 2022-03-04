@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclubs.forms import RateReviewForm
-from bookclubs.models import User, Book, BookRatingReview
+from bookclubs.models import User, Book, BookStatus, BookRatingReview
 from bookclubs.tests.helpers import reverse_with_next
 
 class CreateBookRateViewTestCase(TestCase):
@@ -21,16 +21,22 @@ class CreateBookRateViewTestCase(TestCase):
             'book':self.book,
             'review':'this is a review.'
         }
+        self.bookStatus = BookStatus.objects.create(
+            user=self.user,
+            book=self.book,
+            status='F'
+        )
         self.url = reverse('create_book_rating_review', kwargs={'ISBN': self.book.ISBN})
 
     def test_get_create_book_url(self):
         self.assertEqual(self.url,f'/create_book_rating_review/{self.book.ISBN}/')
 
-    def test_get_create_book(self):
+    def test_get_create_book_review(self):
         self.client.login(username=self.user.username, password='Password123')
-        response = self.client.get(self.url)
+        url = reverse('show_book', kwargs={'ISBN': self.book.ISBN})
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'create_book_rating_review.html')
+        self.assertTemplateUsed(response, 'show_book.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, RateReviewForm))
         self.assertFalse(form.is_bound)
