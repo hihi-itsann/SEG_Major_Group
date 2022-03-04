@@ -13,6 +13,7 @@
             <h1>{{ book.title }}</h1>
             <hr>
             <h4><em>Author: {{ book.author }}</em></h4><br>
+            <h4><em>Genre: {{ book.genra }}</em></h4><br>
             <h4><em>Year: {{ book.year_of_publication }}</em></h4><br>
             <h4><em>publisher: {{ book.publisher }}</em></h4><br>
             <h4><em>ISBN: {{ book.ISBN }}</em></h4><br>
@@ -22,11 +23,14 @@
             {% else %}
               <h1 style="color:Green">Rating: {{ book.getAverageRate|floatformat:1 }}/10</h1>
             {% endif %}
-            <button type="button" class="btn btn-outline-primary btn-lg"><a href="{% url 'create_book_status' book.ISBN %}">Add to your reading list</a></button>
 
             {% if user.is_authenticated %}
+                {% if readingStatus == 'F'%}
+                    <button type="button" class="btn btn-outline-primary btn-lg"><a href="{% url 'create_book_rating_review' book.ISBN %}">Rate this book here</a></button>
+                {% endif %}
+                <br>
                 {% if isInReadingList == True %}
-                    <br><br>
+                    <br>
                     <div class="dropdown">
                       <a class="btn btn-outline-primary dropdown-toggle btn-lg" role="button" data-bs-toggle="dropdown">
                         Change Reading Status
@@ -37,13 +41,10 @@
                         <li><a class="dropdown-item" href="{% url 'change_book_status' book.ISBN  'F'%}">Finished</a></li>
                       </ul>
                     </div>
-                {% endif %}
-            {% endif %}
-
-            {% if user.is_authenticated %}
-                {% if readingStatus == 'F'%}
                     <br>
-                    <button type="button" class="btn btn-outline-primary btn-lg"><a href="{% url 'create_book_rating_review' book.ISBN %}">Create Your Rate and Review here</a></button>
+                    <button type="button" class="btn btn-outline-primary btn-lg"><i class="bi bi-bookmark-check-fill"></i>&emsp;<a href="{% url 'delete_book_status' book.ISBN %}">Delete from your reading list</a></button>
+                {% else %}
+                <button type="button" class="btn btn-outline-primary btn-lg"><i class="bi bi-bookmark"></i>&emsp;<a href="{% url 'create_book_status' book.ISBN %}">Add to your reading list</a></button>
                 {% endif %}
             {% endif %}
 

@@ -227,9 +227,18 @@ def create_book_status(request, ISBN):
         return redirect('reading_book_list', 'All')
     messages.add_message(request, messages.ERROR, "The Book has already been added in your reading list!")
     return redirect('show_book', ISBN)
-    # model = BookStatus
-    # template_name = 'reading_list.html'
-    # ordering = ['-added_at' ]
+
+@login_required
+def delete_book_status(request, ISBN):
+    book = Book.objects.get(ISBN=ISBN)
+    try:
+        current_book_status = BookStatus.objects.get(user=request.user, book=book)
+    except ObjectDoesNotExist:
+        messages.add_message(request, messages.ERROR, "The Book is not in your reading list!")
+        return redirect('show_book', ISBN)
+    current_book_status.delete()
+    messages.add_message(request, messages.ERROR, "The Book has already been deleted in your reading list!")
+    return redirect('reading_book_list', 'All')
 
 @login_required
 def change_book_status(request, ISBN, choice):
