@@ -12,9 +12,9 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.shortcuts import redirect, render, get_object_or_404
-from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm,UpdateApplicationForm, CommentForm, RateForm, PostForm, NewMeetingForm
+from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm,UpdateApplicationForm, CommentForm, RateReviewForm, PostForm, NewMeetingForm
 from .helpers import *
-from .models import User, Book, Application, Comment, Post, Rating, BookStatus, Club
+from .models import User, Book, Application, Comment, Post, BookRatingReview, BookStatus, Club
 
 
 
@@ -174,6 +174,12 @@ class ShowBookView(LoginRequiredMixin, DetailView):
     template_name = 'show_book.html'
     pk_url_kwarg = 'ISBN'
 
+    def get_context_data(self, **kwargs):
+        book = self.get_object()
+        context = super().get_context_data(**kwargs)
+        context['readingStatus'] = book.getReadingStatus(self.request.user)
+        return context
+
     def get(self, request, *args, **kwargs):
         """Handle get request, and redirect to book_list if ISBN invalid."""
 
@@ -183,10 +189,10 @@ class ShowBookView(LoginRequiredMixin, DetailView):
             return redirect('book_list')
 
 
-class CreateBookRateView(LoginRequiredMixin, CreateView):
-    model = Rating
-    form_class = RateForm
-    template_name = 'create_book_rating.html'
+class CreateBookRateReviewView(LoginRequiredMixin, CreateView):
+    model = BookRatingReview
+    form_class = RateReviewForm
+    template_name = 'create_book_rating_review.html'
 
     def form_valid(self, form):
         """Process a valid form."""

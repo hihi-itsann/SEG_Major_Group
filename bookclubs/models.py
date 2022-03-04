@@ -75,14 +75,27 @@ class Book(models.Model):
     # image_url_m = models.CharField(max_length=100, blank=False)
     # image_url_l = models.CharField(max_length=100, blank=False)
     genra=models.CharField(max_length=100, blank=True)
+
     def getAverageRate(self):
-        return self.rating_set.all().aggregate(Avg('rate'))['rate__avg']
+        return self.bookratingreview_set.all().aggregate(Avg('rate'))['rate__avg']
+
+    def getReview(self):
+        return BookRatingReview.objects.filter(book=self).exclude(review__exact='')
+
+    def getReadingStatus(self,user):
+        return BookStatus.objects.get(book=self, user=user).status
 
 
-class Rating(models.Model):
+class BookRatingReview(models.Model):
     rate = models.FloatField(default=0, validators=[MinValueValidator(0.0), MaxValueValidator(10.0)])
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    review = models.CharField(max_length=520, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
 
 class BookStatus(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
@@ -301,7 +314,7 @@ class Post(models.Model):
 
 
 class Comment(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
     body = models.CharField(max_length=520, blank=False)
     related_post = models.ForeignKey(Post, related_name="comments", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
