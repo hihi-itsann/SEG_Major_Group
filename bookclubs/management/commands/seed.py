@@ -90,10 +90,10 @@ class Command(BaseCommand):
 
 
     def create_books(self):
-        for index, book in self.df_books[:10].iterrows():
+        for index, book in self.df_books[:20].iterrows():
         # for index, book in self.df_books.iterrows():
             # print(f"Seeding book {index}/{len(self.df_books)}", end='\r')
-            print(f"Seeding book {index}/10", end='\r')
+            print(f"Seeding book {index}/20", end='\r')
             try:
 
                 self.create_book(book)
