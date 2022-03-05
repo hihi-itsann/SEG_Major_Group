@@ -167,6 +167,19 @@ class BookListView(LoginRequiredMixin, ListView):
     template_name = 'book_list.html'
     context_object_name = "books"
     paginate_by = settings.BOOKS_PER_PAGE
+    pk_url_kwarg = 'book_genre'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        books = Book.objects.all()
+        genres = []
+        for book in books:
+            genres.append(book.genra)
+        genres = list(set(genres))
+        if not self.kwargs['book_genre'] == 'All':
+            context['books'] = Book.objects.filter(genra=self.kwargs['book_genre'])
+        context['genres'] = genres
+        return context
 
 class ShowBookView(LoginRequiredMixin, DetailView):
     """View that shows book details."""
