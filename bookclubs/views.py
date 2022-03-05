@@ -218,8 +218,8 @@ class CreateBookRateReviewView(LoginRequiredMixin, CreateView):
         return context
 
     def get_success_url(self):
-        return reverse('book_list')
-        # return reverse('show_book', self.kwargs['ISBN'])
+        book = Book.objects.get(ISBN=self.kwargs['ISBN'])
+        return '{}#education'.format(reverse('show_book', kwargs={'ISBN': book.ISBN}))
 
 @login_required
 def create_book_status(request, ISBN):

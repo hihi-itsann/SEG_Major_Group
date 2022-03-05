@@ -48,7 +48,7 @@ class CreateBookRateViewTestCase(TestCase):
         after_count = BookRatingReview.objects.count()
         self.assertEqual(after_count, before_count+1)
         book = Book.objects.get(ISBN='0195153448')
-        self.assertTemplateUsed(response, 'book_list.html')
+        self.assertTemplateUsed(response, 'show_book.html')
 
     def test_redirects_when_not_logged_in(self):
         redirect_url = reverse_with_next('log_in', self.url)
