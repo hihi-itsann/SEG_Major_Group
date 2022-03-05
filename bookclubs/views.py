@@ -621,10 +621,10 @@ class DeleteCommentView(LoginRequiredMixin, DeleteView):
 @login_required
 @club_exists
 @membership_required
-def create_meeting(request, club_name, book_id):
+def create_meeting(request, club_name, book_isbn):
     """Creates a new meeting within a club"""
     current_club = Club.objects.get(club_name=club_name)
-    chosen_book = Book.objects.get(id=book_id)
+    chosen_book = Book.objects.get(ISBN=book_isbn)
     if request.method == 'POST':
         form = NewMeetingForm(request.POST)
         if form.is_valid():
@@ -641,11 +641,6 @@ def create_meeting(request, club_name, book_id):
 def show_book_choices(request, club_name):
     """Choose a book for the meeting"""
     current_club = Club.objects.get(club_name=club_name)
+    all_books = Book.objects.all()
+    return render(request, 'show_book_recommendations.html', {'recommended_books': all_books, 'club_name': club_name})
 
-
-
-@login_required
-@club_exists
-@membership_required
-def choose_book_for_meeting(request, club_name, book_id):
-    current_club = Club.objects.get(club_name=club_name)

@@ -156,9 +156,10 @@ class Club(models.Model):
         ]
     )
 
-    meeting_status = models.BooleanField(
+    meeting_status = models.CharField(
         choices=MEETING_CHOICES,
-        default='OFF'
+        default='OFF',
+        max_length=3
     )
 
     location = models.CharField(
@@ -166,9 +167,10 @@ class Club(models.Model):
         blank=False
     )
 
-    public_status = models.BooleanField(
+    public_status = models.CharField(
         choices=PRIVACY_CHOICES,
-        default='PRI'
+        default='PRI',
+        max_length=3
     )
 
     genre = models.CharField(
@@ -323,7 +325,7 @@ class Meeting(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE, null=True, blank=True, )
     topic = models.CharField(max_length=120, default='', blank=False)
     description = models.TextField(max_length=520, blank=True)
-    meeting_status = models.BooleanField(choices=MEETING_CHOICES, default='OFF')
+    meeting_status = models.CharField(choices=MEETING_CHOICES, default='OFF', max_length=3)
     location = models.CharField(max_length=120, blank=False)
     date = models.DateTimeField(blank=False)
     time_start = models.TimeField(blank=False)

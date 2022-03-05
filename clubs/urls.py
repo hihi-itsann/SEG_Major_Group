@@ -57,5 +57,8 @@ urlpatterns = [
     path('club/<str:club_name>/remove/<int:user_id>/', views.remove_member, name='remove_applicant'),
     path('club/<str:club_name>/moderator_management/', views.moderator_list,name='moderator_list'),
     path('club/<str:club_name>/moderator_management/new_owner/<int:user_id>/', views.transfer_ownership, name='transfer_ownership'),
-    path('club/<str:club_name>/host_meeting/', views.create_meeting, name='create_meeting'),
+    # path('club/<str:club_name>/host_meeting/', views.create_meeting, name='create_meeting'),
+    path('club/<str:club_name>/host_meeting/show_books/', views.show_book_choices, name='show_book_choices'),
+    path('club/<str:club_name>/host_meeting/book/<str:ISBN>/', views.create_meeting, name='create_meeting'),
+
 ]
