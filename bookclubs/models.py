@@ -81,6 +81,8 @@ class Book(models.Model):
 
     # def getReadingStatus(self,user):
     #     return BookStatus.objects.get(user=user, book=self).status
+    class Meta:
+        ordering = ['title']
 
 
 class BookRatingReview(models.Model):

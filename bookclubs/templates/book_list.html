@@ -1,10 +1,14 @@
 {% extends 'base_content.html' %}
+{% load bootstrap_pagination %}
+
+
 {% block content %}
     <br>
     <div class="container">
         <div class="col-xs-12 col-lg-6 col-xl-8">
             <h1>Book List</h1>
             <br>
+            {% bootstrap_paginate page_obj range=6 previous_label="Previous" next_label="Next" show_first_last="true" %}
             {% for book in books %}
               <div class="row">
                 <div class="col-4 offset-2">
@@ -23,6 +27,7 @@
               </div>
               <hr>
             {% endfor %}
+            {% bootstrap_paginate page_obj range=6 previous_label="Previous" next_label="Next" show_first_last="true" %}
         </div>
     </div>
 {% endblock %}

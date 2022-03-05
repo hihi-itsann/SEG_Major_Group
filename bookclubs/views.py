@@ -166,7 +166,7 @@ class BookListView(LoginRequiredMixin, ListView):
     model = Book
     template_name = 'book_list.html'
     context_object_name = "books"
-
+    paginate_by = settings.BOOKS_PER_PAGE
 
 class ShowBookView(LoginRequiredMixin, DetailView):
     """View that shows book details."""
