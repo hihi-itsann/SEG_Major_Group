@@ -44,7 +44,7 @@ class ShowBookViewTestCase(TestCase):
         self.client.login(username=self.user.username, password='Password123')
         url = reverse('show_book', kwargs={'ISBN': 'invalid_ISBN'})
         response = self.client.get(url, follow=True)
-        response_url = reverse('book_list')
+        response_url = reverse('book_list', kwargs={'book_genre':'All'})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'book_list.html')
 

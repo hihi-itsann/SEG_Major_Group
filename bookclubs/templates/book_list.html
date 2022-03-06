@@ -15,7 +15,7 @@
             {% endfor %}
           </div>
             <br>
-            {% bootstrap_paginate page_obj previous_label="Previous" next_label="Next" show_first_last="true" %}
+            {% bootstrap_paginate page_obj range=6 previous_label="Previous" next_label="Next" show_first_last="true" %}
             {% for book in books %}
               <div class="row">
                 <div class="col-4 offset-2">
