@@ -208,7 +208,7 @@ class ShowBookView(LoginRequiredMixin, DetailView):
         try:
             return super().get(request, *args, **kwargs)
         except Http404:
-            return redirect('book_list')
+            return redirect('book_list', 'All')
 
 
 class CreateBookRateReviewView(LoginRequiredMixin, CreateView):
