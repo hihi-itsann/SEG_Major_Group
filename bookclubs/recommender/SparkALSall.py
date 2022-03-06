@@ -9,14 +9,14 @@ from pyspark.ml.feature import StringIndexer, IndexToString
 from pyspark.ml.evaluation import RegressionEvaluator
 from pyspark.ml.recommendation import ALS
 from pyspark.sql.functions import explode
-
+from bookclubs.views import get_club_books_average_rating
 import pandas as pd
 import csv
 
 from bookclubs.models import ClubBookAverageRating
 
-#if __name__ == "__main__":
-def get_recommendations(club_subject):
+if __name__ == "__main__":
+#def get_recommendations(club_subject):
     spark = SparkSession\
         .builder\
         .appName("ALSExample")\
@@ -26,7 +26,7 @@ def get_recommendations(club_subject):
     spark.sparkContext.setCheckpointDir("/tmp/checkpoints")
 
     #df = pd.read_csv('bookclubs/dataset/BX-Book-Ratings.csv', sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0 )
-
+    get_club_books_average_rating()
     df=pd.DataFrame(list(ClubBookAverageRating.objects.all().values()))
     print(df)
     df['Book-Rating']=df['rate']/df['number_of_ratings']
