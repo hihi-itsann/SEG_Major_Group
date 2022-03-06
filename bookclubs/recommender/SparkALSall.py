@@ -67,7 +67,7 @@ if __name__ == "__main__":
     flatUserRecs = userRecs.withColumn("bookAndRating", explode(userRecs.recommendations)) \
     .select ( "club_id", "bookAndRating.*")
 
-    flatUserRecs = labelConverter.transform(flatUserRecs).filter(userRecs['club_id'] == club_subject.id)
+    flatUserRecs = labelConverter.transform(flatUserRecs).filter(userRecs['club_id'] == 'chose id')
     user85Recs = flatUserRecs.collect()
     # user85Recs.show()
 
