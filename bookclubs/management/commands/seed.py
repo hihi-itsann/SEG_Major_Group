@@ -20,12 +20,12 @@ class Command(BaseCommand):
     USER_IN_CLUB_PROBABILITY = 0.2
     USER_RATE_BOOK_PROBABILITY= 0.3
     #ratingsPath = 'bookclubs/recommender/dataset/BX-Book-Ratings.csv'
-    booksPath   = 'bookclubs/recommender/dataset/BX-Books.csv'
+    booksPath   = 'bookclubs/dataset/BX-Books.csv'
     #usersPath   = 'bookclubs/recommender/dataset/BX-Users.csv'
     # df_ratings=[]
     # df_users=[]
     # df_books=[]
-    
+
 
 
     def load_data_from_csv(self):
@@ -55,13 +55,13 @@ class Command(BaseCommand):
         self.books = Book.objects.all()
 
         self.create_users()
-        # self.users = User.objects.all()
-        # self.create_ratings()
-        #
-        # self._create_clubs()
-        # self.clubs = Club.objects.all()
-        # self._create_roles()
-        # self.roles = Role.objects.all()
+        self.users = User.objects.all()
+        self.create_ratings()
+
+        self._create_clubs()
+        self.clubs = Club.objects.all()
+        self._create_roles()
+        self.roles = Role.objects.all()
     # def create_ratings(self):
     #     for index, rating in self.df_ratings.iterrows():
     #         print(f"Seeding rating {index}/{len(self.df_ratings)}", end='\r')
@@ -97,7 +97,7 @@ class Command(BaseCommand):
             user=user
         )
     def create_books(self):
-        for index, book in self.df_books.head(3).iterrows():
+        for index, book in self.df_books.head(100).iterrows():
             print(f"Seeding book {index}/{len(self.df_books)}", end='\r')
             try:
 

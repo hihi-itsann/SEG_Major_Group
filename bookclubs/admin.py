@@ -44,7 +44,7 @@ class RatingAdmin(admin.ModelAdmin):
 @admin.register(ClubBookAverageRating)
 class ClubBookAverageRatingAdmin(admin.ModelAdmin):
     list_display = [
-        'rate', 'book', 'club'
+        'rate', 'number_of_ratings','book', 'club'
     ]
 
 @admin.register(BookStatus)

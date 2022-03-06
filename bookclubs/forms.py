@@ -7,7 +7,7 @@ from django.db import IntegrityError
 import datetime
 
 from .models import Post, Book
-from bookclubs.recommender.fakeRecommender import get_recommendations
+from bookclubs.recommender.SparkALSall import get_recommendations
 
 # from django.forms.widgets import DateInput
 
@@ -280,7 +280,7 @@ class NewMeetingForm(forms.ModelForm):
           super().__init__(*args,**kwargs)
           print(club_subject)
           #extend __init__
-          recommendations=get_recommendations(club_subject)
+          recommendations=get_recommendations(club_subject.id)
           #self.fields['city'].queryset = City.objects.none()
 
           self.fields['book'].queryset= Book.objects.all().filter(ISBN__in=recommendations)

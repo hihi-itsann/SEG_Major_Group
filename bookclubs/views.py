@@ -14,7 +14,7 @@ from django.shortcuts import redirect, render, get_object_or_404
 from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm,UpdateApplicationForm, CommentForm, RateForm, PostForm, NewMeetingForm
 from .helpers import *
 from .models import User, Book, Application, Comment, Post, Rating, BookStatus, Club,ClubBookAverageRating
-from bookclubs.recommender.fakeRecommender import get_recommendations
+from bookclubs.recommender.SparkALSall import get_recommendations
 #from bookclubs.management.commands.seed import get_club_books_average_rating
 
 @login_prohibited
@@ -631,6 +631,9 @@ def create_meeting(request, club_name):
     current_club = Club.objects.get(club_name=club_name)
     ClubBookAverageRating.objects.all().delete()
     get_club_books_average_rating()
+    # recommendations=get_recommendations(current_club.id)
+    # recommended_books= Book.objects.all().filter(ISBN__in=recommendations)
+
     if request.method == 'POST':
         form = NewMeetingForm(current_club,request.POST)
         if form.is_valid():
