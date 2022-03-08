@@ -14,9 +14,9 @@ from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.shortcuts import redirect, render, get_object_or_404
 from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm,UpdateApplicationForm, CommentForm, RateReviewForm, PostForm, NewMeetingForm
 from .helpers import *
-from .models import User, Book, Application, Comment, Post, BookRatingReview, BookStatus, Club
-
-
+from .models import User, Book, Application, Comment, Post, BookStatus, Club, ClubBookAverageRating, BookRatingReview
+from bookclubs.recommender.SparkALSall import get_recommendations
+# from bookclubs.management.commands.seed import get_club_books_average_rating
 
 @login_prohibited
 def home(request):
@@ -669,6 +669,12 @@ def show_book_recommendations(request, club_name):
     """Choose a book for the meeting"""
     current_club = Club.objects.get(club_name=club_name)
     all_books = Book.objects.all()
+    # get_club_books_average_rating()
+    # recommendations=get_recommendations(current_club.id)
+    # print(recommendations)
+    # recommended_books= Book.objects.all().filter(ISBN__in=recommendations)
+
+
     return render(request, 'show_book_recommendations.html', {'recommended_books': all_books, 'club_name': club_name})
 
 

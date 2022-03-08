@@ -37,6 +37,9 @@ class User(AbstractUser):
     )
     meeting_preference = models.CharField(max_length=1, choices=MEETING_CHOICES, blank=True)
 
+    def get_rated_books(self):
+        return BookRatingReview.objects.all().filter(user=self)
+
     class Meta:
         """Model options."""
 
@@ -79,10 +82,14 @@ class Book(models.Model):
     def getReview(self):
         return BookRatingReview.objects.filter(book=self).exclude(review__exact='')
 
+    def get_ISBN(self):
+        return self.ISBN
+
     # def getReadingStatus(self,user):
     #     return BookStatus.objects.get(user=user, book=self).status
     class Meta:
         ordering = ['title']
+        # return self.rating_set.all().aggregate(Avg('rate'))['rate__avg']
 
 
 class BookRatingReview(models.Model):
@@ -94,6 +101,7 @@ class BookRatingReview(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
 
 
 class BookStatus(models.Model):
@@ -251,6 +259,10 @@ class Club(models.Model):
         return self.club_members.all().filter(
             club__club_name=self.club_name, role__club_role='MEM')
 
+    def get_moderators(self):
+        return self.club_members.all().filter(
+            club__club_name=self.club_name, role__club_role='MOD')
+
     def get_management(self):
         return self.club_members.all().filter(
             club__club_name=self.club_name, role__club_role='OFF') | self.club_members.all().filter(
@@ -276,6 +288,18 @@ class Club(models.Model):
         else:
             self.status = False
         self.save()
+
+class ClubBookAverageRating(models.Model):
+    club = models.ForeignKey(Club, on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    rate = models.FloatField(default=0, validators=[MinValueValidator(0.0), MaxValueValidator(10.0)])
+    number_of_ratings=models.IntegerField()
+
+    def add_rating(self, rate):
+        self.rate+=rate
+
+    def increment_number_of_ratings(self):
+        self.number_of_ratings+=1
 
 class Role(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
