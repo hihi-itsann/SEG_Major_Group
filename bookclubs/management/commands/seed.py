@@ -50,7 +50,7 @@ class Command(BaseCommand):
 
         self.create_roles()
 
-        self.create_meetings()
+        # self.create_meetings()
 
     def load_data_from_csv(self):
         self.df_users= pd.read_csv(self.usersPath, sep = ';',names = ['User-ID', 'Location', 'Age'], quotechar = '"', encoding = 'latin-1',header = 0)
@@ -303,4 +303,4 @@ def create_email(first_name, last_name):
     return first_name + '.' + last_name + '@example.org'
 
 def create_club_name(location):
-    return location + 'Book Club'
+    return location + ' Book Club'

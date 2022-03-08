@@ -56,7 +56,12 @@ urlpatterns = [
     path('delete_comment/<int:pk>/', views.DeleteCommentView.as_view(), name='delete_comment'),
     # path('<str:club_name>/club_details_update', views.ClubDetailsUpdateView.as_view(), name='club_details_update'),
     path('club/<str:club_name>/remove/<int:user_id>/', views.remove_member, name='remove_applicant'),
-    path('club/<str:club_name>/moderator_management/', views.moderator_list,name='moderator_list'),
-    path('club/<str:club_name>/moderator_management/new_owner/<int:user_id>/', views.transfer_ownership, name='transfer_ownership'),
-    path('club/<str:club_name>/host_meeting/', views.create_meeting, name='create_meeting'),
+    path('club/<str:club_name>/moderator_management/', views.moderator_list, name='moderator_list'),
+    path('club/<str:club_name>/moderator_management/new_owner/<int:user_id>/', views.transfer_ownership,
+         name='transfer_ownership'),
+    # path('club/<str:club_name>/host_meeting/', views.create_meeting, name='create_meeting'),
+    path('club/<str:club_name>/host_meeting/show_books/', views.show_book_recommendations,
+         name='show_book_recommendations'),
+    path('club/<str:club_name>/host_meeting/book/<str:book_isbn>/', views.create_meeting, name='create_meeting'),
+
 ]

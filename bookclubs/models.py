@@ -147,13 +147,13 @@ class Application(models.Model):
 
 
 class Club(models.Model):
-    MEETING_STATUS_CHOICES = (
-        (True, 'Online'),
-        (False, 'In Person')
+    MEETING_CHOICES = (
+        ('ONL', 'Online'),
+        ('OFF', 'In-person')
     )
-    PUBLIC_STATUS_CHOICES = (
-        (True, 'Public'),
-        (False, 'Private')
+    PRIVACY_CHOICES = (
+        ('PUB', 'Public'),
+        ('PRI', 'Private')
     )
 
     club_name = models.CharField(
@@ -168,9 +168,10 @@ class Club(models.Model):
         ]
     )
 
-    meeting_status = models.BooleanField(
-        choices=MEETING_STATUS_CHOICES,
-        default=False
+    meeting_status = models.CharField(
+        choices=MEETING_CHOICES,
+        default='OFF',
+        max_length=3
     )
 
     location = models.CharField(
@@ -178,9 +179,10 @@ class Club(models.Model):
         blank=False
     )
 
-    public_status = models.BooleanField(
-        choices=PUBLIC_STATUS_CHOICES,
-        default=False
+    public_status = models.CharField(
+        choices=PRIVACY_CHOICES,
+        default='PRI',
+        max_length=3
     )
 
     genre = models.CharField(
@@ -326,16 +328,16 @@ class Comment(models.Model):
 
 
 class Meeting(models.Model):
-    MEETING_STATUS_CHOICES = (
-        (True, 'Online'),
-        (False, 'In Person')
+    MEETING_CHOICES = (
+        ('ONL', 'Online'),
+        ('OFF', 'In-person')
     )
+
     club = models.ForeignKey(Club, related_name='meeting_club', on_delete=models.CASCADE)
-    chooser = models.ForeignKey(User, related_name='book_chooser', on_delete=models.CASCADE, null=True)
-    book = models.ForeignKey(Book, on_delete=models.CASCADE, null=True, blank=True)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, null=True, blank=True, )
     topic = models.CharField(max_length=120, default='', blank=False)
     description = models.TextField(max_length=520, blank=True)
-    meeting_status = models.BooleanField(choices=MEETING_STATUS_CHOICES, default=False)
+    meeting_status = models.CharField(choices=MEETING_CHOICES, default='OFF', max_length=3)
     location = models.CharField(max_length=120, blank=False)
     date = models.DateTimeField(blank=False)
     time_start = models.TimeField(blank=False)
@@ -348,7 +350,6 @@ class Meeting(models.Model):
 class MeetingAttendance(models.Model):
     MEETING_ROLE_CHOICES = (
         ('H', 'Host'),
-        ('C', 'Chooser'),
         ('A', 'Attendee')
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
