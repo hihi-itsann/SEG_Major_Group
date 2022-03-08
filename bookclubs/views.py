@@ -15,7 +15,7 @@ from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewCl
 from .helpers import *
 from .models import User, Book, Application, Comment, Post, Rating, BookStatus, Club,ClubBookAverageRating
 from bookclubs.recommender.SparkALSall import get_recommendations
-#from bookclubs.management.commands.seed import get_club_books_average_rating
+# from bookclubs.management.commands.seed import get_club_books_average_rating
 
 @login_prohibited
 def home(request):
@@ -601,45 +601,47 @@ class DeleteCommentView(LoginRequiredMixin, DeleteView):
     template_name = 'delete_comment.html'
     success_url = reverse_lazy('post_comment')
 
-# def create_meeting(request, club_name):
-#      current_club = Club.objects.get(club_name=club_name)
-#      users_in_club=
-#
-def get_club_books_average_rating():
-    """ Saves the average rating of books read by users of each club (banned member are not included) """
-    clubs=Club.objects.all()
-    for club in clubs:
-        members=club.get_moderators()|club.get_members()|club.get_management()
-        for user in members:
-            for rating in user.get_rated_books():
-                clubBookRating=ClubBookAverageRating.objects.all().filter(club=club,book=rating.book)
-                if clubBookRating:
-                    clubBookRating.get().add_rating(clubBookRating.get().rate)
-                    clubBookRating.get().increment_number_of_ratings()
-                else:
-                    ClubBookAverageRating.objects.create(
-                        club=club,
-                        book=rating.book,
-                        rate=rating.rate,
-                        number_of_ratings=1
-                    )
+# # def create_meeting(request, club_name):
+# #      current_club = Club.objects.get(club_name=club_name)
+# #      users_in_club=
+# #
+# def get_club_books_average_rating():
+#     """ Saves the average rating of books read by users of each club (banned member are not included) """
+#     clubs=Club.objects.all()
+#     for club in clubs:
+#         members=club.get_moderators()|club.get_members()|club.get_management()
+#         for user in members:
+#             for rating in user.get_rated_books():
+#                 clubBookRating=ClubBookAverageRating.objects.all().filter(club=club,book=rating.book)
+#                 if clubBookRating:
+#                     clubBookRating.get().add_rating(clubBookRating.get().rate)
+#                     clubBookRating.get().increment_number_of_ratings()
+#                 else:
+#                     ClubBookAverageRating.objects.create(
+#                         club=club,
+#                         book=rating.book,
+#                         rate=rating.rate,
+#                         number_of_ratings=1
+
+
+                    # )
 # @login_required
 # @club_exists
 # @management_required
 def create_meeting(request, club_name):
     """Creates a new meeting within a club"""
     current_club = Club.objects.get(club_name=club_name)
-    ClubBookAverageRating.objects.all().delete()
-    get_club_books_average_rating()
-    # recommendations=get_recommendations(current_club.id)
+    # get_club_books_average_rating()
+    recommendations=get_recommendations(current_club.id)
+    print(recommendations)
     # recommended_books= Book.objects.all().filter(ISBN__in=recommendations)
 
     if request.method == 'POST':
-        form = NewMeetingForm(current_club,request.POST)
+        form = NewMeetingForm(request.POST)
         if form.is_valid():
             form.save(current_club)
             messages.add_message(request, messages.SUCCESS, "Meeting set up!")
             return redirect('my_applications')
     else:
-        form = NewMeetingForm(current_club)
+        form = NewMeetingForm()
     return render(request, 'create_meeting.html', {'form': form, 'club_name': club_name})

@@ -10,8 +10,7 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Club)
 class ClubAdmin(admin.ModelAdmin):
-    list_display = ['club_name',
-                    'id']
+    list_display = ['club_name', 'id']
 
 
 @admin.register(Role)
