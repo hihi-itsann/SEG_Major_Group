@@ -1,6 +1,6 @@
 from django import forms
 from django.core.validators import RegexValidator
-from .models import User, Club, Application, Role, Post, Comment, Rating, Meeting, MeetingAttendance, Book
+from .models import User, Club, Application, Role, Post, Comment, BookRatingReview, Meeting, MeetingAttendance, Book
 from django.contrib.auth import authenticate
 # from django.forms.widgets import DateInput
 from django.db import IntegrityError
@@ -125,10 +125,13 @@ class PasswordForm(NewPasswordMixin):
         return self.user
 
 
-class RateForm(forms.ModelForm):
+class RateReviewForm(forms.ModelForm):
     class Meta:
-        model = Rating
-        fields = ['rate']
+        model = BookRatingReview
+        fields = ['rate','review']
+        widgets = {
+            'review': forms.Textarea(),
+        }
 
 
 class NewClubForm(forms.ModelForm):
@@ -253,7 +256,6 @@ class CommentForm(forms.ModelForm):
 class NewMeetingForm(forms.ModelForm):
 
     class Meta:
-        # !!! Chooser and Book should be got through algorithms
         model = Meeting
         fields = ('topic', 'description', 'meeting_status', 'location', 'date', 'time_start', 'time_end')
 

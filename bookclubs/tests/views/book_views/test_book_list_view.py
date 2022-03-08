@@ -4,19 +4,16 @@ from bookclubs.models import User, Book
 from bookclubs.tests.helpers import reverse_with_next
 
 class BookListViewTest(TestCase):
-
-    VIEW = 'book_list'
-
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json'
     ]
 
     def setUp(self):
-        self.url = reverse(self.VIEW)
+        self.url = reverse('book_list', kwargs={'book_genre':'All'})
         self.user = User.objects.get(username='@johndoe')
 
     def test_book_list_url(self):
-        self.assertEqual(self.url,'/book_list/')
+        self.assertEqual(self.url,'/book_list/All/')
 
     def test_get_book_list(self):
         self.client.login(username=self.user.username, password='Password123')
@@ -45,5 +42,6 @@ class BookListViewTest(TestCase):
                 publisher=f'Last{book_id}',
                 image_url_s=f'url-s{book_id}',
                 image_url_m=f'url-m{book_id}',
-                image_url_l=f'url-l{book_id}'
+                image_url_l=f'url-l{book_id}',
+                genra="Fiction"
             )

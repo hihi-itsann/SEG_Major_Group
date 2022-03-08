@@ -25,7 +25,7 @@ class DeleteCommentTest(TestCase):
         )
         self.url = reverse('delete_comment', kwargs={'pk': self.comment.id})
 
-    def test_delete_user_url(self):
+    def test_delete_comment_url(self):
         self.assertEqual(self.url, f'/delete_comment/{self.comment.id}/')
 
     def test_create_user_redirects_when_not_logged_in(self):

@@ -12,9 +12,9 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.shortcuts import redirect, render, get_object_or_404
-from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm,UpdateApplicationForm, CommentForm, RateForm, PostForm, NewMeetingForm
+from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm,UpdateApplicationForm, CommentForm, RateReviewForm, PostForm, NewMeetingForm
 from .helpers import *
-from .models import User, Book, Application, Comment, Post, Rating, BookStatus, Club
+from .models import User, Book, Application, Comment, Post, BookRatingReview, BookStatus, Club
 
 
 
@@ -166,7 +166,20 @@ class BookListView(LoginRequiredMixin, ListView):
     model = Book
     template_name = 'book_list.html'
     context_object_name = "books"
+    paginate_by = settings.BOOKS_PER_PAGE
+    pk_url_kwarg = 'book_genre'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        books = Book.objects.all()
+        genres = []
+        for book in books:
+            genres.append(book.genra)
+        genres = list(set(genres))
+        if not self.kwargs['book_genre'] == 'All':
+            context['books'] = Book.objects.filter(genra=self.kwargs['book_genre'])
+        context['genres'] = genres
+        return context
 
 class ShowBookView(LoginRequiredMixin, DetailView):
     """View that shows book details."""
@@ -174,19 +187,36 @@ class ShowBookView(LoginRequiredMixin, DetailView):
     template_name = 'show_book.html'
     pk_url_kwarg = 'ISBN'
 
+    def get_context_data(self, **kwargs):
+        book = self.get_object()
+        context = super().get_context_data(**kwargs)
+        try:
+            bookStatus = BookStatus.objects.get(user=self.request.user, book=book)
+        except ObjectDoesNotExist:
+            context['readingStatus'] = 'U'  #default is U (unread)
+            context['isInReadingList'] = False
+        else:
+            # context['readingStatus'] = book.getReadingStatus(self.request.user)
+            context['readingStatus'] = bookStatus.status
+            context['isInReadingList'] = True
+            context['form'] = RateReviewForm()
+        return context
+
     def get(self, request, *args, **kwargs):
         """Handle get request, and redirect to book_list if ISBN invalid."""
 
         try:
             return super().get(request, *args, **kwargs)
         except Http404:
-            return redirect('book_list')
+            return redirect('book_list', 'All')
 
 
-class CreateBookRateView(LoginRequiredMixin, CreateView):
-    model = Rating
-    form_class = RateForm
-    template_name = 'create_book_rating.html'
+class CreateBookRateReviewView(LoginRequiredMixin, CreateView):
+    model = BookRatingReview
+    form_class = RateReviewForm
+    template_name = 'show_book.html'
+    http_method_names = ['post']
+    pk_url_kwarg = 'ISBN'
 
     def form_valid(self, form):
         """Process a valid form."""
@@ -194,10 +224,15 @@ class CreateBookRateView(LoginRequiredMixin, CreateView):
         form.instance.book_id = self.kwargs['ISBN']
         return super().form_valid(form)
 
+    def get_context_data(self, **kwargs):
+        book = Book.objects.get(ISBN=self.kwargs['ISBN'])
+        context = super().get_context_data(**kwargs)
+        context['book'] = book
+        return context
+
     def get_success_url(self):
-        """Return URL to redirect the user too after valid form handling."""
-        return reverse('book_list')
-        #return reverse('book', kwargs={'ISBN': self.kwargs['ISBN']})
+        book = Book.objects.get(ISBN=self.kwargs['ISBN'])
+        return '{}#education'.format(reverse('show_book', kwargs={'ISBN': book.ISBN}))
 
 @login_required
 def create_book_status(request, ISBN):
@@ -213,9 +248,18 @@ def create_book_status(request, ISBN):
         return redirect('reading_book_list', 'All')
     messages.add_message(request, messages.ERROR, "The Book has already been added in your reading list!")
     return redirect('show_book', ISBN)
-    # model = BookStatus
-    # template_name = 'reading_list.html'
-    # ordering = ['-added_at' ]
+
+@login_required
+def delete_book_status(request, ISBN):
+    book = Book.objects.get(ISBN=ISBN)
+    try:
+        current_book_status = BookStatus.objects.get(user=request.user, book=book)
+    except ObjectDoesNotExist:
+        messages.add_message(request, messages.ERROR, "The Book is not in your reading list!")
+        return redirect('show_book', ISBN)
+    current_book_status.delete()
+    messages.add_message(request, messages.ERROR, "The Book has already been deleted in your reading list!")
+    return redirect('reading_book_list', 'All')
 
 @login_required
 def change_book_status(request, ISBN, choice):
