@@ -6,8 +6,6 @@ from django.contrib.auth import authenticate
 from django.db import IntegrityError
 import datetime
 
-from .models import Post
-
 
 # from django.forms.widgets import DateInput
 
@@ -169,6 +167,7 @@ class NewClubForm(forms.ModelForm):
         )
         return club
 
+
 class UpdateClubForm(forms.ModelForm):
     """Form to update club details."""
 
@@ -190,7 +189,6 @@ class UpdateClubForm(forms.ModelForm):
 
         meeting_status = forms.ChoiceField(widget=forms.Select(), label='Meetings Held', choices=MEETING_CHOICES)
         public_status = forms.ChoiceField(widget=forms.Select(), label='Status', choices=PRIVACY_CHOICES)
-
 
 
 class NewApplicationForm(forms.ModelForm):
@@ -295,4 +293,3 @@ class NewMeetingForm(forms.ModelForm):
             meeting_role='H'
         )
         return meeting
-
