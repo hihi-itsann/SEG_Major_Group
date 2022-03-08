@@ -7,7 +7,7 @@ from django.db import IntegrityError
 import datetime
 
 from .models import Post, Book
-from bookclubs.recommender.SparkALSall import get_recommendations
+# from bookclubs.recommender.SparkALSall import get_recommendations
 
 # from django.forms.widgets import DateInput
 
@@ -275,15 +275,15 @@ class CommentForm(forms.ModelForm):
 #         (False, 'In Person')
 #     )
 class NewMeetingForm(forms.ModelForm):
-    def __init__(self,club_subject,*args,**kwargs):
-          # call standard __init__
-          super().__init__(*args,**kwargs)
-          print(club_subject)
-          #extend __init__
-          recommendations=get_recommendations(club_subject.id)
-          #self.fields['city'].queryset = City.objects.none()
+    # def __init__(self,club_subject,*args,**kwargs):
+    #       # call standard __init__
+    #       super().__init__(*args,**kwargs)
+    #       print(club_subject)
+    #       #extend __init__
+    #     #   recommendations=get_recommendations(club_subject.id)
+    #       #self.fields['city'].queryset = City.objects.none()
 
-          self.fields['book'].queryset= Book.objects.all().filter(ISBN__in=recommendations)
+    #       self.fields['book'].queryset= Book.objects.all().filter(ISBN__in=recommendations)
 
     class Meta:
         model = Meeting
@@ -310,7 +310,7 @@ class NewMeetingForm(forms.ModelForm):
 
     # meeting_status = forms.ChoiceField(widget=forms.Select(), label='Meetings Held', choices=MEETING_STATUS_CHOICES)
 
-    def save(self, user=None, club=None):
+    def save(self, club=None):
         super().save(commit=False)
         meeting = Meeting.objects.create(
             club=club,

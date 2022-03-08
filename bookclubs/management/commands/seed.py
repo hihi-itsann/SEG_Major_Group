@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from bookclubs.models import User, Club, Role, Book,Rating,ClubBookAverageRating
+from bookclubs.models import User, Club, Role, Book, Rating, ClubBookAverageRating
 
 import pytz
 from faker import Faker
