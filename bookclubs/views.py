@@ -621,6 +621,16 @@ class DeleteCommentView(LoginRequiredMixin, DeleteView):
 @login_required
 @club_exists
 @membership_required
+def show_book_recommendations(request, club_name):
+    """Choose a book for the meeting"""
+    current_club = Club.objects.get(club_name=club_name)
+    all_books = Book.objects.all()
+    return render(request, 'show_book_recommendations.html', {'recommended_books': all_books, 'club_name': club_name})
+
+
+@login_required
+@club_and_book_exists
+@membership_required
 def create_meeting(request, club_name, book_isbn):
     """Creates a new meeting within a club"""
     current_club = Club.objects.get(club_name=club_name)
@@ -628,19 +638,10 @@ def create_meeting(request, club_name, book_isbn):
     if request.method == 'POST':
         form = NewMeetingForm(request.POST)
         if form.is_valid():
-            form.save(current_club, chosen_book)
+            form.save(request.user, current_club, chosen_book)
             messages.add_message(request, messages.SUCCESS, "Meeting set up!")
             return redirect(f'/club/{club_name}/feed/')
     else:
         form = NewMeetingForm()
-    return render(request, 'create_meeting.html', {'form': form, 'club_name': club_name})
-
-@login_required
-@club_exists
-@membership_required
-def show_book_recommendations(request, club_name):
-    """Choose a book for the meeting"""
-    current_club = Club.objects.get(club_name=club_name)
-    all_books = Book.objects.all()
-    return render(request, 'show_book_recommendations.html', {'recommended_books': all_books, 'club_name': club_name})
+    return render(request, 'create_meeting.html', {'form': form, 'club_name': club_name, 'book_isbn': book_isbn, 'book': chosen_book})
 

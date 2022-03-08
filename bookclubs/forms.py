@@ -254,6 +254,7 @@ class NewMeetingForm(forms.ModelForm):
 
     class Meta:
         # !!! Chooser and Book should be got through algorithms
+        model = Meeting
         fields = ('topic', 'description', 'meeting_status', 'location', 'date', 'time_start', 'time_end')
 
         widgets = {

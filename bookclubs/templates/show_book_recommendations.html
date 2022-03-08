@@ -54,7 +54,7 @@
                                 <td>{{ book.author }}</td>
                                 <td> {{ book.ISBN }} </td>
                                 <td>
-                                        <a href="{% url 'create_meeting' club_name book.ISBN %}" class=button>
+                                        <a href="{% url 'create_meeting' club_name=club_name book_isbn=book.ISBN %}" class=button>
                                             Choose
                                         </a>
                                 </td>

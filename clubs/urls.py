@@ -61,6 +61,6 @@ urlpatterns = [
     # path('club/<str:club_name>/host_meeting/', views.create_meeting, name='create_meeting'),
     path('club/<str:club_name>/host_meeting/show_books/', views.show_book_recommendations,
          name='show_book_recommendations'),
-    path('club/<str:club_name>/host_meeting/book/<str:ISBN>/', views.create_meeting, name='create_meeting'),
+    path('club/<str:club_name>/host_meeting/book/<str:book_isbn>/', views.create_meeting, name='create_meeting'),
 
 ]
