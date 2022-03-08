@@ -87,9 +87,9 @@ class Command(BaseCommand):
         self.users = User.objects.all()
         self.create_ratings()
 
-        self._create_clubs()
+        self.create_clubs()
         self.clubs = Club.objects.all()
-        self._create_roles()
+        self.create_roles()
         self.roles = Role.objects.all()
     # def create_ratings(self):
     #     for index, rating in self.df_ratings.iterrows():
