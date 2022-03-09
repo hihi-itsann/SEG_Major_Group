@@ -63,7 +63,8 @@ def get_recommendations(club_id): #club_subject
 
     get_club_books_average_rating()
     clubDf = pd.DataFrame(list(ClubBookAverageRating.objects.all().values()))
-    indexer1 = StringIndexer(inputCol="book_id", outputCol="bookID").fit(df)
+    clubDf = spark.createDataFrame(clubDf)
+    indexer1 = StringIndexer(inputCol="book_id", outputCol="bookID").fit(clubDf)
     indexed2 = indexer1.transform(clubDf)
     ratings2 = indexed2.drop("book_id")
 
