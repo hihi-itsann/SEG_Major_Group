@@ -26,7 +26,7 @@
                 </div>
             {% else %}
                 <h1>You haven't joined any club yet!</h1>
-                <p>Click <a href="{% url 'club_list' %}">here</a> to apply to one of our clubs
+                <p>Click <a href='{% url 'club_list' meeting_status='Meeting Location' %}'>here</a> to apply to one of our clubs
                     or <a href="{% url 'create_club' %}">here</a> to create a new club.</p>
             {% endif %}
         </div>

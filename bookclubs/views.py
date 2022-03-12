@@ -497,17 +497,24 @@ def my_clubs(request):
 
 
 @login_required
-def club_list(request):
+def club_list(request, meeting_status):
     clubs = []
     if Role.objects.filter(user=request.user):
+        print("inside if")
         relations = Role.objects.filter(user=request.user)
         clubs = Club.objects.all()
         for club in relations:
             clubs = clubs.exclude(club_name=club.club.club_name)
     else:
         clubs = Club.objects.all()
-    return render(request, 'club_list.html', {'clubs': clubs})
+    print(len(clubs))
+    if meeting_status == "Online":
+        clubs=clubs.filter(meeting_status='ONL')
+    elif meeting_status=="In person":
+        clubs=clubs.filter(meeting_status='OFF')
+    print(len(clubs))
 
+    return render(request, 'club_list.html', {'clubs': clubs,'meeting_status':meeting_status})
 
 @login_required
 @club_exists

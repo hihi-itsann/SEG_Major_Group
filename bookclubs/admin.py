@@ -11,7 +11,7 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Club)
 class ClubAdmin(admin.ModelAdmin):
-    list_display = ['club_name', 'id']
+    list_display = ['club_name', 'id','meeting_status']
 
 
 @admin.register(Role)
@@ -71,4 +71,3 @@ class MeetingAdmin(admin.ModelAdmin):
     list_display = [
         'club', 'book', 'topic', 'description', 'meeting_status', 'location', 'date', 'time_start', 'time_end'
     ]
-

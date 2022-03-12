@@ -78,19 +78,19 @@ class Command(BaseCommand):
     def __init__(self):
         self.faker = Faker('en_GB')
 
-    def handle(self, *args, **options):
-        self.load_data_from_csv()
-        self.create_books()
-        self.books = Book.objects.all()
-
-        self.create_users()
-        self.users = User.objects.all()
-        self.create_ratings()
-
-        self.create_clubs()
-        self.clubs = Club.objects.all()
-        self.create_roles()
-        self.roles = Role.objects.all()
+    # def handle(self, *args, **options):
+    #     self.load_data_from_csv()
+    #     self.create_books()
+    #     self.books = Book.objects.all()
+    #
+    #     self.create_users()
+    #     self.users = User.objects.all()
+    #     self.create_ratings()
+    #
+    #     self.create_clubs()
+    #     self.clubs = Club.objects.all()
+    #     self.create_roles()
+    #     self.roles = Role.objects.all()
     # def create_ratings(self):
     #     for index, rating in self.df_ratings.iterrows():
     #         print(f"Seeding rating {index}/{len(self.df_ratings)}", end='\r')
@@ -247,7 +247,8 @@ class Command(BaseCommand):
 
     def create_club(self):
         description = self.faker.text(max_nb_chars=520)
-        meeting_status = self.faker.boolean()
+        meeting_status = self.faker.random_choices(elements=('ONL', 'OFF'), length=3)[0]
+        #meeting_status = self.faker.boolean()
         location = self.faker.street_name()
         club_name = create_club_name(location)
         public_status = self.faker.boolean()
