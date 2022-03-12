@@ -1,11 +1,25 @@
 {% extends 'base_content.html' %}
+{% load bootstrap_pagination %}
+
+
 {% block content %}
     <br>
     <div class="container">
-        <div class="col-xs-12 col-lg-6 col-xl-8">
+        <div class="col-xs-12 col-xl-9">
             <h1>Book List</h1>
+            <hr>
+            <div class="btn-group-mg">
+            <a href="{% url 'book_list' 'All' %}"class="btn btn-warning">All</a>
+            {% for genre in genres %}
+              <a href="{% url 'book_list' genre %}"class="btn btn-warning">{{ genre }}</a>
+            {% endfor %}
+          </div>
             <br>
+<<<<<<< HEAD
             <div class="row">
+=======
+            {% bootstrap_paginate page_obj range=6 previous_label="Previous" next_label="Next" show_first_last="true" %}
+>>>>>>> cfc32881e251ff988621ada47b20db6605e4b9ee
             {% for book in books %}
 
                 <div class="col-4 offset-2">
@@ -23,7 +37,11 @@
                 </div>
               <hr>
             {% endfor %}
+<<<<<<< HEAD
             </div>
+=======
+            {% bootstrap_paginate page_obj range=6 previous_label="Previous" next_label="Next" show_first_last="true" %}
+>>>>>>> cfc32881e251ff988621ada47b20db6605e4b9ee
         </div>
     </div>
 {% endblock %}

@@ -46,7 +46,7 @@ p.cover-text {
 }
 
 .cover-card {
-  background-color: rgba(245, 245, 245, 0.6);
+  background-color:#E1EED2;
   max-width: 30rem;
   padding-top: 30px;
   padding-left: 50px;
@@ -68,12 +68,12 @@ body {
   background-color: #ffffff;
   height: 100vh;
 }
-login .container #login-row #login-column #login-box {
+login.container #login-row #login-column #login-box {
   margin-top: 120px;
   max-width: 600px;
   height: 320px;
   border: 1px solid #9C9C9C;
-  background-color: #EAEAEA;
+  background-color: #FFFFFF;
 }
 login .container #login-row #login-column #login-box #login-form {
   padding: 20px;
@@ -192,25 +192,43 @@ h3.profile-title {
  */
 .content a {
   text-decoration: none;
-  color: #0d6efd;
+  color: #123555;
 }
 .content a:hover {
   text-decoration: underline;
-  color: #0d6efd;
+  color: #D1494E;
 }
 
 .post-author a {
   text-decoration: none;
-  color: black;
+  color:#123555;
 }
 .post-author a:hover {
   text-decoration: underline;
-  color: black;
+  color:#D1494E;
 }
 
-
-
 /*
- * Hyperlinks
+ * My clubs
  */
- .card {display:inline-block;}
+.card{
+  background-color:#DBD0A7;
+  color:#123555;
+}
+
+.btn-outline-dark{
+  color:#D1494E;
+}
+
+.btn-outline-dark:hover{
+  background-color: #123555
+}
+
+.card:hover{
+  color:#D1494E;
+  transform:scale(1.1);
+}
+
+.container{
+  color:#123555;
+}

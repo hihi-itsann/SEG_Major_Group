@@ -5,6 +5,7 @@
         "dropna",
         "Genra",
         "LOOCV",
+        "pyspark",
         "RMSE",
         "similarty"
     ]

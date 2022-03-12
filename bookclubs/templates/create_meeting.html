@@ -3,8 +3,8 @@
     <div class="container">
         <div class="row">
             <div class="col-xs-12 col-lg-6 col-xl-4">
-                <h3>new application</h3>
-                <form action="{% url 'create_meeting' club_name %}" method="post">
+                <h3>New Meeting</h3>
+                <form action="{% url 'create_meeting' club_name book.ISBN%}" method="post">
                     {% csrf_token %}
                     {% include 'partials/bootstrap_form.html' with form=form %}
                     <button type="submit" class="btn btn-primary">Host</button>
