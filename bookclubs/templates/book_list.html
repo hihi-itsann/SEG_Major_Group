@@ -15,13 +15,9 @@
             {% endfor %}
           </div>
             <br>
-<<<<<<< HEAD
-            <div class="row">
-=======
             {% bootstrap_paginate page_obj range=6 previous_label="Previous" next_label="Next" show_first_last="true" %}
->>>>>>> cfc32881e251ff988621ada47b20db6605e4b9ee
             {% for book in books %}
-
+              <div class="row">
                 <div class="col-4 offset-2">
                   <img src="{{ book.image_url_m }}">
                 </div>
@@ -35,13 +31,10 @@
                   <p><em>Author: {{ book.author }}</em></p>
                   <p><em>ISBN: {{ book.ISBN }}</em></p>
                 </div>
+              </div>
               <hr>
             {% endfor %}
-<<<<<<< HEAD
-            </div>
-=======
             {% bootstrap_paginate page_obj range=6 previous_label="Previous" next_label="Next" show_first_last="true" %}
->>>>>>> cfc32881e251ff988621ada47b20db6605e4b9ee
         </div>
     </div>
 {% endblock %}

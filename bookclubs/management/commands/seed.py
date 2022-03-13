@@ -344,7 +344,6 @@ class Command(BaseCommand):
 
     def create_meeting(self):
         club = self.get_random_club()
-        chooser = self.get_random_user()
         topic = self.faker.text(max_nb_chars=120)
         description = self.faker.text(max_nb_chars=520)
         meeting_status = self.faker.boolean()
@@ -354,7 +353,6 @@ class Command(BaseCommand):
         time_end = self.faker.time()
         meeting = Meeting.objects.create(
             club=club,
-            chooser=chooser,
             topic=topic,
             description=description,
             meeting_status=meeting_status,
