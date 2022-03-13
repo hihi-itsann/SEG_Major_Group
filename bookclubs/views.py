@@ -499,6 +499,10 @@ def my_clubs(request):
 @login_required
 def club_list(request):
     clubs = []
+    if Club.objects.all().count()==0:
+        club_exists=False
+    else:
+        club_exists=True
 
     if Role.objects.filter(user=request.user):
         relations = Role.objects.filter(user=request.user)
@@ -513,6 +517,7 @@ def club_list(request):
     #city_list=clubs.values('city')
     user_country=request.user.country
     user_city=request.user.city
+    is_suitable_clubs=True
     meeting_status=None
     distance=None
     #print(city_list)
@@ -527,11 +532,13 @@ def club_list(request):
                 clubs=clubs.filter(city=user_city)
             elif distance=="same country":
                 clubs=clubs.filter(country=user_country)
-    if clubs.count()==0:
-        club_exists=False
-    else:
-        club_exists=True
-    return render(request, 'club_list.html', {'clubs': clubs,'meeting_status':meeting_status,'distance':distance,'club_exists':club_exists})
+        if clubs.count()==0:
+            is_suitable_clubs=False
+        else:
+            is_suitable_clubs=True
+
+    return render(request, 'club_list.html', {'clubs': clubs,'meeting_status':meeting_status,
+                            'distance':distance,'club_exists':club_exists,'is_suitable_clubs':is_suitable_clubs})
 
 @login_required
 @club_exists
