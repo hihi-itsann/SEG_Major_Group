@@ -1,8 +1,8 @@
+from django.db.models import Q  #filter exception
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ImproperlyConfigured
-from django.db.models import Q  # filter exception
 from django.http import Http404
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
@@ -11,19 +11,12 @@ from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
-
-from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm, \
-<<<<<<< HEAD
-    UpdateApplicationForm, CommentForm, RateForm, PostForm, NewMeetingForm,UpdateClubForm
-=======
-    UpdateApplicationForm, CommentForm, RateReviewForm, PostForm, NewMeetingForm
-from bookclubs.recommender.SparkALSall import get_recommendations
->>>>>>> cfc32881e251ff988621ada47b20db6605e4b9ee
+from django.shortcuts import redirect, render, get_object_or_404
+from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm,UpdateApplicationForm, CommentForm, RateReviewForm, PostForm, NewMeetingForm
 from .helpers import *
-from .models import User, Book, Application, Comment, Post, BookStatus, Club, BookRatingReview
+from .models import User, Book, Application, Comment, Post, BookRatingReview, BookStatus, Club
 
 
-# from bookclubs.management.commands.seed import get_club_books_average_rating
 
 @login_prohibited
 def home(request):
@@ -188,7 +181,6 @@ class BookListView(LoginRequiredMixin, ListView):
         context['genres'] = genres
         return context
 
-
 class ShowBookView(LoginRequiredMixin, DetailView):
     """View that shows book details."""
     model = Book
@@ -201,7 +193,7 @@ class ShowBookView(LoginRequiredMixin, DetailView):
         try:
             bookStatus = BookStatus.objects.get(user=self.request.user, book=book)
         except ObjectDoesNotExist:
-            context['readingStatus'] = 'U'  # default is U (unread)
+            context['readingStatus'] = 'U'  #default is U (unread)
             context['isInReadingList'] = False
         else:
             # context['readingStatus'] = book.getReadingStatus(self.request.user)
@@ -242,7 +234,6 @@ class CreateBookRateReviewView(LoginRequiredMixin, CreateView):
         book = Book.objects.get(ISBN=self.kwargs['ISBN'])
         return '{}#education'.format(reverse('show_book', kwargs={'ISBN': book.ISBN}))
 
-
 @login_required
 def create_book_status(request, ISBN):
     book = Book.objects.get(ISBN=ISBN)
@@ -258,7 +249,6 @@ def create_book_status(request, ISBN):
     messages.add_message(request, messages.ERROR, "The Book has already been added in your reading list!")
     return redirect('show_book', ISBN)
 
-
 @login_required
 def delete_book_status(request, ISBN):
     book = Book.objects.get(ISBN=ISBN)
@@ -271,7 +261,6 @@ def delete_book_status(request, ISBN):
     messages.add_message(request, messages.ERROR, "The Book has already been deleted in your reading list!")
     return redirect('reading_book_list', 'All')
 
-
 @login_required
 def change_book_status(request, ISBN, choice):
     current_book = Book.objects.get(ISBN=ISBN)
@@ -282,10 +271,8 @@ def change_book_status(request, ISBN, choice):
         messages.add_message(request, messages.ERROR, f'Unsuccessfully change the book status!')
         return redirect('show_book', ISBN)
     else:
-        messages.add_message(request, messages.SUCCESS,
-                             f'Successfully change the book status to {current_book_status.get_status_display()}!')
+        messages.add_message(request, messages.SUCCESS, f'Successfully change the book status to {current_book_status.get_status_display()}!')
         return redirect('show_book', ISBN)
-
 
 @login_required
 def reading_book_list(request, book_genra='All'):
@@ -309,7 +296,7 @@ def reading_book_list(request, book_genra='All'):
     for bookStatus in finishedBookStatuses:
         if bookStatus.book.genra == book_genra or book_genra == 'All':
             finishedBooks.append(bookStatus.book)
-    args = {'unreadBooks': unreadBooks, 'readingBooks': readingBooks, 'finishedBooks': finishedBooks, 'genras': genras}
+    args = {'unreadBooks': unreadBooks, 'readingBooks': readingBooks, 'finishedBooks':finishedBooks, 'genras': genras}
     return render(request, 'reading_book_list.html', args)
 
 
@@ -376,7 +363,6 @@ def delete_club(request, club_name):
     current_club = Club.objects.get(club_name=club_name)
     current_club.delete()
     return feed(request)
-
 
 # #to-do: fix the club_name (not finished)
 # class ClubDetailsUpdateView(LoginRequiredMixin, UpdateView):
@@ -512,11 +498,10 @@ def club_list(request):
         clubs = Club.objects.all()
     return render(request, 'club_list.html', {'clubs': clubs})
 
-
 @login_required
 @club_exists
 @management_required
-def members_management_list(request, club_name):
+def members_management_list(request,club_name):
     banned_is_empty = False
     member_is_empty = False
     current_club = Club.objects.get(club_name=club_name)
@@ -526,103 +511,94 @@ def members_management_list(request, club_name):
         member_is_empty = True
     if banned.count() == 0:
         banned_is_empty = True
-    return render(request, 'member_management.html',
-                  {'banned': banned, 'members': members, 'banned_is_empty': banned_is_empty,
-                   'member_is_empty': member_is_empty, 'current_club': current_club})
+    return render(request,'member_management.html', {'banned':banned,'members':members, 'banned_is_empty':banned_is_empty,'member_is_empty':member_is_empty, 'current_club':current_club})
 
 
 @login_required
 @club_exists
 @management_required
-def ban_member(request, club_name, user_id):
+def ban_member(request,club_name,user_id):
     current_club = Club.objects.get(club_name=club_name)
     try:
-        member = User.objects.get(id=user_id, club__club_name=current_club.club_name, role__club_role='MEM')
+        member = User.objects.get(id=user_id,club__club_name = current_club.club_name, role__club_role = 'MEM')
         current_club.ban_member(member)
     except ObjectDoesNotExist:
         return redirect('feed')
     else:
-        return members_management_list(request, current_club.club_name)
-
+        return members_management_list(request,current_club.club_name)
 
 @login_required
 @club_exists
 @management_required
-def unban_member(request, club_name, user_id):
+def unban_member(request,club_name,user_id):
     current_club = Club.objects.get(club_name=club_name)
     try:
-        banned = User.objects.get(id=user_id, club__club_name=current_club.club_name, role__club_role='BAN')
+        banned = User.objects.get(id=user_id,club__club_name = current_club.club_name, role__club_role = 'BAN')
         current_club.unban_member(banned)
     except ObjectDoesNotExist:
         return redirect('feed')
     else:
-        return members_management_list(request, current_club.club_name)
-
+        return members_management_list(request,current_club.club_name)
 
 @login_required
 @club_exists
 @management_required
-def remove_member(request, club_name, user_id):
+def remove_member(request,club_name,user_id):
     current_club = Club.objects.get(club_name=club_name)
     try:
-        member = User.objects.get(id=user_id, club__club_name=current_club.club_name, role__club_role='MEM')
+        member = User.objects.get(id=user_id,club__club_name = current_club.club_name, role__club_role = 'MEM')
         current_club.remove_user_from_club(member)
     except ObjectDoesNotExist:
         return redirect('feed')
     else:
-        return members_management_list(request, current_club.club_name)
-
+        return members_management_list(request,current_club.club_name)
 
 @login_required
 @club_exists
 @owner_required
-def moderator_list(request, club_name):
+def moderator_list(request,club_name):
     current_club = Club.objects.get(club_name=club_name)
     moderators = current_club.get_moderators()
-    return render(request, 'moderator_list.html', {'moderators': moderators, 'current_club': current_club})
-
+    return render(request,'moderator_list.html', {'moderators':moderators, 'current_club':current_club})
 
 @login_required
 @club_exists
 @owner_required
-def transfer_ownership(request, club_name, user_id):
+def transfer_ownership(request,club_name,user_id):
     current_club = Club.objects.get(club_name=club_name)
     try:
-        moderator = User.objects.get(id=user_id, club__club_name=current_club.club_name, role__club_role='MOD')
-        current_club.transfer_ownership(request.user, moderator)
+        moderator = User.objects.get(id=user_id,club__club_name = current_club.club_name, role__club_role = 'MOD')
+        current_club.transfer_ownership(request.user,moderator)
     except (ObjectDoesNotExist):
         return redirect('feed')
     else:
-        return moderator_list(request, current_club.club_name)
-
+        return moderator_list(request,current_club.club_name)
 
 @login_required
 @club_exists
 @owner_required
-def demote_moderator(request, club_name, user_id):
+def demote_moderator(request,club_name,user_id):
     current_club = Club.objects.get(club_name=club_name)
     try:
-        moderator = User.objects.get(id=user_id, club__club_name=current_club.club_name, role__club_role='MOD')
+        moderator = User.objects.get(id=user_id,club__club_name = current_club.club_name, role__club_role = 'MOD')
         current_club.toggle_member(moderator)
     except (ObjectDoesNotExist):
         return redirect('feed')
     else:
-        return moderator_list(request, current_club.club_name)
-
+        return moderator_list(request,current_club.club_name)
 
 @login_required
 @club_exists
 @management_required
-def promote_member(request, club_name, user_id):
+def promote_member(request,club_name,user_id):
     current_club = Club.objects.get(club_name=club_name)
     try:
-        member = User.objects.get(id=user_id, club__club_name=current_club.club_name, role__club_role='MEM')
+        member = User.objects.get(id=user_id,club__club_name = current_club.club_name, role__club_role = 'MEM')
         current_club.toggle_moderator(member)
     except (ObjectDoesNotExist):
         return redirect('feed')
     else:
-        return members_management_list(request, current_club.club_name)
-
+        return members_management_list(request,current_club.club_name)
 
 @login_required
 @club_exists
@@ -633,20 +609,20 @@ def change_club_to_public_status(request, club_name):
     current_club.change_club_status(True)
     return redirect('feed')
 
-
 @login_required
 @club_exists
 @membership_required
 def member_list(request, club_name):
     is_owner = False
     club = Club.objects.get(club_name=club_name)
-    cur_user = request.user
-    roles = Role.objects.filter(club=club).exclude(club_role='BAN')
+    cur_user=request.user
+    roles=Role.objects.filter(club=club).exclude(club_role='BAN')
     club_role = club.get_club_role(cur_user)
-    if club_role == 'OWN':
+    if club_role== 'OWN':
         is_owner = True
     context = {'club': club, 'roles': roles, 'is_owner': is_owner}
     return render(request, "member_list.html", context)
+
 
 
 class PostCommentView(LoginRequiredMixin, ListView):
@@ -693,13 +669,7 @@ def show_book_recommendations(request, club_name):
     """Choose a book for the meeting"""
     current_club = Club.objects.get(club_name=club_name)
     all_books = Book.objects.all()
-    ## get_club_books_average_rating()
-    recommendations = get_recommendations(current_club.id)
-    print(recommendations)
-    recommended_books = Book.objects.all().filter(ISBN__in=recommendations)
-
-    return render(request, 'show_book_recommendations.html',
-                  {'recommended_books': recommended_books, 'club_name': club_name})
+    return render(request, 'show_book_recommendations.html', {'recommended_books': all_books, 'club_name': club_name})
 
 
 @login_required
@@ -717,5 +687,5 @@ def create_meeting(request, club_name, book_isbn):
             return redirect(f'/club/{club_name}/feed/')
     else:
         form = NewMeetingForm()
-    return render(request, 'create_meeting.html',
-                  {'form': form, 'club_name': club_name, 'book_isbn': book_isbn, 'book': chosen_book})
+    return render(request, 'create_meeting.html', {'form': form, 'club_name': club_name, 'book_isbn': book_isbn, 'book': chosen_book})
+
