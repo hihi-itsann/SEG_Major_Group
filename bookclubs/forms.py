@@ -41,7 +41,7 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
         """Form options."""
 
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'bio', 'dob', 'gender', 'location',
+        fields = ['first_name', 'last_name', 'username', 'email', 'bio', 'dob', 'gender', 'location','city','country',
                   'meeting_preference']
         widgets = {'dob': forms.DateInput(format='%d/%m/%Y'), 'bio': forms.Textarea()}
 
@@ -135,7 +135,7 @@ class RateReviewForm(forms.ModelForm):
 class NewClubForm(forms.ModelForm):
     class Meta:
         model = Club
-        fields = ['club_name', 'meeting_status', 'location', 'public_status', 'genre', 'description']
+        fields = ['club_name', 'meeting_status', 'location','city','country' ,'public_status', 'genre', 'description']
         widgets = {'description': forms.Textarea()}
 
     MEETING_CHOICES = (
@@ -175,7 +175,7 @@ class UpdateClubForm(forms.ModelForm):
         """Form options."""
 
         model = Club
-        fields = ['club_name', 'meeting_status', 'location', 'public_status', 'genre', 'description']
+        fields = ['club_name', 'meeting_status', 'location','city','country', 'public_status', 'genre', 'description']
         widgets = {'description': forms.Textarea()}
 
         MEETING_CHOICES = (

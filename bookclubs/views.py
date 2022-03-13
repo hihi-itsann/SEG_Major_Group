@@ -497,24 +497,37 @@ def my_clubs(request):
 
 
 @login_required
-def club_list(request, meeting_status):
+def club_list(request):
     clubs = []
     if Role.objects.filter(user=request.user):
-        print("inside if")
         relations = Role.objects.filter(user=request.user)
         clubs = Club.objects.all()
         for club in relations:
             clubs = clubs.exclude(club_name=club.club.club_name)
     else:
         clubs = Club.objects.all()
-    print(len(clubs))
-    if meeting_status == "Online":
-        clubs=clubs.filter(meeting_status='ONL')
-    elif meeting_status=="In person":
-        clubs=clubs.filter(meeting_status='OFF')
-    print(len(clubs))
+    #country_list=clubs.values('country')
+    #city_list=clubs.values('city')
+    #country_list=clubs.values('country')
+    #city_list=clubs.values('city')
+    user_country=request.user.country
+    user_city=request.user.city
+    meeting_status=None
+    distance=None
+    #print(city_list)
+    if request.method=="POST":
+        meeting_status=request.POST.get("meeting_status")
+        if meeting_status == "Online":
+            clubs=clubs.filter(meeting_status='ONL')
+        elif meeting_status=="In person":
+            clubs=clubs.filter(meeting_status='OFF')
+            distance=request.POST.get("distance")
+            if distance == "same city":
+                clubs=clubs.filter(city=user_city)
+            elif distance=="same country":
+                clubs=clubs.filter(country=user_country)
 
-    return render(request, 'club_list.html', {'clubs': clubs,'meeting_status':meeting_status})
+    return render(request, 'club_list.html', {'clubs': clubs,'meeting_status':meeting_status,'distance':distance})
 
 @login_required
 @club_exists

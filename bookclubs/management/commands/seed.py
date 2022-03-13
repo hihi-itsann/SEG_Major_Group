@@ -75,8 +75,9 @@ class Command(BaseCommand):
 
         return  volume_info["volumeInfo"]["categories"]
 
-    def __init__(self):
-        self.faker = Faker('en_GB')
+
+    # def __init__(self):
+    #     self.faker = Faker('en_GB')
 
     # def handle(self, *args, **options):
     #     self.load_data_from_csv()
@@ -206,7 +207,10 @@ class Command(BaseCommand):
         dob = self.faker.date_of_birth(minimum_age = 8, maximum_age = 100)
         #dob=self.get_dob_from_age(user['Age'])
         gender = self.faker.random_choices(elements=('M', 'F', 'O'), length=1)[0]
-        location = self.faker.city()
+        location = self.faker.street_name()
+        country=self.faker.country()
+        city=self.faker.city()
+
         meeting_preference = self.faker.random_choices(elements=('O', 'P'), length=1)[0]
         User.objects.create_user(
             userID=userID+1,
@@ -219,6 +223,8 @@ class Command(BaseCommand):
             dob=dob,
             gender=gender,
             location=location,
+            city=city,
+            country=country,
             meeting_preference=meeting_preference
         )
 
@@ -250,6 +256,8 @@ class Command(BaseCommand):
         meeting_status = self.faker.random_choices(elements=('ONL', 'OFF'), length=3)[0]
         #meeting_status = self.faker.boolean()
         location = self.faker.street_name()
+        country=self.faker.country()
+        city=self.faker.city()
         club_name = create_club_name(location)
         public_status = self.faker.boolean()
         genre = self.faker.text(max_nb_chars=520)
@@ -258,6 +266,8 @@ class Command(BaseCommand):
             description=description,
             meeting_status=meeting_status,
             location=location,
+            city=city,
+            country=country,
             public_status=public_status,
             genre=genre
         )

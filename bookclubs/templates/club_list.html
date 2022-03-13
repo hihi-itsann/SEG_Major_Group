@@ -1,21 +1,32 @@
 {% extends 'base_content.html' %}
 {% block content %}
 <br>
-
-<div class="container">
-  <h1>Clubs</h1>
-  <br>
-    <div class="dropdown">
-    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">{{meeting_status}}
-    <span class="caret"></span></button>
-    <ul class="dropdown-menu">
-      <input class="form-control" id="myInput" type="text" placeholder="Search..">
-      <li><a href="{% url 'club_list' 'In person' %}">In person</a></li>
-      <li><a href="{% url 'club_list' 'Online' %}">Online</a></li>
-  </div>
-</div>
+    <center>
+      <form method="POST">
+        {% csrf_token %}
+        <select name="meeting_status" onchange="chooseStatus()">
+          <option disabled selected="true">--Meeting preference--</option>
+          <option value="Online">Online</option>
+          <option value="In person">In person</option>
+        </select>
+        <select name="distance" style="visibility: hidden;">
+          <option value="all places" selected="true">--Distance preference--</option>
+          <option value="same city">Same city</option>
+          <option value="same country">Same country</option>
+        </select>
+        <input type="submit" value="Apply filter">
+      </form>
+    </center>
     <div class="container">
         <div class="col-xs-12 col-lg-6 col-xl-8">
+          <h1>Clubs </h1>
+            {% if meeting_status == None %}
+            <p> Filter applied:None </p>
+            {% elif meeting_status == 'Online' %}
+            <p> Filter applied: {{meeting_status}} meeting </p>
+            {% else %}
+            <p> Filter applied: {{meeting_status}} meeting in  {{distance}}</p>
+            {% endif%}
 
             {% if clubs %}
                 {% for club in clubs %}
@@ -40,14 +51,5 @@
             {% endif %}
         </div>
     </div>
-    <script>
-    $(document).ready(function(){
-      $("#myInput").on("keyup", function() {
-        var value = $(this).val().toLowerCase();
-        $(".dropdown-menu li").filter(function() {
-          $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-        });
-      });
-    });
-    </script>
+
 {% endblock %}

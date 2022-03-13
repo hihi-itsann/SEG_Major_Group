@@ -6,12 +6,12 @@ from .models import User, Application, Club, Role, Book, BookRatingReview, BookS
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = ['userID','username',
-                    'email','location']
+                    'email','location','country','city']
 
 
 @admin.register(Club)
 class ClubAdmin(admin.ModelAdmin):
-    list_display = ['club_name', 'id','meeting_status']
+    list_display = ['club_name', 'id','meeting_status','location']
 
 
 @admin.register(Role)
