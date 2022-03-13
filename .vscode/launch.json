@@ -12,6 +12,6 @@
             "name": "JavaScript Debug Terminal",
             "request": "launch",
             "cwd": "${workspaceFolder}"
-        }
+        },
     ]
 }
