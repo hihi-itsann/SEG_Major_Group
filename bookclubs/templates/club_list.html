@@ -27,6 +27,7 @@
             {% else %}
             <p> Filter applied: {{meeting_status}} meeting in  {{distance}}</p>
             {% endif%}
+            {%if club_exists %}
 
             {% if clubs %}
                 {% for club in clubs %}
@@ -49,6 +50,12 @@
                     See my clubs
                 </a>
             {% endif %}
+        {% else %}
+            <p>There is no clubs now!</p>
+            <a href='{% url 'create_club' %}' class="btn btn-outline-success">
+                Create your club
+            </a>
+        {% endif %}
         </div>
     </div>
 
