@@ -31,7 +31,7 @@ class CreateBookStatusTest(TestCase):
         response = self.client.post(self.url, follow=True)
         book_status_count_after = BookStatus.objects.count()
         self.assertEqual(book_status_count_after, book_status_count_before+1)
-        response_url = reverse('reading_book_list', kwargs={'book_genra': 'All'})
+        response_url = reverse('reading_book_list', kwargs={'book_genre': 'All'})
         self.assertRedirects(
             response, response_url,
             status_code=302, target_status_code=200,

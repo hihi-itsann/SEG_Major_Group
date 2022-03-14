@@ -24,7 +24,7 @@ class DeleteBookStatusTest(TestCase):
     def test_delete_book_status_url(self):
         self.assertEqual(self.url, f'/delete_book_status/{self.book.ISBN}/')
 
-    def test_create_user_redirects_when_not_logged_in(self):
+    def test_delete_book_status_redirects_when_not_logged_in(self):
         redirect_url = reverse_with_next('log_in', self.url)
         response = self.client.get(self.url)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
@@ -35,7 +35,7 @@ class DeleteBookStatusTest(TestCase):
         response = self.client.delete(self.url)
         book_status_count_after = BookStatus.objects.count()
         self.assertEqual(book_status_count_after, book_status_count_before-1)
-        response_url = reverse('reading_book_list', kwargs={'book_genra': 'All'})
+        response_url = reverse('reading_book_list', kwargs={'book_genre': 'All'})
         self.assertRedirects(
             response, response_url,
             status_code=302, target_status_code=200,

@@ -32,7 +32,7 @@ class ApplicationAdmin(admin.ModelAdmin):
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
     list_display = [
-        'ISBN', 'title', 'genra','author', 'year_of_publication', 'publisher', 'image_url_s', 'image_url_m', 'image_url_l'
+        'ISBN', 'title', 'genre','author', 'year_of_publication', 'publisher', 'image_url_s', 'image_url_m', 'image_url_l'
     ]
 
 
