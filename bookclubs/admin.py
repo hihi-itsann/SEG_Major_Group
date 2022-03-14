@@ -11,7 +11,7 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Club)
 class ClubAdmin(admin.ModelAdmin):
-    list_display = ['club_name', 'id','meeting_status','location']
+    list_display = ['club_name', 'id','meeting_status','location','country','city']
 
 
 @admin.register(Role)
