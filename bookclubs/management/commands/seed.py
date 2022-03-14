@@ -251,7 +251,7 @@ class Command(BaseCommand):
 
     def create_club(self):
         description = self.faker.text(max_nb_chars=520)
-        meeting_status = self.faker.boolean()
+        meeting_status = self.faker.random_choices(elements=('ONL', 'OFF'), length=3)[0]
         location = self.faker.street_name()
         city = self.faker.city()
         country = self.faker.country()
