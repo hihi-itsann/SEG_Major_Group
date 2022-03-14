@@ -7,6 +7,18 @@ from django.db.models import Avg
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+# class Country(models.Model):
+#     name = models.CharField(max_length=30)
+#
+#     def __str__(self):
+#         return self.name
+#
+# class City(models.Model):
+#     country = models.ForeignKey(Country, on_delete=models.CASCADE)
+#     name = models.CharField(max_length=30)
+#
+#     def __str__(self):
+#         return self.name
 
 class User(AbstractUser):
     userID=models.IntegerField(unique=True, null=True)
@@ -31,6 +43,11 @@ class User(AbstractUser):
     )
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True)
     location = models.CharField(max_length=50, blank=True)
+    city = models.CharField(max_length=50, blank=True)
+    country = models.CharField(max_length=50, blank=True)
+    # country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True)
+    # city = models.ForeignKey(City, on_delete=models.CASCADE, null=True)
+
     MEETING_CHOICES = (
         ('O', 'Online'),
         ('P', 'In-person')
@@ -178,20 +195,30 @@ class Club(models.Model):
 
     meeting_status = models.CharField(
         choices=MEETING_CHOICES,
-        max_length=3,
-        blank=False
+        default='OFF',
+        max_length=3
     )
 
     location = models.CharField(
         max_length=100,
         blank=False
     )
+    city = models.CharField(
+        max_length=100,
+        blank=True
+    )
+    country = models.CharField(
+        max_length=100,
+        blank=True
+    )
+    # country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True)
+    # city = models.ForeignKey(City, on_delete=models.CASCADE, null=True)
+
 
     public_status = models.CharField(
         choices=PRIVACY_CHOICES,
-        max_length=3,
-        blank=False
-
+        default='PRI',
+        max_length=3
     )
 
     genre = models.CharField(

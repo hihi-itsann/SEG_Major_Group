@@ -10,7 +10,7 @@ from faker.providers import BaseProvider, address, date_time, misc
 import pandas as pd
 import datetime
 import numpy
-#from bookclubs.recommender.BooksRecommender import getGenre
+#from bookclubs.recommender.BooksRecommender import getgenre
 import urllib.request
 import json
 import textwrap
@@ -63,7 +63,7 @@ class Command(BaseCommand):
         #self.df_ratings= pd.read_csv(self.ratingsPath, sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0)
 
 
-    def getGenre(self, isbn):
+    def getgenre(self, isbn):
         base_api_link = "https://www.googleapis.com/books/v1/volumes?q=isbn:"
 
         with urllib.request.urlopen(base_api_link + isbn) as f:
@@ -145,7 +145,7 @@ class Command(BaseCommand):
             image_url_s = book['Image-URL-S'],
             image_url_m =book['Image-URL-M'],
             image_url_l = book['Image-URL-L'],
-            genre=self.getGenre(book['ISBN'])[0]
+            genre=self.getgenre(book['ISBN'])[0]
         )
 
 
@@ -206,7 +206,9 @@ class Command(BaseCommand):
         dob = self.faker.date_of_birth(minimum_age = 8, maximum_age = 100)
         #dob=self.get_dob_from_age(user['Age'])
         gender = self.faker.random_choices(elements=('M', 'F', 'O'), length=1)[0]
-        location = self.faker.city()
+        location = self.faker.street_name()
+        city = self.faker.city()
+        country = self.faker.country()
         meeting_preference = self.faker.random_choices(elements=('O', 'P'), length=1)[0]
         User.objects.create_user(
             userID=userID+1,
@@ -219,6 +221,8 @@ class Command(BaseCommand):
             dob=dob,
             gender=gender,
             location=location,
+            city=city,
+            country=country,
             meeting_preference=meeting_preference
         )
 
@@ -247,8 +251,10 @@ class Command(BaseCommand):
 
     def create_club(self):
         description = self.faker.text(max_nb_chars=520)
-        meeting_status = self.faker.boolean()
+        meeting_status = self.faker.random_choices(elements=('ONL', 'OFF'), length=3)[0]
         location = self.faker.street_name()
+        city = self.faker.city()
+        country = self.faker.country()
         club_name = create_club_name(location)
         public_status = self.faker.boolean()
         genre = self.faker.text(max_nb_chars=520)
@@ -257,6 +263,8 @@ class Command(BaseCommand):
             description=description,
             meeting_status=meeting_status,
             location=location,
+            city=city,
+            country=country,
             public_status=public_status,
             genre=genre
         )
