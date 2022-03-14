@@ -195,8 +195,8 @@ class Club(models.Model):
 
     meeting_status = models.CharField(
         choices=MEETING_CHOICES,
-        max_length=3,
-        blank=False
+        default='OFF',
+        max_length=3
     )
 
     location = models.CharField(
@@ -217,9 +217,8 @@ class Club(models.Model):
 
     public_status = models.CharField(
         choices=PRIVACY_CHOICES,
-        max_length=3,
-        blank=False
-
+        default='PRI',
+        max_length=3
     )
 
     genre = models.CharField(

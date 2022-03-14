@@ -511,24 +511,29 @@ def club_list(request):
     user_country=request.user.country
     user_city=request.user.city
     is_suitable_clubs=True
-    meeting_status=None
-    distance=None
+    distance="all places"
     #print(city_list)
+    meeting_status=request.user.meeting_preference
+    
     if request.method=="POST":
         meeting_status=request.POST.get("meeting_status")
-        if meeting_status == "Online":
-            clubs=clubs.filter(meeting_status='ONL')
-        elif meeting_status=="In person":
-            clubs=clubs.filter(meeting_status='OFF')
+    if meeting_status == "Online" or meeting_status == "O":
+        meeting_status="Online"
+        clubs=clubs.filter(meeting_status='ONL')
+    elif meeting_status=="In person" or meeting_status == "P":
+        meeting_status="In person"
+
+        clubs=clubs.filter(meeting_status='OFF')
+        if request.method=="POST":
             distance=request.POST.get("distance")
-            if distance == "same city":
-                clubs=clubs.filter(city=user_city)
-            elif distance=="same country":
-                clubs=clubs.filter(country=user_country)
-        if clubs.count()==0:
-            is_suitable_clubs=False
-        else:
-            is_suitable_clubs=True
+        if distance == "same city":
+            clubs=clubs.filter(city=user_city)
+        elif distance=="same country":
+            clubs=clubs.filter(country=user_country)
+    if clubs.count()==0:
+        is_suitable_clubs=False
+    else:
+        is_suitable_clubs=True
 
     return render(request, 'club_list.html', {'clubs': clubs,'meeting_status':meeting_status,
                             'distance':distance,'club_exists':club_exists,'is_suitable_clubs':is_suitable_clubs})
