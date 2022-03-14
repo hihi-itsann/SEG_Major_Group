@@ -47,7 +47,7 @@ def get_recommendations(club_id): #club_subject
         .getOrCreate()
 
     spark.sparkContext.setCheckpointDir("/tmp/checkpoints")
-    
+
     ClubBookAverageRating.objects.all().delete()
 
     #df = pd.read_csv('bookclubs/dataset/BX-Book-Ratings.csv', sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0 )
@@ -101,12 +101,13 @@ def get_recommendations(club_id): #club_subject
 
     ml = BookLens()
     ml.loadBookLensLatestSmall()
-  
+
     # print(len(user85Recs))
 
     isbn_list = []
 
     for row in user85Recs:
+        print(row['book_id'])
         isbn_list.append(row['book_id'])
 
     # for row in user85Recs:
