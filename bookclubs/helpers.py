@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect
 
-from .models import User, Club, Role, Application, Book
+from .models import Club, Role, Application, Book
 
 
 def login_prohibited(view_function):
@@ -18,39 +18,48 @@ def login_prohibited(view_function):
     return modified_view_function
 
 
-# TODO: Change officer to moderator?
 def management_required(view_function):
-    """check whether the user is an officer or an owner"""
+    """check whether the user is an officer or the owner"""
 
     def modified_view_function(request, club_name, *args, **kwargs):
-        try:
-            club = Club.objects.get(club_name=club_name)
-            role = request.user.role_set.get(club=club)
-        except ObjectDoesNotExist:
-            return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
-        else:
-            if role.club_role == 'OFF' or role.club_role == 'OWN':
+        current_club = Club.objects.get(club_name=club_name)
+        if Role.objects.filter(user=request.user, club=current_club).count() > 0:
+            role = Role.objects.get(user=request.user, club=current_club).club_role
+            if role == 'BAN':
+                messages.add_message(request, messages.WARNING, "You have been banned from this club!")
+                return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+            elif role == 'OWN' or role == 'MOD':
                 return view_function(request, club_name, *args, **kwargs)
             else:
-                return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+                messages.add_message(request, messages.WARNING, "You do not have the permissions required to access "
+                                                                "this content!")
+                return redirect(f'/club/{club_name}/feed/')
+        else:
+            messages.add_message(request, messages.WARNING, "You are not part of this club yet!")
+            return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
     return modified_view_function
 
 
 def owner_required(view_function):
-    """check whether the user is an owner"""
+    """check whether the user is the owner"""
 
     def modified_view_function(request, club_name, *args, **kwargs):
-        try:
-            club = Club.objects.get(club_name=club_name)
-            role = request.user.role_set.get(club=club)
-        except ObjectDoesNotExist:
-            return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
-        else:
-            if role.club_role == 'OWN':
+        current_club = Club.objects.get(club_name=club_name)
+        if Role.objects.filter(user=request.user, club=current_club).count() > 0:
+            role = Role.objects.get(user=request.user, club=current_club).club_role
+            if role == 'BAN':
+                messages.add_message(request, messages.WARNING, "You have been banned from this club!")
+                return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+            elif role == 'OWN':
                 return view_function(request, club_name, *args, **kwargs)
             else:
-                return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+                messages.add_message(request, messages.WARNING, "You do not have the permissions required to access "
+                                                                "this content!")
+                return redirect(f'/club/{club_name}/feed/')
+        else:
+            messages.add_message(request, messages.WARNING, "You are not part of this club yet!")
+            return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
     return modified_view_function
 
@@ -59,16 +68,17 @@ def membership_required(view_function):
     """check whether the user is a member"""
 
     def modified_view_function(request, club_name, *args, **kwargs):
-        try:
-            club = Club.objects.get(club_name=club_name)
-            role = request.user.role_set.get(club=club)
-        except ObjectDoesNotExist:
-            return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
-        else:
-            if role.club_role == 'MEM' or role.club_role == 'OFF' or role.club_role == 'OWN':
-                return view_function(request, club_name, *args, **kwargs)
-            else:
+        current_club = Club.objects.get(club_name=club_name)
+        if Role.objects.filter(user=request.user, club=current_club).count() > 0:
+            role = Role.objects.get(user=request.user, club=current_club).club_role
+            if role == 'BAN':
+                messages.add_message(request, messages.WARNING, "You have been banned from this club!")
                 return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+            else:
+                return view_function(request, club_name, *args, **kwargs)
+        else:
+            messages.add_message(request, messages.WARNING, "You are not part of this club yet!")
+            return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
     return modified_view_function
 
@@ -84,7 +94,7 @@ def non_applicant_required(view_function):
                 messages.add_message(request, messages.WARNING, "You are the owner!")
                 return redirect(f'/club/{club_name}/feed/')
             elif role == 'BAN':
-                messages.add_message(request, messages.ERROR, "You have been banned from this club!")
+                messages.add_message(request, messages.WARNING, "You have been banned from this club!")
                 return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
             else:
                 messages.add_message(request, messages.WARNING, "You are already a member!")
@@ -119,7 +129,7 @@ def applicant_required(view_function):
                 messages.add_message(request, messages.WARNING, "You are the owner!")
                 return redirect(f'/club/{club_name}/feed/')
             elif role == 'BAN':
-                messages.add_message(request, messages.ERROR, "You have been banned from this club!")
+                messages.add_message(request, messages.WARNING, "You have been banned from this club!")
                 return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
             else:
                 messages.add_message(request, messages.WARNING, "You are already a member!")
@@ -154,5 +164,26 @@ def club_exists(view_function):
             return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
         else:
             return view_function(request, club_name, *args, **kwargs)
+
+    return modified_view_function
+
+
+def club_and_book_exists(view_function):
+    """check whether the club and book exists"""
+
+    def modified_view_function(request, club_name, book_isbn, *args, **kwargs):
+        try:
+            club = Club.objects.get(club_name=club_name)
+        except ObjectDoesNotExist:
+            messages.add_message(request, messages.WARNING, "No club found with this name.")
+            return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+        else:
+            try:
+                book = Book.objects.get(ISBN=book_isbn)
+            except ObjectDoesNotExist:
+                messages.add_message(request, messages.WARNING, "No book found with this ISBN.")
+                return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+            else:
+                return view_function(request, club_name, book_isbn, *args, **kwargs)
 
     return modified_view_function

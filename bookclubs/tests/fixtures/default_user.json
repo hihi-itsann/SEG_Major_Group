@@ -3,6 +3,7 @@
      "model": "bookclubs.user",
      "pk": 1,
      "fields": {
+       "userID": 1,
        "first_name": "John",
        "last_name": "Doe",
        "username": "@johndoe",

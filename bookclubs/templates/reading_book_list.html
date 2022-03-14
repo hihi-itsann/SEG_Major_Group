@@ -1,0 +1,54 @@
+{% extends 'base_content.html' %}
+{% block content %}
+    <br>
+    <div class="container">
+      <div class = "row">
+        <h1>Reading List</h1>
+        <hr>
+          <div class="btn-group-mg">
+          <a href="{% url 'reading_book_list' 'All' %}"class="btn btn-warning">All</a>
+          {% for genra in genras %}
+            <a href="{% url 'reading_book_list' genra %}"class="btn btn-warning">{{ genra }}</a>
+          {% endfor %}
+        </div>
+        <div class="col-sm-4" style="background-color: #FFFFE0">
+          <h2>Unread Books</h2><br>
+          {% if not unreadBooks %}
+            <h5 >Empty</h5>
+          {% else %}
+            {% for book in unreadBooks%}
+                <img src="{{ book.image_url_m }}">
+                <h5><a href="{% url 'show_book' book.ISBN %}">{{ book.title }}</a></h5>
+                <br>
+            {% endfor %}
+          {% endif %}
+        </div>
+
+        <div class="col-sm-4"style="background-color: #FFFACD">
+          <h2>Reading Books</h2><br>
+          {% if not readingBooks %}
+            <h5 >Empty</h5>
+          {% else %}
+            {% for book in readingBooks%}
+                <img src="{{ book.image_url_m }}">
+                <h5><a href="{% url 'show_book' book.ISBN %}">{{ book.title }}</a></h5>
+                <br>
+            {% endfor %}
+          {% endif %}
+        </div>
+
+        <div class="col-sm-4" style="background-color: #FAFAD2">
+          <h2>Finished Books</h2><br>
+          {% if not finishedBooks %}
+            <h5 >Empty</h5>
+          {% else %}
+            {% for book in finishedBooks%}
+                <img src="{{ book.image_url_m }}">
+                <h5><a href="{% url 'show_book' book.ISBN %}">{{ book.title }}</a></h5>
+                <br>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+{% endblock %}

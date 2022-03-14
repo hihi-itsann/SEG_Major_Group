@@ -1,0 +1,17 @@
+[
+   {
+     "model": "bookclubs.book",
+     "pk": "0002005018",
+     "fields": {
+       "ISBN": "0002005018",
+       "title": "Clara Callan",
+       "author": "Richard Bruce Wright",
+       "year_of_publication": 2001,
+       "publisher": "HarperFlamingo Canada",
+       "image_url_s": "http://images.amazon.com/images/P/0002005018.01.THUMBZZZ.jpg",
+       "image_url_m": "http://images.amazon.com/images/P/0002005018.01.MZZZZZZZ.jpg",
+       "image_url_l": "http://images.amazon.com/images/P/0002005018.01.LZZZZZZZ.jpg",
+       "genra": "Actresses"
+     }
+   }
+]

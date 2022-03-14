@@ -1,0 +1,68 @@
+{% extends 'base_content.html' %}
+{% block content %}
+    <style>
+        h1 {
+            padding: 5px;
+            text-align: left;
+
+        }
+
+        h5 {
+            padding: 5px;
+            text-align: left;
+
+        }
+
+        table {
+            border-collapse: separate;
+            border-spacing: 0 15px;
+        }
+
+        td {
+            width: 150px;
+            text-align: left;
+            padding: 5px;
+        }
+    </style>
+    <div class="container">
+        <div class="row justify-content-between">
+            <h1> Recommended Books </h1>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div>
+
+                    <table>
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>ISBN</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for book in recommended_books %}
+                            <tr class="row_hover">
+                                <td>
+                                    <img src="{{ book.image_url_m }}">
+                                </td>
+                                <td>{{ book.title }}</td>
+                                <td>{{ book.author }}</td>
+                                <td> {{ book.ISBN }} </td>
+                                <td>
+                                        <a href="{% url 'create_meeting' club_name=club_name book_isbn=book.ISBN %}" class=button>
+                                            Choose
+                                        </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

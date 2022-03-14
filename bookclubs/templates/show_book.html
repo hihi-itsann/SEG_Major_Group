@@ -13,12 +13,75 @@
             <h1>{{ book.title }}</h1>
             <hr>
             <h4><em>Author: {{ book.author }}</em></h4><br>
+            <h4><em>Genre: {{ book.genra }}</em></h4><br>
             <h4><em>Year: {{ book.year_of_publication }}</em></h4><br>
             <h4><em>publisher: {{ book.publisher }}</em></h4><br>
             <h4><em>ISBN: {{ book.ISBN }}</em></h4><br>
-            <h1 style="color:Green">Rating: {{ book.getAverageRate|floatformat:1 }}/10</h1>
-            <button type="button" class="btn btn-outline-primary btn-lg"><a href="{% url 'create_book_rating' book.ISBN %}">Create Your Rate here</a></button>
+
+            {% if book.getAverageRate == None %}
+              <h1 style="color:Green">Not Yet Rated</h1>
+            {% else %}
+              <h1 style="color:Green">Rating: {{ book.getAverageRate|floatformat:1 }}/10</h1>
+            {% endif %}
+
+            {% if user.is_authenticated %}
+                {% if isInReadingList == False %}
+                  <button type="button" class="btn btn-outline-primary btn-lg"><i class="bi bi-bookmark"></i>&emsp;<a href="{% url 'create_book_status' book.ISBN %}">Add to your reading list</a></button>
+                {% else %}
+                <br>
+                <button type="button" class="btn btn-outline-primary btn-lg"><i class="bi bi-bookmark-check-fill"></i>&emsp;<a href="{% url 'delete_book_status' book.ISBN %}">Delete from your reading list</a></button>
+                <br><br>
+                <div class="dropdown">
+                  <a class="btn btn-outline-primary dropdown-toggle btn-lg" role="button" data-bs-toggle="dropdown">
+                    Change Reading Status
+                  </a>
+                  <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                    <li><a class="dropdown-item" href="{% url 'change_book_status' book.ISBN  'U'%}">Unread</a></li>
+                    <li><a class="dropdown-item" href="{% url 'change_book_status' book.ISBN  'R'%}">Reading</a></li>
+                    <li><a class="dropdown-item" href="{% url 'change_book_status' book.ISBN  'F'%}">Finished</a></li>
+                  </ul>
+                </div>
+                {% endif %}
+                {% if readingStatus == 'F'%}
+                    <br><button type="button" class="btn btn-outline-primary btn-lg" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="Create Review">Create your feedback here</a></button>
+                    {% include 'create_book_rating_review.html' %}
+                {% endif %}
+            {% endif %}
+
           </div>
+            <br><br>
+            {% if not book.getReview.all %}
+                <h2>No Reviews Yet.</h2>
+            {% else %}
+                <h2>Reviews:</h2>
+                {% for review in book.getReview%}
+                <hr><br><br>
+                <div class="row">
+                  <div class="col-lg-1 offset-0">
+                        <img src="{{ review.user.gravatar }}" alt="Gravatar of author {{ review.user.username }}" class="rounded-circle">
+                  </div>
+                  <div class="col-lg-6 offset-1">
+                    <p class="review.user">
+                      <span class="review.user-fullname">
+                        {{ post.author.full_name }}
+                      </span>
+                      <span class="review.user-user-details">
+                        {{ review.user.username }}
+                        &nbsp;&middot;&nbsp;
+                        {{ review.created_at }}
+                      </span>
+                      <b><p class="review-rate">Rate: {{ review.rate  }}</p></b>
+                      <b><p class="review-text">Review: {{ review.review  }}</p></b><br>
+                  </div>
+                </div>
+                {%endfor%}
+            {%endif%}
+
+          <div>
+            <form class="row justify-content-center">
+              <input type="button" class="btn-close btn-lg" aria-label="Close" onclick="history.back()">
+            </form>
+        </div>
 
         </div>
       </div>

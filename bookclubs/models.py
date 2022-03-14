@@ -9,6 +9,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 class User(AbstractUser):
+    userID=models.IntegerField(unique=True, null=True)
     username = models.CharField(
         max_length=30,
         unique=True,
@@ -35,6 +36,9 @@ class User(AbstractUser):
         ('P', 'In-person')
     )
     meeting_preference = models.CharField(max_length=1, choices=MEETING_CHOICES, blank=True)
+
+    def get_rated_books(self):
+        return BookRatingReview.objects.all().filter(user=self)
 
     class Meta:
         """Model options."""
@@ -70,15 +74,58 @@ class Book(models.Model):
     image_url_s = models.URLField(blank=False)
     image_url_m = models.URLField(blank=False)
     image_url_l = models.URLField(blank=False)
+    genra=models.CharField(max_length=100, blank=True)
 
     def getAverageRate(self):
-        return self.rating_set.all().aggregate(Avg('rate'))['rate__avg']
+        return self.bookratingreview_set.all().aggregate(Avg('rate'))['rate__avg']
+
+    def getReview(self):
+        return BookRatingReview.objects.filter(book=self).exclude(review__exact='')
+
+    def get_ISBN(self):
+        return self.ISBN
+
+    # def getReadingStatus(self,user):
+    #     return BookStatus.objects.get(user=user, book=self).status
+    class Meta:
+        ordering = ['title']
+        # return self.rating_set.all().aggregate(Avg('rate'))['rate__avg']
 
 
-class Rating(models.Model):
+class BookRatingReview(models.Model):
     rate = models.FloatField(default=0, validators=[MinValueValidator(0.0), MaxValueValidator(10.0)])
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    review = models.CharField(max_length=520, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+
+
+class BookStatus(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    STATUS_CHOICES = (
+        ('U', 'Unread'),
+        ('R', 'Reading'),
+        ('F', 'Finished')
+    )
+    status = models.CharField(max_length=1, choices=STATUS_CHOICES, blank=False, default='U')
+
+    def change_status(self, choice):
+        if choice == 'U':
+            self.status = 'U'
+            self.save()
+        elif choice == 'R':
+            self.status = 'R'
+            self.save()
+        elif choice == 'F':
+            self.status = 'F'
+            self.save()
+        else:
+            pass
 
 
 class Application(models.Model):
@@ -108,13 +155,13 @@ class Application(models.Model):
 
 
 class Club(models.Model):
-    MEETING_STATUS_CHOICES = (
-        (True, 'Online'),
-        (False, 'In Person')
+    MEETING_CHOICES = (
+        ('ONL', 'Online'),
+        ('OFF', 'In-person')
     )
-    PUBLIC_STATUS_CHOICES = (
-        (True, 'Public'),
-        (False, 'Private')
+    PRIVACY_CHOICES = (
+        ('PUB', 'Public'),
+        ('PRI', 'Private')
     )
 
     club_name = models.CharField(
@@ -129,9 +176,10 @@ class Club(models.Model):
         ]
     )
 
-    meeting_status = models.BooleanField(
-        choices=MEETING_STATUS_CHOICES,
-        default=False
+    meeting_status = models.CharField(
+        choices=MEETING_CHOICES,
+        default='OFF',
+        max_length=3
     )
 
     location = models.CharField(
@@ -139,9 +187,10 @@ class Club(models.Model):
         blank=False
     )
 
-    public_status = models.BooleanField(
-        choices=PUBLIC_STATUS_CHOICES,
-        default=False
+    public_status = models.CharField(
+        choices=PRIVACY_CHOICES,
+        default='PRI',
+        max_length=3
     )
 
     genre = models.CharField(
@@ -152,9 +201,13 @@ class Club(models.Model):
 
     description = models.CharField(
         max_length=520,
-        blank=False)
+        blank=False
+    )
 
     club_members = models.ManyToManyField(User, through='Role')
+
+    def get_club_name(self):
+        return self.club_name
 
     def get_club_role(self, user):
         return Role.objects.get(club=self, user=user).club_role
@@ -206,9 +259,13 @@ class Club(models.Model):
         return self.club_members.all().filter(
             club__club_name=self.club_name, role__club_role='MEM')
 
+    def get_moderators(self):
+        return self.club_members.all().filter(
+            club__club_name=self.club_name, role__club_role='MOD')
+
     def get_management(self):
         return self.club_members.all().filter(
-            club__club_name=self.club_name, role__club_role='OFF') | self.club_members.all().filter(
+            club__club_name=self.club_name, role__club_role='MOD') | self.club_members.all().filter(
             club__club_name=self.club_name, role__club_role='OWN')
 
     def get_banned_members(self):
@@ -250,7 +307,7 @@ class Role(models.Model):
 
     def get_club_role(self):
         return self.RoleOptions(self.club_role).name.title()
-        
+
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
 
@@ -270,9 +327,8 @@ class Post(models.Model):
 
 
 class Comment(models.Model):
-    # name = models.CharField(max_length=50, blank=False, default="Unknown")
-    author = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    body = models.TextField(max_length=520, blank=False)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    body = models.CharField(max_length=520, blank=False)
     related_post = models.ForeignKey(Post, related_name="comments", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -281,3 +337,46 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+
+class Meeting(models.Model):
+    MEETING_CHOICES = (
+        ('ONL', 'Online'),
+        ('OFF', 'In-person')
+    )
+
+    club = models.ForeignKey(Club, related_name='meeting_club', on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, null=True, blank=True, )
+    topic = models.CharField(max_length=120, default='', blank=False)
+    description = models.TextField(max_length=520, blank=True)
+    meeting_status = models.CharField(choices=MEETING_CHOICES, default='OFF', max_length=3)
+    location = models.CharField(max_length=120, blank=False)
+    date = models.DateTimeField(blank=False)
+    time_start = models.TimeField(blank=False)
+    time_end = models.TimeField(blank=False)
+
+    class Meta:
+        ordering = ['-date']
+
+
+class MeetingAttendance(models.Model):
+    MEETING_ROLE_CHOICES = (
+        ('H', 'Host'),
+        ('A', 'Attendee')
+    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    meeting = models.ForeignKey(Meeting, on_delete=models.CASCADE)
+    meeting_role = models.CharField(max_length=1, choices=MEETING_ROLE_CHOICES)
+
+
+class ClubBookAverageRating(models.Model):
+    club = models.ForeignKey(Club, on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    rate = models.FloatField(default=0, validators=[MinValueValidator(0.0), MaxValueValidator(10.0)])
+    number_of_ratings=models.IntegerField()
+
+    def add_rating(self, rate):
+        self.rate+=rate
+
+    def increment_number_of_ratings(self):
+        self.number_of_ratings+=1

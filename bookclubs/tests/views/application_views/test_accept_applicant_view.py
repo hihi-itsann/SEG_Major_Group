@@ -44,7 +44,7 @@ class AcceptApplicantViewTestCase(TestCase):
     def test_accept_applicant_redirects_when_a_member(self):
         self.log_in(self.applicant)
         Role.objects.create(user=self.applicant, club=self.club, club_role='MEM')
-        redirect_url = reverse('feed')
+        redirect_url = reverse('club_feed', kwargs={'club_name': self.club.club_name})
         response = self.client.get(self.url)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
