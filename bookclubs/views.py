@@ -511,10 +511,6 @@ def club_list(request):
             clubs = clubs.exclude(club_name=club.club.club_name)
     else:
         clubs = Club.objects.all()
-    #country_list=clubs.values('country')
-    #city_list=clubs.values('city')
-    #country_list=clubs.values('country')
-    #city_list=clubs.values('city')
     user_country=request.user.country
     user_city=request.user.city
     is_suitable_clubs=True
