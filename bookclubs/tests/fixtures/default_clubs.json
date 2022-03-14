@@ -4,9 +4,9 @@
      "pk": 1,
      "fields": {
        "club_name": "private_online",
-       "meeting_status": false,
+       "meeting_status": "ONL",
        "location": "Bush House",
-       "public_status": false,
+       "public_status": "PRI",
        "genre": "Fiction",
        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ipsum dolor sit amet consectetur adipiscing. Mauris in aliquam sem fringilla ut morbi tincidunt augue interdum."
 
@@ -17,9 +17,9 @@
      "pk": 2,
      "fields": {
        "club_name": "public_online",
-       "meeting_status": false,
+       "meeting_status": "ONL",
        "location": "Bush House",
-       "public_status": true,
+       "public_status": "PUB",
        "genre": "Fiction",
        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ipsum dolor sit amet consectetur adipiscing. Mauris in aliquam sem fringilla ut morbi tincidunt augue interdum."
 
@@ -30,9 +30,9 @@
      "pk": 3,
      "fields": {
        "club_name": "private_in-person",
-       "meeting_status": true,
+       "meeting_status": "OFF",
        "location": "Bush House",
-       "public_status": false,
+       "public_status": "PRI",
        "genre": "Fiction",
        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ipsum dolor sit amet consectetur adipiscing. Mauris in aliquam sem fringilla ut morbi tincidunt augue interdum."
 
@@ -43,9 +43,9 @@
      "pk": 4,
      "fields": {
        "club_name": "public_in-person",
-       "meeting_status": true,
+       "meeting_status": "OFF",
        "location": "Bush House",
-       "public_status": true,
+       "public_status": "PUB",
        "genre": "Fiction",
        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ipsum dolor sit amet consectetur adipiscing. Mauris in aliquam sem fringilla ut morbi tincidunt augue interdum."
 

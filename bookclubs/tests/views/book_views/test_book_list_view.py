@@ -43,5 +43,5 @@ class BookListViewTest(TestCase):
                 image_url_s=f'url-s{book_id}',
                 image_url_m=f'url-m{book_id}',
                 image_url_l=f'url-l{book_id}',
-                genra="Fiction"
+                genre="Fiction"
             )
