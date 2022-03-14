@@ -115,7 +115,7 @@ class TestUrls(SimpleTestCase):
         self.assertEquals(resolve(url).func, reject_applicant)
 
     def test_club_list_url_is_resolved(self):
-        url = reverse('club_list',args=['some-str'])
+        url = reverse('club_list')
         self.assertEquals(resolve(url).func, club_list)
 
     def test_my_clubs_url_is_resolved(self):
