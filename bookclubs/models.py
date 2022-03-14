@@ -357,13 +357,16 @@ class Meeting(models.Model):
     time_end = models.TimeField(blank=False)
 
     def is_attending(self, user):
-        return (MeetingAttendance.objects.filter(meeting=self, user=user)) == 1
+        return (MeetingAttendance.objects.filter(meeting=self, user=user)).count() == 1
 
     def is_host(self, user):
-        return (MeetingAttendance.objects.filter(meeting=self, user=user, meeting_role='H')) == 1
+        return (MeetingAttendance.objects.filter(meeting=self, user=user, meeting_role='H')).count() == 1
 
     def is_attendee_only(self, user):
-        return (MeetingAttendance.objects.filter(meeting=self, user=user, meeting_role='A')) == 1
+        return (MeetingAttendance.objects.filter(meeting=self, user=user, meeting_role='A')).count() == 1
+
+    def get_host(self):
+        return MeetingAttendance.objects.get(meeting=self, meeting_role='H').user
 
     class Meta:
         ordering = ['-date']

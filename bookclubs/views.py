@@ -707,7 +707,7 @@ def create_meeting(request, club_name, book_isbn):
         if form.is_valid():
             form.save(request.user, current_club, chosen_book)
             messages.add_message(request, messages.SUCCESS, "Meeting set up!")
-            return redirect(f'/club/{club_name}/feed/')
+            return redirect('meeting_list', club_name)
     else:
         form = NewMeetingForm()
     return render(request, 'create_meeting.html',
@@ -724,17 +724,16 @@ def meeting_list(request, club_name):
     meetings_count = meetings.count()
     return render(request, 'meeting_list.html',
                   {'club_name': club_name, 'meetings': meetings,
-                   'meeting_counts': meetings_count})
+                   'meetings_count': meetings_count})
 
 @login_required
 @membership_required
 def show_meeting(request, club_name, meeting_id):
-    """User becomes an attendee of the meeting"""
+    """Show a meeting"""
     meeting = Meeting.objects.get(id=meeting_id)
     is_host = meeting.is_host(request.user)
     is_attendee_only = meeting.is_attendee_only(request.user)
     is_attending = meeting.is_attending(request.user)
-
     return render(request, 'show_meeting.html', {'meeting': meeting, 'club_name': club_name, 'is_host': is_host,
                                                  'is_attendee_only': is_attendee_only, 'is_attending': is_attending})
 
@@ -743,25 +742,25 @@ def show_meeting(request, club_name, meeting_id):
 @membership_required
 def join_meeting(request, club_name, meeting_id):
     """User becomes an attendee of the meeting"""
-    meeting = Meeting.objects.filter(id=meeting_id)
+    meeting = Meeting.objects.get(id=meeting_id)
     MeetingAttendance.objects.create(user=request.user, meeting=meeting, meeting_role='A')
-    return redirect('show_meeting', kwargs={'club_name': club_name, 'meeting_id': meeting_id})
+    return redirect('meeting_list', club_name)
 
 
 @login_required
 @membership_required
 def leave_meeting(request, club_name, meeting_id):
     """User stops being an attendee of the meeting"""
-    meeting = Meeting.objects.filter(id=meeting_id)
+    meeting = Meeting.objects.get(id=meeting_id)
     MeetingAttendance.objects.get(user=request.user, meeting=meeting, meeting_role='A').delete()
-    return redirect('meeting_list', kwargs={'club_name': club_name})
+    return redirect('meeting_list', club_name)
 
 
 @login_required
 @membership_required
 def delete_meeting(request, club_name, meeting_id):
     """Meeting is deleted"""
-    meeting = Meeting.objects.filter(id=meeting_id)
+    meeting = Meeting.objects.get(id=meeting_id)
     MeetingAttendance.objects.filter(user=request.user, meeting=meeting).delete()
     meeting.delete()
-    return redirect('meeting_list', kwargs={'club_name': club_name})
+    return redirect('meeting_list', club_name)

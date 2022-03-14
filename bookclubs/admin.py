@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import User, Application, Club, Role, Book, BookRatingReview, BookStatus, Comment, Post, Meeting
+from .models import User, Application, Club, Role, Book, BookRatingReview, BookStatus, Comment, Post, Meeting, \
+    MeetingAttendance
 
 
 @admin.register(User)
@@ -63,6 +64,11 @@ class PostAdmin(admin.ModelAdmin):
 @admin.register(Meeting)
 class MeetingAdmin(admin.ModelAdmin):
     list_display = [
-        'club', 'book', 'topic', 'description', 'meeting_status', 'location', 'date', 'time_start', 'time_end'
+        'id', 'club', 'book', 'topic', 'description', 'meeting_status', 'location', 'date', 'time_start', 'time_end'
     ]
 
+@admin.register(MeetingAttendance)
+class MeetingAttendanceAdmin(admin.ModelAdmin):
+    list_display = [
+        'id', 'user', 'meeting', 'meeting_role'
+    ]
