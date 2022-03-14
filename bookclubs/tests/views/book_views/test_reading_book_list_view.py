@@ -9,7 +9,7 @@ class BookListViewTest(TestCase):
     ]
 
     def setUp(self):
-        self.url = reverse('reading_book_list', kwargs={'book_genra': 'All'})
+        self.url = reverse('reading_book_list', kwargs={'book_genre': 'All'})
         self.user = User.objects.get(username='@johndoe')
 
     def test_reading_book_list_url(self):
@@ -53,7 +53,7 @@ class BookListViewTest(TestCase):
                 image_url_s=f'url-s{book_id}',
                 image_url_m=f'url-m{book_id}',
                 image_url_l=f'url-l{book_id}',
-                genra="Social Science"
+                genre="Social Science"
             )
             BookStatus.objects.create(
                 book=unreadBook,
@@ -69,7 +69,7 @@ class BookListViewTest(TestCase):
                 image_url_s=f'url-s{book_id}',
                 image_url_m=f'url-m{book_id}',
                 image_url_l=f'url-l{book_id}',
-                genra="Fiction"
+                genre="Fiction"
             )
             BookStatus.objects.create(
                 book=readingBook,
@@ -86,7 +86,7 @@ class BookListViewTest(TestCase):
                 image_url_s=f'url-s{book_id}',
                 image_url_m=f'url-m{book_id}',
                 image_url_l=f'url-l{book_id}',
-                genra="Medical"
+                genre="Medical"
             )
             BookStatus.objects.create(
                 book=finishedBook,

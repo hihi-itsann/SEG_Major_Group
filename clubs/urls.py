@@ -34,7 +34,7 @@ urlpatterns = [
     path('create_book_status/<str:ISBN>/', views.create_book_status, name='create_book_status'),
     path('delete_book_status/<str:ISBN>/', views.delete_book_status, name='delete_book_status'),
     path('change_book_status/<str:ISBN>/<str:choice>/', views.change_book_status, name='change_book_status'),
-    path('reading_book_list/<str:book_genra>/', views.reading_book_list, name='reading_book_list'),
+    path('reading_book_list/<str:book_genre>/', views.reading_book_list, name='reading_book_list'),
     path('club/<str:club_name>/feed/', views.club_feed, name='club_feed'),
     path('club/<str:club_name>/', views.club_welcome, name='club_welcome'),
     path('create_club/', views.create_club, name='create_club'),
@@ -56,14 +56,15 @@ urlpatterns = [
     path('article/delete/<int:pk>/', views.DeletePostView.as_view(), name='delete_post'),
     path('create_comment/<int:pk>/', views.CreateCommentView.as_view(), name='create_comment'),
     path('delete_comment/<int:pk>/', views.DeleteCommentView.as_view(), name='delete_comment'),
-    # path('<str:club_name>/club_details_update', views.ClubDetailsUpdateView.as_view(), name='club_details_update'),
+    path('club/<str:club_name>/update_club_info/',views.update_club_info,name='update_club_info'),
     path('club/<str:club_name>/remove/<int:user_id>/', views.remove_member, name='remove_applicant'),
     path('club/<str:club_name>/moderator_management/', views.moderator_list, name='moderator_list'),
     path('club/<str:club_name>/moderator_management/new_owner/<int:user_id>/', views.transfer_ownership,
          name='transfer_ownership'),
-    # path('club/<str:club_name>/host_meeting/', views.create_meeting, name='create_meeting'),
-    path('club/<str:club_name>/host_meeting/show_books/', views.show_book_recommendations,
+    path('club/<str:club_name>/meeting/show_books/', views.show_book_recommendations,
          name='show_book_recommendations'),
-    path('club/<str:club_name>/host_meeting/book/<str:book_isbn>/', views.create_meeting, name='create_meeting'),
+    path('club/<str:club_name>/meeting/book/<str:book_isbn>/create/', views.create_meeting, name='create_meeting'),
+    # path('club/<str:club_name>/meeting_list/', views.meeting_list, name='meeting_list'),
+
 
 ]

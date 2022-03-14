@@ -10,7 +10,7 @@ from faker.providers import BaseProvider, address, date_time, misc
 import pandas as pd
 import datetime
 import numpy
-#from bookclubs.recommender.BooksRecommender import getGenra
+#from bookclubs.recommender.BooksRecommender import getGenre
 import urllib.request
 import json
 import textwrap
@@ -63,7 +63,7 @@ class Command(BaseCommand):
         #self.df_ratings= pd.read_csv(self.ratingsPath, sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0)
 
 
-    def getGenra(self, isbn):
+    def getGenre(self, isbn):
         base_api_link = "https://www.googleapis.com/books/v1/volumes?q=isbn:"
 
         with urllib.request.urlopen(base_api_link + isbn) as f:
@@ -145,7 +145,7 @@ class Command(BaseCommand):
             image_url_s = book['Image-URL-S'],
             image_url_m =book['Image-URL-M'],
             image_url_l = book['Image-URL-L'],
-            genra=self.getGenra(book['ISBN'])[0]
+            genre=self.getGenre(book['ISBN'])[0]
         )
 
 

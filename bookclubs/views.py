@@ -1,3 +1,4 @@
+from django.db.models import Q  # filter exception
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -11,15 +12,12 @@ from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
-
+from django.shortcuts import redirect, render, get_object_or_404
 from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm, \
-    UpdateApplicationForm, CommentForm, RateReviewForm, PostForm, NewMeetingForm
-from bookclubs.recommender.SparkALSall import get_recommendations
+    UpdateApplicationForm, CommentForm, RateReviewForm, PostForm, NewMeetingForm, UpdateClubForm
 from .helpers import *
 from .models import User, Book, Application, Comment, Post, BookStatus, Club, BookRatingReview
 
-
-# from bookclubs.management.commands.seed import get_club_books_average_rating
 
 @login_prohibited
 def home(request):
@@ -177,10 +175,10 @@ class BookListView(LoginRequiredMixin, ListView):
         books = Book.objects.all()
         genres = []
         for book in books:
-            genres.append(book.genra)
+            genres.append(book.genre)
         genres = list(set(genres))
         if not self.kwargs['book_genre'] == 'All':
-            context['books'] = Book.objects.filter(genra=self.kwargs['book_genre'])
+            context['books'] = Book.objects.filter(genre=self.kwargs['book_genre'])
         context['genres'] = genres
         return context
 
@@ -284,12 +282,12 @@ def change_book_status(request, ISBN, choice):
 
 
 @login_required
-def reading_book_list(request, book_genra='All'):
+def reading_book_list(request, book_genre='All'):
     bookStatuses = BookStatus.objects.filter(user=request.user)
-    genras = []
+    genres = []
     for bookStatus in bookStatuses:
-        genras.append(bookStatus.book.genra)
-    genras = list(set(genras))
+        genres.append(bookStatus.book.genre)
+    genres = list(set(genres))
     unreadBookStatuses = bookStatuses.filter(status='U')
     readingBookStatuses = bookStatuses.filter(status='R')
     finishedBookStatuses = bookStatuses.filter(status='F')
@@ -297,15 +295,15 @@ def reading_book_list(request, book_genra='All'):
     readingBooks = []
     finishedBooks = []
     for bookStatus in unreadBookStatuses:
-        if bookStatus.book.genra == book_genra or book_genra == 'All':
+        if bookStatus.book.genre == book_genre or book_genre == 'All':
             unreadBooks.append(bookStatus.book)
     for bookStatus in readingBookStatuses:
-        if bookStatus.book.genra == book_genra or book_genra == 'All':
+        if bookStatus.book.genre == book_genre or book_genre == 'All':
             readingBooks.append(bookStatus.book)
     for bookStatus in finishedBookStatuses:
-        if bookStatus.book.genra == book_genra or book_genra == 'All':
+        if bookStatus.book.genre == book_genre or book_genre == 'All':
             finishedBooks.append(bookStatus.book)
-    args = {'unreadBooks': unreadBooks, 'readingBooks': readingBooks, 'finishedBooks': finishedBooks, 'genras': genras}
+    args = {'unreadBooks': unreadBooks, 'readingBooks': readingBooks, 'finishedBooks': finishedBooks, 'genres': genres}
     return render(request, 'reading_book_list.html', args)
 
 
@@ -374,22 +372,21 @@ def delete_club(request, club_name):
     return feed(request)
 
 
-# #to-do: fix the club_name (not finished)
-# class ClubDetailsUpdateView(LoginRequiredMixin, UpdateView):
-#     """View to update club ClubDetailsUpdateView."""
-#     model = UpdateClubForm
-#     template_name = "club_details_update.html"
-#     form_class = UpdateClubForm
-#
-#     def get_object(self):
-#         """Return the club to be updated."""
-#         current_club = Club.objects.get(self.get_club_name==club_name)
-#         return current_club
-#
-#     def get_success_url(self):
-#         """Return redirect URL after successful update."""
-#         messages.add_message(self.request, messages.SUCCESS, "Deatils updated!")
-#         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+@login_required
+@club_exists
+@owner_required
+def update_club_info(request, club_name):
+    """owner change information of club"""
+    club = Club.objects.get(club_name=club_name)
+    form = UpdateClubForm(instance=club)
+    if request.method == 'POST':
+        form = UpdateClubForm(request.POST, instance=club)
+        if form.is_valid():
+            form.save()
+            return redirect(f'/club/{club_name}/feed/')
+    context = {'form': form}
+    return render(request, 'update_club_info.html', context)
+
 
 @login_required
 @club_exists
@@ -401,7 +398,7 @@ def create_application(request, club_name):
         form = NewApplicationForm(request.POST)
         if form.is_valid():
             application = form.save(request.user, current_club)
-            if current_club.public_status:
+            if current_club.public_status == 'PUB':
                 current_club.club_members.add(request.user, through_defaults={'club_role': 'MEM'})
                 current_club.toggle_member(request.user)
                 application.change_status('A')
@@ -535,6 +532,7 @@ def club_list(request):
 
     return render(request, 'club_list.html', {'clubs': clubs,'meeting_status':meeting_status,
                             'distance':distance,'club_exists':club_exists,'is_suitable_clubs':is_suitable_clubs})
+
 
 @login_required
 @club_exists

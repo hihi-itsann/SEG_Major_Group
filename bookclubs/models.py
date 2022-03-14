@@ -91,7 +91,7 @@ class Book(models.Model):
     image_url_s = models.URLField(blank=False)
     image_url_m = models.URLField(blank=False)
     image_url_l = models.URLField(blank=False)
-    genra=models.CharField(max_length=100, blank=True)
+    genre=models.CharField(max_length=100, blank=True)
 
     def getAverageRate(self):
         return self.bookratingreview_set.all().aggregate(Avg('rate'))['rate__avg']
@@ -195,8 +195,8 @@ class Club(models.Model):
 
     meeting_status = models.CharField(
         choices=MEETING_CHOICES,
-        default='OFF',
-        max_length=3
+        max_length=3,
+        blank=False
     )
 
     location = models.CharField(
@@ -217,8 +217,9 @@ class Club(models.Model):
 
     public_status = models.CharField(
         choices=PRIVACY_CHOICES,
-        default='PRI',
-        max_length=3
+        max_length=3,
+        blank=False
+
     )
 
     genre = models.CharField(

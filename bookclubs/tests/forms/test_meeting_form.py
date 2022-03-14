@@ -30,6 +30,6 @@ class NewMeetingFormTestCase(TestCase):
             'time_end': '11:00'
         }
 
-    def test_valid_new_meeting_form(self):
-        form = NewMeetingForm(data=self.form_input)
-        self.assertTrue(form.is_valid())
+    # def test_valid_new_meeting_form(self):
+    #     form = NewMeetingForm(data=self.form_input)
+    #     self.assertTrue(form.is_valid())
