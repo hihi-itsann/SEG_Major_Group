@@ -119,7 +119,8 @@ class Command(BaseCommand):
         print("Rating seeding complete.      ")
 
     def create_rating(self, user, book):
-        rate = self.faker.random_int(min=0, max=10)
+        # rate = self.faker.random_int(min=0, max=10)
+        rate = self.faker.random_choices(elements=('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'X'), length=1)[0]
         BookRatingReview.objects.create(
             rate=rate,
             book=book,
@@ -127,7 +128,8 @@ class Command(BaseCommand):
         )
     def create_books(self):
         for index, book in self.df_books.head(100).iterrows():
-            print(f"Seeding book {index}/{len(self.df_books)}", end='\r')
+            # print(f"Seeding book {index}/{len(self.df_books)}", end='\r')
+            print(f"Seeding book {index}/100", end='\r')
             try:
 
                 self.create_book(book)
