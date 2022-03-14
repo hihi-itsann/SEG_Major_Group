@@ -685,12 +685,13 @@ class DeleteCommentView(LoginRequiredMixin, DeleteView):
 def load_book_recommendations(request, club_name):
     return render(request, 'load_book_recommendations.html', {'club_name': club_name})
 
+
 @login_required
 @club_exists
 @membership_required
 def show_book_recommendations(request, club_name):
     """Choose a book for the meeting"""
-    current_club = Club.objects.get(club_name=club_name)
+    # current_club = Club.objects.get(club_name=club_name)
     all_books = Book.objects.all()
     return render(request, 'show_book_recommendations.html', {'recommended_books': all_books, 'club_name': club_name})
 
@@ -726,6 +727,7 @@ def meeting_list(request, club_name):
                   {'club_name': club_name, 'meetings': meetings,
                    'meetings_count': meetings_count})
 
+
 @login_required
 @membership_required
 def show_meeting(request, club_name, meeting_id):
@@ -733,9 +735,8 @@ def show_meeting(request, club_name, meeting_id):
     meeting = Meeting.objects.get(id=meeting_id)
     is_host = meeting.is_host(request.user)
     is_attendee_only = meeting.is_attendee_only(request.user)
-    is_attending = meeting.is_attending(request.user)
     return render(request, 'show_meeting.html', {'meeting': meeting, 'club_name': club_name, 'is_host': is_host,
-                                                 'is_attendee_only': is_attendee_only, 'is_attending': is_attending})
+                                                 'is_attendee_only': is_attendee_only})
 
 
 @login_required

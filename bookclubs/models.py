@@ -381,6 +381,9 @@ class MeetingAttendance(models.Model):
     meeting = models.ForeignKey(Meeting, on_delete=models.CASCADE)
     meeting_role = models.CharField(max_length=1, choices=MEETING_ROLE_CHOICES)
 
+    class Meta:
+        unique_together = ('user', 'meeting')
+
 
 class ClubBookAverageRating(models.Model):
     club = models.ForeignKey(Club, on_delete=models.CASCADE)

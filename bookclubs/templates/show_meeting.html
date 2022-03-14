@@ -4,9 +4,9 @@
         <div class="row">
             <div class="col-lg-6 offset-2">
                 <h1>{{ meeting.club.club_name }} Meeting #{{ meeting.id }}</h1>
-                <h4>Host:</h4>
-                <h4><a href="{% url 'show_user' meeting.get_host.username %}"> {{ meeting.get_host.full_name }} </a>
-                </h4><br>
+                <p>Host:</p>
+                <p><a href="{% url 'show_user' meeting.get_host.username %}"> {{ meeting.get_host.full_name }} </a>
+                </p><br>
                 <br>
                 <h2>{{ meeting.book.title }} </h2>
                 <img src="{{ meeting.book.image_url_m }}" alt="Book Cover">
@@ -18,22 +18,25 @@
                 <p>End: {{ meeting.time_end }}</p>
                 <br>
                 {% if is_host %}
-                    <button type="button" class="btn btn-outline-primary btn-lg"><a
+                    <button type="button" class="btn btn-outline-dark"><a
                             href="{% url 'delete_meeting' club_name=club_name meeting_id=meeting.id %}">Cancel
                         Meeting</a></button>
-                {% endif %}
-                {% if is_attendee_only %}
-                    <h7>Can't join us anymore?</h7>
-                    <br>
-                    <button type="button" class="btn btn-outline-dark">
-                        <a href="{% url 'leave_meeting' club_name=club_name meeting_id=meeting.id %}">Not Going</a>
-                    </button>
                 {% else %}
-                    <h7>Want to join us?</h7>
-                    <br>
-                    <button type="button" class="btn btn-outline-dark" >
-                        <a href="{% url 'join_meeting' club_name=club_name meeting_id=meeting.id %}">Attend</a>
-                    </button>
+                    {% if is_attendee_only %}
+
+
+                        <h7>Can't join us anymore?</h7>
+                        <br>
+                        <button type="button" class="btn btn-outline-dark">
+                            <a href="{% url 'leave_meeting' club_name=club_name meeting_id=meeting.id %}">Not Going</a>
+                        </button>
+                    {% else %}
+                        <h7>Want to join us?</h7>
+                        <br>
+                        <button type="button" class="btn btn-outline-dark">
+                            <a href="{% url 'join_meeting' club_name=club_name meeting_id=meeting.id %}">Attend</a>
+                        </button>
+                    {% endif %}
                 {% endif %}
 
             </div>
