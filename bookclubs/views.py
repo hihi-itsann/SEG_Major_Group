@@ -15,7 +15,7 @@ from django.shortcuts import redirect, render, get_object_or_404
 from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm, UpdateApplicationForm, CommentForm, RateReviewForm, PostForm, NewMeetingForm, UpdateClubForm
 from .helpers import *
 from .models import User, Book, Application, Comment, Post, BookRatingReview, BookStatus, Club
-
+from django.core.paginator import Paginator
 
 
 @login_prohibited
@@ -177,7 +177,11 @@ class BookListView(LoginRequiredMixin, ListView):
             genres.append(book.genra)
         genres = list(set(genres))
         if not self.kwargs['book_genre'] == 'All':
-            context['books'] = Book.objects.filter(genra=self.kwargs['book_genre'])
+            book_list = Book.objects.filter(genra=self.kwargs['book_genre'])
+            context['books'] = book_list
+            paginator = Paginator(book_list, 10)
+            page_number = settings.BOOKS_PER_PAGE
+            context['page_obj'] = paginator.get_page(page_number)
         context['genres'] = genres
         return context
 
@@ -689,4 +693,3 @@ def create_meeting(request, club_name, book_isbn):
     else:
         form = NewMeetingForm()
     return render(request, 'create_meeting.html', {'form': form, 'club_name': club_name, 'book_isbn': book_isbn, 'book': chosen_book})
-
