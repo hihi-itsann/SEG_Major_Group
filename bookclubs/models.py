@@ -7,6 +7,18 @@ from django.db.models import Avg
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+# class Country(models.Model):
+#     name = models.CharField(max_length=30)
+#
+#     def __str__(self):
+#         return self.name
+#
+# class City(models.Model):
+#     country = models.ForeignKey(Country, on_delete=models.CASCADE)
+#     name = models.CharField(max_length=30)
+#
+#     def __str__(self):
+#         return self.name
 
 class User(AbstractUser):
     userID=models.IntegerField(unique=True, null=True)
@@ -31,6 +43,11 @@ class User(AbstractUser):
     )
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True)
     location = models.CharField(max_length=50, blank=True)
+    city = models.CharField(max_length=50, blank=True)
+    country = models.CharField(max_length=50, blank=True)
+    # country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True)
+    # city = models.ForeignKey(City, on_delete=models.CASCADE, null=True)
+
     MEETING_CHOICES = (
         ('O', 'Online'),
         ('P', 'In-person')
@@ -74,7 +91,7 @@ class Book(models.Model):
     image_url_s = models.URLField(blank=False)
     image_url_m = models.URLField(blank=False)
     image_url_l = models.URLField(blank=False)
-    genra=models.CharField(max_length=100, blank=True)
+    genre=models.CharField(max_length=100, blank=True)
 
     def getAverageRate(self):
         return self.bookratingreview_set.all().aggregate(Avg('rate'))['rate__avg']
@@ -200,6 +217,17 @@ class Club(models.Model):
         max_length=100,
         blank=False
     )
+    city = models.CharField(
+        max_length=100,
+        blank=True
+    )
+    country = models.CharField(
+        max_length=100,
+        blank=True
+    )
+    # country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True)
+    # city = models.ForeignKey(City, on_delete=models.CASCADE, null=True)
+
 
     public_status = models.CharField(
         choices=PRIVACY_CHOICES,
@@ -369,6 +397,18 @@ class Meeting(models.Model):
     time_start = models.TimeField(blank=False)
     time_end = models.TimeField(blank=False)
 
+    def is_attending(self, user):
+        return (MeetingAttendance.objects.filter(meeting=self, user=user)).count() == 1
+
+    def is_host(self, user):
+        return (MeetingAttendance.objects.filter(meeting=self, user=user, meeting_role='H')).count() == 1
+
+    def is_attendee_only(self, user):
+        return (MeetingAttendance.objects.filter(meeting=self, user=user, meeting_role='A')).count() == 1
+
+    def get_host(self):
+        return MeetingAttendance.objects.get(meeting=self, meeting_role='H').user
+
     class Meta:
         ordering = ['-date']
 
@@ -381,6 +421,9 @@ class MeetingAttendance(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     meeting = models.ForeignKey(Meeting, on_delete=models.CASCADE)
     meeting_role = models.CharField(max_length=1, choices=MEETING_ROLE_CHOICES)
+
+    class Meta:
+        unique_together = ('user', 'meeting')
 
 
 class ClubBookAverageRating(models.Model):
