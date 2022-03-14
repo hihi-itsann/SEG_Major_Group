@@ -514,7 +514,7 @@ def club_list(request):
     distance="all places"
     #print(city_list)
     meeting_status=request.user.meeting_preference
-    
+
     if request.method=="POST":
         meeting_status=request.POST.get("meeting_status")
     if meeting_status == "Online" or meeting_status == "O":
@@ -720,12 +720,12 @@ def show_book_recommendations(request, club_name):
     current_club = Club.objects.get(club_name=club_name)
     all_books = Book.objects.all()
     ## get_club_books_average_rating()
-    recommendations = get_recommendations(current_club.id)
-    print(recommendations)
-    recommended_books = Book.objects.all().filter(ISBN__in=recommendations)
+    #recommendations = get_recommendations(current_club.id)
+    #print(recommendations)
+    #recommended_books = Book.objects.all().filter(ISBN__in=recommendations)
 
     return render(request, 'show_book_recommendations.html',
-                  {'recommended_books': recommended_books, 'club_name': club_name})
+                  {'recommended_books': all_books, 'club_name': club_name})
 
 
 @login_required
