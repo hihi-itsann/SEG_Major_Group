@@ -16,12 +16,10 @@ class NewMeetingFormTestCase(TestCase):
 
     def setUp(self):
         self.user = User.objects.get(username='@johndoe')
-        self.chooser = User.objects.get(username='@janedoe')
         self.club = Club.objects.get(club_name='private_online')
         self.book = Book.objects.get(ISBN='0195153448')
         self.form_input = {
             'club': self.club,
-            'chooser': self.chooser,
             'book': self.book,
             'topic': 'alpha bravo charlie',
             'description': 'delta foxtrot golf hotel india',

@@ -6,6 +6,8 @@ from django.contrib.auth import authenticate
 from django.db import IntegrityError
 import datetime
 
+from .models import Post
+
 
 # from django.forms.widgets import DateInput
 

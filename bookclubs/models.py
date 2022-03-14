@@ -293,7 +293,7 @@ class Club(models.Model):
 
     def get_management(self):
         return self.club_members.all().filter(
-            club__club_name=self.club_name, role__club_role='OFF') | self.club_members.all().filter(
+            club__club_name=self.club_name, role__club_role='MOD') | self.club_members.all().filter(
             club__club_name=self.club_name, role__club_role='OWN')
 
     def get_banned_members(self):
@@ -316,18 +316,6 @@ class Club(models.Model):
         else:
             self.status = False
         self.save()
-
-class ClubBookAverageRating(models.Model):
-    club = models.ForeignKey(Club, on_delete=models.CASCADE)
-    book = models.ForeignKey(Book, on_delete=models.CASCADE)
-    rate = models.FloatField(default=0, validators=[MinValueValidator(0.0), MaxValueValidator(10.0)])
-    number_of_ratings=models.IntegerField()
-
-    def add_rating(self, rate):
-        self.rate+=rate
-
-    def increment_number_of_ratings(self):
-        self.number_of_ratings+=1
 
 class Role(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -407,3 +395,16 @@ class MeetingAttendance(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     meeting = models.ForeignKey(Meeting, on_delete=models.CASCADE)
     meeting_role = models.CharField(max_length=1, choices=MEETING_ROLE_CHOICES)
+
+
+class ClubBookAverageRating(models.Model):
+    club = models.ForeignKey(Club, on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    rate = models.FloatField(default=0, validators=[MinValueValidator(0.0), MaxValueValidator(10.0)])
+    number_of_ratings=models.IntegerField()
+
+    def add_rating(self, rate):
+        self.rate+=rate
+
+    def increment_number_of_ratings(self):
+        self.number_of_ratings+=1

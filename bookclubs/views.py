@@ -667,7 +667,7 @@ class DeleteCommentView(LoginRequiredMixin, DeleteView):
 @membership_required
 def show_book_recommendations(request, club_name):
     """Choose a book for the meeting"""
-    
+
     current_club = Club.objects.get(club_name=club_name)
     all_books = Book.objects.all()
     return render(request, 'show_book_recommendations.html', {'recommended_books': all_books, 'club_name': club_name})
