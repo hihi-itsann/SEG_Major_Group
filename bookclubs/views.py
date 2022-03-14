@@ -15,13 +15,9 @@ from django.shortcuts import redirect, render, get_object_or_404
 from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm, \
     UpdateApplicationForm, CommentForm, RateReviewForm, PostForm, NewMeetingForm, UpdateClubForm
 from .helpers import *
-<<<<<<< HEAD
-from .models import User, Book, Application, Comment, Post, BookRatingReview, BookStatus, Club
-from django.core.paginator import Paginator
-=======
 from .models import User, Book, Application, Comment, Post, BookRatingReview, BookStatus, Club, Meeting, \
     MeetingAttendance
->>>>>>> main
+from django.core.paginator import Paginator
 
 
 @login_prohibited
@@ -183,15 +179,11 @@ class BookListView(LoginRequiredMixin, ListView):
             genres.append(book.genre)
         genres = list(set(genres))
         if not self.kwargs['book_genre'] == 'All':
-<<<<<<< HEAD
             book_list = Book.objects.filter(genra=self.kwargs['book_genre'])
             context['books'] = book_list
             paginator = Paginator(book_list, 10)
             page_number = settings.BOOKS_PER_PAGE
             context['page_obj'] = paginator.get_page(page_number)
-=======
-            context['books'] = Book.objects.filter(genre=self.kwargs['book_genre'])
->>>>>>> main
         context['genres'] = genres
         return context
 
@@ -756,9 +748,6 @@ def create_meeting(request, club_name, book_isbn):
             return redirect('meeting_list', club_name)
     else:
         form = NewMeetingForm()
-<<<<<<< HEAD
-    return render(request, 'create_meeting.html', {'form': form, 'club_name': club_name, 'book_isbn': book_isbn, 'book': chosen_book})
-=======
     return render(request, 'create_meeting.html',
                   {'form': form, 'club_name': club_name, 'book_isbn': book_isbn, 'book': chosen_book})
 
@@ -813,4 +802,3 @@ def delete_meeting(request, club_name, meeting_id):
     MeetingAttendance.objects.filter(user=request.user, meeting=meeting).delete()
     meeting.delete()
     return redirect('meeting_list', club_name)
->>>>>>> main
