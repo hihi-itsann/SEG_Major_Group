@@ -1,0 +1,44 @@
+{% extends 'base_content.html' %}
+{% block content %}
+    <br>
+    <br>
+    <div class="container">
+        <div class="row">
+
+            <div class="col-lg-6 offset-2">
+                <h1>{{ meeting.club }} Meeting #{{ meeting.id }}</h1>
+                <h4>Host:</h4>
+                <h4><a href="{% url 'show_user' username=meeting.host.username %}"> {{ meeting.host.full_name }} </a>
+                </h4><br>
+                <br>
+                <h2>{{ meeting.book.title }} </h2>
+                <img src="{{ meeting.book.image_url_l }}" alt="Book Cover">
+                <h3>{{ meeting.topic }}</h3>
+                <p>{{ meeting.description }}</p>
+                <br>
+                <table>
+                    <tr>Date: {{ meeting.date }}</tr>
+                    <tr>Start: {{ meeting.time_start }}</tr>
+                    <tr>End: {{ meeting.time_end }}</tr>
+                </table>
+                <br>
+                {% if is_host %}
+                    <button type="button" class="btn btn-outline-primary btn-lg"><a
+                            href="{% url 'delete_meeting' club_name=club_name meeting_id=meeting.id %}">Cancel Meeting</a></button>
+                {% endif %}
+                {% if is_attendee_only %}
+                    <h7>Can't join us anymore?</h7>
+                    <button type="button" class="btn btn-outline-primary btn-lg"><a
+                            href="{% url 'join_meeting' club_name=club_name meeting_id=meeting.id %}">Attend</a></button>
+                {% endif %}
+                {% if is_attendee_only == true %}
+                    <h7>Can't join us anymore?</h7>
+                    <button type="button" class="btn btn-outline-primary btn-lg"><a
+                            href="{% url 'leave_meeting' club_name=club_name meeting_id=meeting.id %}">Not Going</a></button>
+                {% endif %}
+
+
+        </div>
+    </div>
+    </div>
+{% endblock %}

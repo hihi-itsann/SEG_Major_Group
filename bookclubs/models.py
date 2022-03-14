@@ -356,6 +356,15 @@ class Meeting(models.Model):
     time_start = models.TimeField(blank=False)
     time_end = models.TimeField(blank=False)
 
+    def is_attending(self, user):
+        return (MeetingAttendance.objects.filter(meeting=self, user=user)) == 1
+
+    def is_host(self, user):
+        return (MeetingAttendance.objects.filter(meeting=self, user=user, meeting_role='H')) == 1
+
+    def is_attendee_only(self, user):
+        return (MeetingAttendance.objects.filter(meeting=self, user=user, meeting_role='A')) == 1
+
     class Meta:
         ordering = ['-date']
 
