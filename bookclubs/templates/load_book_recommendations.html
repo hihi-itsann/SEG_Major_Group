@@ -1,0 +1,52 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<style>
+        h1 {
+            padding: 5px;
+            text-align: left;
+
+        }
+
+        h5 {
+            padding: 5px;
+            text-align: left;
+
+        }
+
+        table {
+            border-collapse: separate;
+            border-spacing: 0 15px;
+        }
+
+        td {
+            width: 150px;
+            text-align: left;
+            padding: 5px;
+        }
+
+</style>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<!--<div id="spinner">
+<div class="d-flex justify-content-center">
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+    </div>-->
+<div>
+    <h2>The next stage could take up to 2 minutes as we are trying to recommend the best books for you!</h2>
+    <h3>Click 'Show Books' if you're happy to go ahead with this!</h3>
+    <h7>We recommend getting a tea or coffee while you wait for our recommendations</h7>
+</div>>
+<div align="centre">
+    <a href="{% url 'show_book_recommendations' club_name=club_name %}" class=button>
+        Show Books
+    </a>
+    <a href="{% url 'club_feed' club_name=club_name %}" class=button>
+        Go back to {{club_name}} Feed!
+    </a>
+</div>
+
+{% endblock %}

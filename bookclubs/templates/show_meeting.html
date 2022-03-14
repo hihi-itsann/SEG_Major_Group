@@ -1,0 +1,45 @@
+{% extends 'base_content.html' %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 offset-2">
+                <h1>{{ meeting.club.club_name }} Meeting #{{ meeting.id }}</h1>
+                <p>Host:</p>
+                <p><a href="{% url 'show_user' meeting.get_host.username %}"> {{ meeting.get_host.full_name }} </a>
+                </p><br>
+                <br>
+                <h2>{{ meeting.book.title }} </h2>
+                <img src="{{ meeting.book.image_url_m }}" alt="Book Cover">
+                <h3>{{ meeting.topic }}</h3>
+                <p>{{ meeting.description }}</p>
+                <br>
+                <p>Date: {{ meeting.date.day }}/{{ meeting.date.month }}/{{ meeting.date.year }}</p>
+                <p>Start: {{ meeting.time_start }}</p>
+                <p>End: {{ meeting.time_end }}</p>
+                <br>
+                {% if is_host %}
+                    <button type="button" class="btn btn-outline-dark"><a
+                            href="{% url 'delete_meeting' club_name=club_name meeting_id=meeting.id %}">Cancel
+                        Meeting</a></button>
+                {% else %}
+                    {% if is_attendee_only %}
+
+
+                        <h7>Can't join us anymore?</h7>
+                        <br>
+                        <button type="button" class="btn btn-outline-dark">
+                            <a href="{% url 'leave_meeting' club_name=club_name meeting_id=meeting.id %}">Not Going</a>
+                        </button>
+                    {% else %}
+                        <h7>Want to join us?</h7>
+                        <br>
+                        <button type="button" class="btn btn-outline-dark">
+                            <a href="{% url 'join_meeting' club_name=club_name meeting_id=meeting.id %}">Attend</a>
+                        </button>
+                    {% endif %}
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

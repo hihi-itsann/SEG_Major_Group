@@ -383,6 +383,18 @@ class Meeting(models.Model):
     time_start = models.TimeField(blank=False)
     time_end = models.TimeField(blank=False)
 
+    def is_attending(self, user):
+        return (MeetingAttendance.objects.filter(meeting=self, user=user)).count() == 1
+
+    def is_host(self, user):
+        return (MeetingAttendance.objects.filter(meeting=self, user=user, meeting_role='H')).count() == 1
+
+    def is_attendee_only(self, user):
+        return (MeetingAttendance.objects.filter(meeting=self, user=user, meeting_role='A')).count() == 1
+
+    def get_host(self):
+        return MeetingAttendance.objects.get(meeting=self, meeting_role='H').user
+
     class Meta:
         ordering = ['-date']
 
@@ -395,6 +407,9 @@ class MeetingAttendance(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     meeting = models.ForeignKey(Meeting, on_delete=models.CASCADE)
     meeting_role = models.CharField(max_length=1, choices=MEETING_ROLE_CHOICES)
+
+    class Meta:
+        unique_together = ('user', 'meeting')
 
 
 class ClubBookAverageRating(models.Model):

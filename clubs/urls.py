@@ -56,7 +56,7 @@ urlpatterns = [
     path('article/delete/<int:pk>/', views.DeletePostView.as_view(), name='delete_post'),
     path('create_comment/<int:pk>/', views.CreateCommentView.as_view(), name='create_comment'),
     path('delete_comment/<int:pk>/', views.DeleteCommentView.as_view(), name='delete_comment'),
-    path('club/<str:club_name>/update_club_info/',views.update_club_info,name='update_club_info'),
+    path('club/<str:club_name>/update_club_info/', views.update_club_info,name='update_club_info'),
     path('club/<str:club_name>/remove/<int:user_id>/', views.remove_member, name='remove_applicant'),
     path('club/<str:club_name>/moderator_management/', views.moderator_list, name='moderator_list'),
     path('club/<str:club_name>/moderator_management/new_owner/<int:user_id>/', views.transfer_ownership,
@@ -64,7 +64,11 @@ urlpatterns = [
     path('club/<str:club_name>/meeting/show_books/', views.show_book_recommendations,
          name='show_book_recommendations'),
     path('club/<str:club_name>/meeting/book/<str:book_isbn>/create/', views.create_meeting, name='create_meeting'),
-    # path('club/<str:club_name>/meeting_list/', views.meeting_list, name='meeting_list'),
+    path('club/<str:club_name>/meeting_list/', views.meeting_list, name='meeting_list'),
+    path('club/<str:club_name>/meeting/<int:meeting_id>/', views.show_meeting, name='show_meeting'),
+    path('club/<str:club_name>/meeting/<int:meeting_id>/join/', views.join_meeting, name='join_meeting'),
+    path('club/<str:club_name>/meeting/<int:meeting_id>/leave/', views.leave_meeting, name='leave_meeting'),
+    path('club/<str:club_name>/meeting/<int:meeting_id>/delete/', views.delete_meeting, name='delete_meeting'),
 
 
 ]

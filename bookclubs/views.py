@@ -3,7 +3,6 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ImproperlyConfigured
-from django.db.models import Q  # filter exception
 from django.http import Http404
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
@@ -16,7 +15,8 @@ from django.shortcuts import redirect, render, get_object_or_404
 from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm, \
     UpdateApplicationForm, CommentForm, RateReviewForm, PostForm, NewMeetingForm, UpdateClubForm
 from .helpers import *
-from .models import User, Book, Application, Comment, Post, BookStatus, Club, BookRatingReview
+from .models import User, Book, Application, Comment, Post, BookRatingReview, BookStatus, Club, Meeting, \
+    MeetingAttendance
 
 
 @login_prohibited
@@ -357,7 +357,7 @@ def create_club(request):
         if form.is_valid():
             club = form.save()
             club.club_members.add(request.user, through_defaults={'club_role': 'OWN'})
-            return redirect('feed')
+            return redirect('club_feed', club.club_name)
     else:
         form = NewClubForm()
     return render(request, 'create_club.html', {'form': form})
@@ -717,7 +717,7 @@ class DeleteCommentView(LoginRequiredMixin, DeleteView):
 @membership_required
 def show_book_recommendations(request, club_name):
     """Choose a book for the meeting"""
-    current_club = Club.objects.get(club_name=club_name)
+    # current_club = Club.objects.get(club_name=club_name)
     all_books = Book.objects.all()
     ## get_club_books_average_rating()
     #recommendations = get_recommendations(current_club.id)
@@ -740,8 +740,60 @@ def create_meeting(request, club_name, book_isbn):
         if form.is_valid():
             form.save(request.user, current_club, chosen_book)
             messages.add_message(request, messages.SUCCESS, "Meeting set up!")
-            return redirect(f'/club/{club_name}/feed/')
+            return redirect('meeting_list', club_name)
     else:
         form = NewMeetingForm()
     return render(request, 'create_meeting.html',
                   {'form': form, 'club_name': club_name, 'book_isbn': book_isbn, 'book': chosen_book})
+
+
+@login_required
+@club_exists
+@membership_required
+def meeting_list(request, club_name):
+    """Shows all the meetings to members of the club"""
+    current_club = Club.objects.get(club_name=club_name)
+    meetings = Meeting.objects.filter(club=current_club)
+    meetings_count = meetings.count()
+    return render(request, 'meeting_list.html',
+                  {'club_name': club_name, 'meetings': meetings,
+                   'meetings_count': meetings_count})
+
+
+@login_required
+@membership_required
+def show_meeting(request, club_name, meeting_id):
+    """Show a meeting"""
+    meeting = Meeting.objects.get(id=meeting_id)
+    is_host = meeting.is_host(request.user)
+    is_attendee_only = meeting.is_attendee_only(request.user)
+    return render(request, 'show_meeting.html', {'meeting': meeting, 'club_name': club_name, 'is_host': is_host,
+                                                 'is_attendee_only': is_attendee_only})
+
+
+@login_required
+@membership_required
+def join_meeting(request, club_name, meeting_id):
+    """User becomes an attendee of the meeting"""
+    meeting = Meeting.objects.get(id=meeting_id)
+    MeetingAttendance.objects.create(user=request.user, meeting=meeting, meeting_role='A')
+    return redirect('meeting_list', club_name)
+
+
+@login_required
+@membership_required
+def leave_meeting(request, club_name, meeting_id):
+    """User stops being an attendee of the meeting"""
+    meeting = Meeting.objects.get(id=meeting_id)
+    MeetingAttendance.objects.get(user=request.user, meeting=meeting, meeting_role='A').delete()
+    return redirect('meeting_list', club_name)
+
+
+@login_required
+@membership_required
+def delete_meeting(request, club_name, meeting_id):
+    """Meeting is deleted"""
+    meeting = Meeting.objects.get(id=meeting_id)
+    MeetingAttendance.objects.filter(user=request.user, meeting=meeting).delete()
+    meeting.delete()
+    return redirect('meeting_list', club_name)
