@@ -236,6 +236,18 @@ class CreateBookRateReviewView(LoginRequiredMixin, CreateView):
         book = Book.objects.get(ISBN=self.kwargs['ISBN'])
         return '{}#education'.format(reverse('show_book', kwargs={'ISBN': book.ISBN}))
 
+@login_required
+def delete_book_rating_review(request, ISBN, pk):
+     book = Book.objects.get(ISBN=ISBN)
+     try:
+         rating_review=BookRatingReview.objects.get(book=book, id=pk)
+     except ObjectDoesNotExist:
+         messages.add_message(request, messages.ERROR, "You have not given that feedback!")
+         return redirect('show_book', ISBN)
+     rating_review.delete();
+     messages.add_message(request, messages.SUCCESS, "This review has successfully been deleted!")
+     return redirect('show_book', ISBN)
+
 
 @login_required
 def create_book_status(request, ISBN):
