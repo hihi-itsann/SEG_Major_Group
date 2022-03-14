@@ -496,6 +496,11 @@ def my_clubs(request):
 @login_required
 def club_list(request):
     clubs = []
+    if Club.objects.all().count()==0:
+        club_exists=False
+    else:
+        club_exists=True
+
     if Role.objects.filter(user=request.user):
         relations = Role.objects.filter(user=request.user)
         clubs = Club.objects.all()
@@ -503,7 +508,35 @@ def club_list(request):
             clubs = clubs.exclude(club_name=club.club.club_name)
     else:
         clubs = Club.objects.all()
-    return render(request, 'club_list.html', {'clubs': clubs})
+    user_country=request.user.country
+    user_city=request.user.city
+    is_suitable_clubs=True
+    distance="all places"
+    #print(city_list)
+    meeting_status=request.user.meeting_preference
+
+    if request.method=="POST":
+        meeting_status=request.POST.get("meeting_status")
+    if meeting_status == "Online" or meeting_status == "O":
+        meeting_status="Online"
+        clubs=clubs.filter(meeting_status='ONL')
+    elif meeting_status=="In person" or meeting_status == "P":
+        meeting_status="In person"
+
+        clubs=clubs.filter(meeting_status='OFF')
+        if request.method=="POST":
+            distance=request.POST.get("distance")
+        if distance == "same city":
+            clubs=clubs.filter(city=user_city)
+        elif distance=="same country":
+            clubs=clubs.filter(country=user_country)
+    if clubs.count()==0:
+        is_suitable_clubs=False
+    else:
+        is_suitable_clubs=True
+
+    return render(request, 'club_list.html', {'clubs': clubs,'meeting_status':meeting_status,
+                            'distance':distance,'club_exists':club_exists,'is_suitable_clubs':is_suitable_clubs})
 
 
 @login_required
@@ -682,18 +715,17 @@ class DeleteCommentView(LoginRequiredMixin, DeleteView):
 @login_required
 @club_exists
 @membership_required
-def load_book_recommendations(request, club_name):
-    return render(request, 'load_book_recommendations.html', {'club_name': club_name})
-
-
-@login_required
-@club_exists
-@membership_required
 def show_book_recommendations(request, club_name):
     """Choose a book for the meeting"""
     # current_club = Club.objects.get(club_name=club_name)
     all_books = Book.objects.all()
-    return render(request, 'show_book_recommendations.html', {'recommended_books': all_books, 'club_name': club_name})
+    ## get_club_books_average_rating()
+    #recommendations = get_recommendations(current_club.id)
+    #print(recommendations)
+    #recommended_books = Book.objects.all().filter(ISBN__in=recommendations)
+
+    return render(request, 'show_book_recommendations.html',
+                  {'recommended_books': all_books, 'club_name': club_name})
 
 
 @login_required
