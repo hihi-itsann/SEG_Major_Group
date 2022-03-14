@@ -93,7 +93,21 @@ class Book(models.Model):
 
 
 class BookRatingReview(models.Model):
-    rate = models.FloatField(default=0, validators=[MinValueValidator(0.0), MaxValueValidator(10.0)])
+    RATE_CHOICES = (
+        ('0', '0'),
+        ('1', '1'),
+        ('2', '2'),
+        ('3', '3'),
+        ('4', '4'),
+        ('5', '5'),
+        ('6', '6'),
+        ('7', '7'),
+        ('8', '8'),
+        ('9', '9'),
+        ('X', '10'),
+    )
+    rate = models.CharField(max_length=1, choices=RATE_CHOICES, blank=False, default=0)
+    # rate = models.FloatField(default=0, validators=[MinValueValidator(0.0), MaxValueValidator(10.0)])
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     review = models.CharField(max_length=520, blank=True)
