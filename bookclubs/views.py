@@ -12,7 +12,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.shortcuts import redirect, render, get_object_or_404
-from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm,UpdateApplicationForm, CommentForm, RateReviewForm, PostForm, NewMeetingForm
+from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm, UpdateApplicationForm, CommentForm, RateReviewForm, PostForm, NewMeetingForm, UpdateClubForm
 from .helpers import *
 from .models import User, Book, Application, Comment, Post, BookRatingReview, BookStatus, Club
 
@@ -234,6 +234,9 @@ class CreateBookRateReviewView(LoginRequiredMixin, CreateView):
         book = Book.objects.get(ISBN=self.kwargs['ISBN'])
         return '{}#education'.format(reverse('show_book', kwargs={'ISBN': book.ISBN}))
 
+    def handle_no_permission(self):
+        return redirect('log_in')
+
 @login_required
 def create_book_status(request, ISBN):
     book = Book.objects.get(ISBN=ISBN)
@@ -364,22 +367,20 @@ def delete_club(request, club_name):
     current_club.delete()
     return feed(request)
 
-# #to-do: fix the club_name (not finished)
-# class ClubDetailsUpdateView(LoginRequiredMixin, UpdateView):
-#     """View to update club ClubDetailsUpdateView."""
-#     model = UpdateClubForm
-#     template_name = "club_details_update.html"
-#     form_class = UpdateClubForm
-#
-#     def get_object(self):
-#         """Return the club to be updated."""
-#         current_club = Club.objects.get(self.get_club_name==club_name)
-#         return current_club
-#
-#     def get_success_url(self):
-#         """Return redirect URL after successful update."""
-#         messages.add_message(self.request, messages.SUCCESS, "Deatils updated!")
-#         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+@login_required
+@club_exists
+@owner_required
+def update_club_info(request,club_name):
+    """owner change information of club"""
+    club= Club.objects.get(club_name=club_name)
+    form= UpdateClubForm(instance=club)
+    if request.method == 'POST':
+        form =  UpdateClubForm(request.POST,instance=club)
+        if form.is_valid():
+            form.save()
+            return redirect(f'/club/{club_name}/feed/')
+    context={'form':form}
+    return render(request,'update_club_info.html',context)
 
 @login_required
 @club_exists
