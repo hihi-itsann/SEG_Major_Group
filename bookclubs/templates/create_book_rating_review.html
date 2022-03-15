@@ -1,20 +1,31 @@
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Feedback for: {{ book.title }}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form action ="{% url 'create_book_rating_review' book.ISBN %}" method="post" id="BookRateReviewForm">
+<form action ="{% url 'create_book_rating_review' book.ISBN %}" method="post" id="BookRateReviewForm">
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Feedback for: {{ book.title }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
           {% csrf_token %}
-          {% include 'partials/bootstrap_form.html' with form=form %}
+        	<div class="form-group">
+        		<b><label for="rate" class="col-sm-3 control-label">Rate</label></b>
+        		<div class="col-sm-9">
+        			<input type="number" id="rate" name="rate" class="form-control" min="0" max="10" required=''/>
+        		</div>
+        	</div>
+          <div class="form-group">
+        		<b><label for="review" class="col-sm-3 control-label">Review</label></b>
+        		<div class="col-sm-9">
+        			<textarea id="review" name="review" class="form-control" maxlength="520" rows="4" cols="50"></textarea>
+        		</div>
+        	</div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary" id="BookRateReviewForm">Submit</button>
+        </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary" id="BookRateReviewForm">Submit</button>
-      </div>
-      </form>
     </div>
   </div>
-</div>
+</form>
