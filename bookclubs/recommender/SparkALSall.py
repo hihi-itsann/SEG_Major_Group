@@ -1,11 +1,4 @@
 # #-*- coding: utf-8 -*-
-
-from curses import BUTTON1_DOUBLE_CLICKED
-from email import header
-from hashlib import new
-from operator import mod
-from os import sep
-from pyspark.sql import Row
 from pyspark.sql import SparkSession
 from pyspark.ml.feature import StringIndexer, IndexToString
 from pyspark.ml.evaluation import RegressionEvaluator
@@ -49,8 +42,8 @@ def get_club_books_average_rating():
 def modelTrain(club_id): #club_subject
     spark = SparkSession\
         .builder\
-        .appName("ALSExample")\
-        .config("spark.executor.cores", '4')\
+        .appName("bookclubs")\
+        .master('local[4]')\
         .getOrCreate()
 
     spark.sparkContext.setCheckpointDir("/tmp/checkpoints")
@@ -81,6 +74,7 @@ def modelTrain(club_id): #club_subject
     als = ALS(maxIter=30, regParam=0.3,rank=40,userCol="User-ID", itemCol="bookID", ratingCol="Book-Rating",
               coldStartStrategy="drop")
     model = als.fit(training)
+    return model
     # predictions_test = model.transform(test)
     # predictions_train = model.transform(training)
     # predictions_club = model.transform(ratings2)
@@ -94,10 +88,6 @@ def modelTrain(club_id): #club_subject
     # print("Root-mean-square error for test = " + str(rmse_test))
     #print("Root-mean-square error for train = " + str(rmse_train))
     # print("Root-mean-square error for train = " + str(rmse_club))
-
-    return model
-
-
 
     # userRecs = model.recommendForAllUsers(10)
 
@@ -115,8 +105,6 @@ def modelTrain(club_id): #club_subject
     # ml.loadBookLensLatestSmall()
   
     # print(len(user85Recs))
-    
-    
 
     # for row in user85Recs:
     #     print(ml.getBookName(row.book_id))
@@ -129,6 +117,7 @@ def get_recommendations(club_id):
         .builder\
         .appName("ALSExample")\
         .config("spark.executor.cores", '4')\
+        .master('local[4]')\
         .getOrCreate()
 
 
@@ -140,6 +129,9 @@ def get_recommendations(club_id):
     new_cols = ['id','User-ID','book_id','rate','number_of_ratings']
     new_names_map = {df.columns[i]:new_cols[i] for i in range(len(new_cols))}
     df.rename(new_names_map, axis=1, inplace=True)
+    df.book_id = df.book_id.apply(lambda x: x[:-1] + "10" if x[-1] == "X" else x)
+    df = df[df.book_id.str.len() <= 11]
+    df = df[df.loc[:]!=0].dropna()
     df = spark.createDataFrame(df)
     indexer1 = StringIndexer(inputCol="book_id", outputCol="bookID").fit(df)
     indexed2 = indexer1.transform(df)
