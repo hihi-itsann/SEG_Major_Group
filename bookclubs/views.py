@@ -17,6 +17,7 @@ from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewCl
 from .helpers import *
 from .models import User, Book, Application, Comment, Post, BookRatingReview, BookStatus, Club, Meeting, \
     MeetingAttendance
+from django.core.paginator import Paginator
 
 
 @login_prohibited
@@ -170,6 +171,11 @@ class BookListView(LoginRequiredMixin, ListView):
     paginate_by = settings.BOOKS_PER_PAGE
     pk_url_kwarg = 'book_genre'
 
+    def get_queryset(self):
+        if self.kwargs['book_genre']=='All':
+            return Book.objects.all()
+        return Book.objects.filter(genre=self.kwargs['book_genre'])
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         books = Book.objects.all()
@@ -177,8 +183,6 @@ class BookListView(LoginRequiredMixin, ListView):
         for book in books:
             genres.append(book.genre)
         genres = list(set(genres))
-        if not self.kwargs['book_genre'] == 'All':
-            context['books'] = Book.objects.filter(genre=self.kwargs['book_genre'])
         context['genres'] = genres
         return context
 
