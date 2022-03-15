@@ -179,7 +179,7 @@ class BookListView(LoginRequiredMixin, ListView):
             genres.append(book.genre)
         genres = list(set(genres))
         if not self.kwargs['book_genre'] == 'All':
-            book_list = Book.objects.filter(genra=self.kwargs['book_genre'])
+            book_list = Book.objects.filter(genre=self.kwargs['book_genre'])
             context['books'] = book_list
             paginator = Paginator(book_list, 10)
             page_number = settings.BOOKS_PER_PAGE
