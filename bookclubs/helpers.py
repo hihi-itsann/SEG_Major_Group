@@ -190,7 +190,7 @@ def club_and_book_exists(view_function):
 
 
 def club_and_meeting_exists(view_function):
-    """check whether the club and book exists"""
+    """check whether the club and meeting exists"""
 
     def modified_view_function(request, club_name, meeting_id, *args, **kwargs):
         try:
