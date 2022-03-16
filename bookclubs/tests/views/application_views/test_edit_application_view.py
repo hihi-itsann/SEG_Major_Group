@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from bookclubs.forms import UpdateApplicationForm
+from bookclubs.forms import ApplicationForm
 from bookclubs.models import User, Club, Application, Role
 from bookclubs.tests.helpers import reverse_with_next
 
@@ -78,7 +78,7 @@ class EditApplicationViewTestCase(TestCase):
 
     def test_edit_application_is_successful_when_pending_applicant(self):
         self.log_in(self.user)
-        Application.objects.create(user=self.user, club=self.club, statement='not empty', status='P')
+        Application.objects.create(user=self.user, club=self.club, statement='Before edit', status='P')
         before_count = Application.objects.count()
         response = self.client.post(self.url, self.form_input, follow=True)
         after_count = Application.objects.count()
@@ -97,5 +97,5 @@ class EditApplicationViewTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, f'{self.VIEW}.html')
         form = response.context['form']
-        self.assertTrue(isinstance(form, UpdateApplicationForm))
+        self.assertTrue(isinstance(form, ApplicationForm))
         self.assertTrue(form.is_bound)

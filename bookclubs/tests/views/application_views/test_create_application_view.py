@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from bookclubs.forms import NewApplicationForm
+from bookclubs.forms import ApplicationForm
 from bookclubs.models import User, Club, Application, Role
 from bookclubs.tests.helpers import reverse_with_next
 
@@ -123,7 +123,7 @@ class CreateApplicationViewTestCase(TestCase):
         response_url = reverse('my_applications')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         application = Application.objects.get(user=self.user, club=self.club_public)
-        self.assertEqual(application.statement, '')
+        self.assertEqual(application.statement, ' ')
         self.assertEqual(application.status, 'A')
 
     def test_create_application_shows_form(self):
@@ -132,5 +132,5 @@ class CreateApplicationViewTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, f'{self.VIEW}.html')
         form = response.context['form']
-        self.assertTrue(isinstance(form, NewApplicationForm))
+        self.assertTrue(isinstance(form, ApplicationForm))
         self.assertFalse(form.is_bound)

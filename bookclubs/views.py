@@ -12,8 +12,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.shortcuts import redirect, render, get_object_or_404
-from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm, \
-    UpdateApplicationForm, CommentForm, RateReviewForm, PostForm, NewMeetingForm, UpdateClubForm
+from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, ApplicationForm, CommentForm, RateReviewForm, PostForm, NewMeetingForm, UpdateClubForm, ApplicationForm
 from .helpers import *
 from .models import User, Book, Application, Comment, Post, BookRatingReview, BookStatus, Club, Meeting, \
     MeetingAttendance
@@ -400,8 +399,8 @@ def update_club_info(request, club_name):
     if request.method == 'POST':
         form = UpdateClubForm(request.POST, instance=club)
         if form.is_valid():
-            form.save()
-            return redirect(f'/club/{club_name}/feed/')
+            club = form.save()
+            return redirect('club_feed', club.club_name)
     context = {'form': form}
     return render(request, 'update_club_info.html', context)
 
@@ -415,19 +414,19 @@ def create_application(request, club_name):
     if current_club.public_status == 'PUB':
         current_club.club_members.add(request.user, through_defaults={'club_role': 'MEM'})
         current_club.toggle_member(request.user)
-        application = Application.objects.create(user=request.user, club=current_club, statement='', status='A')
+        application = Application.objects.create(user=request.user, club=current_club, statement=' ', status='A')
         messages.add_message(request, messages.SUCCESS, "Club is public. You are now a member!")
         return redirect('my_applications')
     else:
         if request.method == 'POST':
-            form = NewApplicationForm(request.POST)
+            form = ApplicationForm(request.POST)
             if form.is_valid():
                 application = form.save(request.user, current_club)
                 application.change_status('P')
                 messages.add_message(request, messages.SUCCESS, "Application submitted!")
                 return redirect('my_applications')
         else:
-            form = NewApplicationForm()
+            form = ApplicationForm()
         return render(request, 'create_application.html', {'form': form, 'club_name': club_name})
 
 
@@ -439,10 +438,10 @@ def edit_application(request, club_name):
     club_applied = Club.objects.get(club_name=club_name)
     application = Application.objects.get(user=request.user, club=club_applied)
     application_id = application.id
-    form = UpdateApplicationForm(request.POST)
+    form = ApplicationForm(request.POST)
     if request.method == 'POST':
         if form.is_valid():
-            form.save(request.user, club_applied)
+            form.update(application_id)
             messages.add_message(request, messages.SUCCESS, "Application edited successfully!")
             return redirect('my_applications')
     return render(request, 'edit_application.html', {'form': form, 'club_name': club_name})

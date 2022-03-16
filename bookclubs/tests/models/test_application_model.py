@@ -20,11 +20,9 @@ class ApplicationModelTestCase(TestCase):
             status='P'
         )
 
-
-
-    def test_statement_can_be_blank(self):
+    def test_statement_cannot_be_blank(self):
         self.application.statement = ''
-        self._assert_application_is_valid()
+        self._assert_application_is_invalid()
 
     def test_change_status(self):
         self.application.change_status('P')

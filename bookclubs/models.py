@@ -153,7 +153,7 @@ class Application(models.Model):
     )
     user = models.ForeignKey('User', on_delete=models.CASCADE)
     club = models.ForeignKey('Club', on_delete=models.CASCADE)
-    statement = models.CharField(max_length=520, blank=True)
+    statement = models.CharField(max_length=520, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=1, choices=STATUS_CHOICES)
 
@@ -325,7 +325,7 @@ class Role(models.Model):
         MEMBER = 'MEM', _('Member')
         MODERATOR = 'MOD', _('Moderator')
         OWNER = 'OWN', _('Owner')
-        BANNED = 'BAN', _('BannedMember')
+        BANNED = 'BAN', _('Banned')
 
     club_role = models.CharField(
         max_length=3,
@@ -335,10 +335,6 @@ class Role(models.Model):
 
     def get_club_role(self):
         return self.RoleOptions(self.club_role).name.title()
-
-    def full_name(self):
-        return f'{self.first_name} {self.last_name}'
-
 
 class Post(models.Model):
     title = models.CharField(max_length=255)
