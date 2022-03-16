@@ -238,7 +238,7 @@ class CreateBookRateReviewView(LoginRequiredMixin, CreateView):
 def delete_book_rating_review(request, ISBN, pk):
      book = Book.objects.get(ISBN=ISBN)
      try:
-         rating_review=BookRatingReview.objects.get(book=book, id=pk)
+         rating_review=BookRatingReview.objects.get(book=book, id=pk, user=request.user)
      except ObjectDoesNotExist:
          messages.add_message(request, messages.ERROR, "You have not given that feedback!")
          return redirect('show_book', ISBN)
