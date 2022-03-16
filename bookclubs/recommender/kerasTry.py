@@ -40,8 +40,12 @@ print(
 
 ratings = ratings.sample(frac=1, random_state=42)
 x = ratings[["user", "book"]].values
+x_test = x[-10000:]
+x = x[:-10000]
 # Normalize the targets between 0 and 1. Makes it easy to train.
 y = ratings["rating"].apply(lambda x: (x - min_rating) / (max_rating - min_rating)).values
+y_test = y[-10000:]
+y = y[:-10000]
 # Assuming training on 90% of the data and validating on 10%.
 train_indices = int(0.9 * ratings.shape[0])
 x_train, x_val, y_train, y_val = (
@@ -87,40 +91,28 @@ class RecommenderNet(keras.Model):
         # The sigmoid activation forces the rating to between 0 and 1
         return tf.nn.sigmoid(x)
 
-def root_mean_squared_error(y_true, y_pred):
-        return K.sqrt(K.mean(K.square(y_pred - y_true)))
 
-# ray.init()
-# model = dKeras(ResNet50, init_ray=False, wait_for_workers=True, n_workers=4)
 model = RecommenderNet(num_users, num_books, EMBEDDING_SIZE)
 
-# lr_schedule = keras.optimizers.schedules.ExponentialDecay(
-#     initial_learning_rate=1e-2,
-#     decay_steps=10000,
-#     decay_rate=0.9)
-# optimizer = keras.optimizers.SGD(learning_rate=lr_schedule)
-
-model.compile(optimizer = "rmsprop", loss = root_mean_squared_error,
-              metrics =["accuracy"])
-
-# model.compile(
-#     loss=tf.keras.losses.BinaryCrossentropy(), optimizer=keras.optimizers.Adam(learning_rate=0.001)
-#     )
+model.compile(optimizer = "adam", loss = tf.keras.losses.MeanSquaredError(),
+              metrics =[tf.keras.metrics.TopKCategoricalAccuracy(), tf.keras.metrics.RootMeanSquaredError()])
 
 history = model.fit(
     x=x_train,
     y=y_train,
-    batch_size=8192,
+    batch_size=16384,
     epochs=5,
     verbose=1,
     validation_data=(x_val, y_val),
 )
-# model.close()
+
+print(model.metrics_names)
+print(model.evaluate(x_test, y_test))
 
 plt.plot(history.history["loss"])
 plt.plot(history.history["val_loss"])
-plt.title("RMSE")
-plt.ylabel("rmse")
+plt.title("model loss")
+plt.ylabel("loss")
 plt.xlabel("epoch")
 plt.legend(["train", "test"], loc="upper left")
 plt.show()
