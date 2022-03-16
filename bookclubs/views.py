@@ -12,12 +12,12 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.shortcuts import redirect, render, get_object_or_404
-from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, NewApplicationForm, \
-    UpdateApplicationForm, CommentForm, RateReviewForm, PostForm, NewMeetingForm, UpdateClubForm
+from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, ApplicationForm, CommentForm, RateReviewForm, PostForm, NewMeetingForm, UpdateClubForm, ApplicationForm
 from .helpers import *
 from .models import User, Book, Application, Comment, Post, BookRatingReview, BookStatus, Club, Meeting, \
     MeetingAttendance
 from django.core.paginator import Paginator
+from random import choice
 
 
 @login_prohibited
@@ -172,7 +172,7 @@ class BookListView(LoginRequiredMixin, ListView):
     pk_url_kwarg = 'book_genre'
 
     def get_queryset(self):
-        if self.kwargs['book_genre']=='All':
+        if self.kwargs['book_genre'] == 'All':
             return Book.objects.all()
         return Book.objects.filter(genre=self.kwargs['book_genre'])
 
@@ -233,6 +233,7 @@ class CreateBookRateReviewView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         book = Book.objects.get(ISBN=self.kwargs['ISBN'])
         return '{}#education'.format(reverse('show_book', kwargs={'ISBN': book.ISBN}))
+
 
 @login_required
 def delete_book_rating_review(request, ISBN, pk):
@@ -392,8 +393,8 @@ def update_club_info(request, club_name):
     if request.method == 'POST':
         form = UpdateClubForm(request.POST, instance=club)
         if form.is_valid():
-            form.save()
-            return redirect(f'/club/{club_name}/feed/')
+            club = form.save()
+            return redirect('club_feed', club.club_name)
     context = {'form': form}
     return render(request, 'update_club_info.html', context)
 
@@ -404,21 +405,23 @@ def update_club_info(request, club_name):
 def create_application(request, club_name):
     """Creates a new application, automatically accepted if club is public"""
     current_club = Club.objects.get(club_name=club_name)
-    if request.method == 'POST':
-        form = NewApplicationForm(request.POST)
-        if form.is_valid():
-            application = form.save(request.user, current_club)
-            if current_club.public_status == 'PUB':
-                current_club.club_members.add(request.user, through_defaults={'club_role': 'MEM'})
-                current_club.toggle_member(request.user)
-                application.change_status('A')
-            else:
-                application.change_status('P')
-            messages.add_message(request, messages.SUCCESS, "Application submitted!")
-            return redirect('my_applications')
+    if current_club.public_status == 'PUB':
+        current_club.club_members.add(request.user, through_defaults={'club_role': 'MEM'})
+        current_club.toggle_member(request.user)
+        application = Application.objects.create(user=request.user, club=current_club, statement=' ', status='A')
+        messages.add_message(request, messages.SUCCESS, "Club is public. You are now a member!")
+        return redirect('my_applications')
     else:
-        form = NewApplicationForm()
-    return render(request, 'create_application.html', {'form': form, 'club_name': club_name})
+        if request.method == 'POST':
+            form = ApplicationForm(request.POST)
+            if form.is_valid():
+                application = form.save(request.user, current_club)
+                application.change_status('P')
+                messages.add_message(request, messages.SUCCESS, "Application submitted!")
+                return redirect('my_applications')
+        else:
+            form = ApplicationForm()
+        return render(request, 'create_application.html', {'form': form, 'club_name': club_name})
 
 
 @login_required
@@ -429,10 +432,10 @@ def edit_application(request, club_name):
     club_applied = Club.objects.get(club_name=club_name)
     application = Application.objects.get(user=request.user, club=club_applied)
     application_id = application.id
-    form = UpdateApplicationForm(request.POST)
+    form = ApplicationForm(request.POST)
     if request.method == 'POST':
         if form.is_valid():
-            form.save(request.user, club_applied)
+            form.update(application_id)
             messages.add_message(request, messages.SUCCESS, "Application edited successfully!")
             return redirect('my_applications')
     return render(request, 'edit_application.html', {'form': form, 'club_name': club_name})
@@ -506,10 +509,10 @@ def my_clubs(request):
 @login_required
 def club_list(request):
     clubs = []
-    if Club.objects.all().count()==0:
-        club_exists=False
+    if Club.objects.all().count() == 0:
+        club_exists = False
     else:
-        club_exists=True
+        club_exists = True
 
     if Role.objects.filter(user=request.user):
         relations = Role.objects.filter(user=request.user)
@@ -518,35 +521,36 @@ def club_list(request):
             clubs = clubs.exclude(club_name=club.club.club_name)
     else:
         clubs = Club.objects.all()
-    user_country=request.user.country
-    user_city=request.user.city
-    is_suitable_clubs=True
-    distance="all places"
-    #print(city_list)
-    meeting_status=request.user.meeting_preference
+    user_country = request.user.country
+    user_city = request.user.city
+    is_suitable_clubs = True
+    distance = "all places"
+    # print(city_list)
+    meeting_status = request.user.meeting_preference
 
-    if request.method=="POST":
-        meeting_status=request.POST.get("meeting_status")
+    if request.method == "POST":
+        meeting_status = request.POST.get("meeting_status")
     if meeting_status == "Online" or meeting_status == "O":
-        meeting_status="Online"
-        clubs=clubs.filter(meeting_status='ONL')
-    elif meeting_status=="In person" or meeting_status == "P":
-        meeting_status="In person"
+        meeting_status = "Online"
+        clubs = clubs.filter(meeting_status='ONL')
+    elif meeting_status == "In person" or meeting_status == "P":
+        meeting_status = "In person"
 
-        clubs=clubs.filter(meeting_status='OFF')
-        if request.method=="POST":
-            distance=request.POST.get("distance")
+        clubs = clubs.filter(meeting_status='OFF')
+        if request.method == "POST":
+            distance = request.POST.get("distance")
         if distance == "same city":
-            clubs=clubs.filter(city=user_city)
-        elif distance=="same country":
-            clubs=clubs.filter(country=user_country)
-    if clubs.count()==0:
-        is_suitable_clubs=False
+            clubs = clubs.filter(city=user_city)
+        elif distance == "same country":
+            clubs = clubs.filter(country=user_country)
+    if clubs.count() == 0:
+        is_suitable_clubs = False
     else:
-        is_suitable_clubs=True
+        is_suitable_clubs = True
 
-    return render(request, 'club_list.html', {'clubs': clubs,'meeting_status':meeting_status,
-                            'distance':distance,'club_exists':club_exists,'is_suitable_clubs':is_suitable_clubs})
+    return render(request, 'club_list.html', {'clubs': clubs, 'meeting_status': meeting_status,
+                                              'distance': distance, 'club_exists': club_exists,
+                                              'is_suitable_clubs': is_suitable_clubs})
 
 
 @login_required
@@ -727,15 +731,21 @@ class DeleteCommentView(LoginRequiredMixin, DeleteView):
 @membership_required
 def show_book_recommendations(request, club_name):
     """Choose a book for the meeting"""
-    # current_club = Club.objects.get(club_name=club_name)
-    all_books = Book.objects.all()
-    ## get_club_books_average_rating()
-    #recommendations = get_recommendations(current_club.id)
-    #print(recommendations)
-    #recommended_books = Book.objects.all().filter(ISBN__in=recommendations)
+    # get_club_books_average_rating()
+    # recommendations = get_recommendations(current_club.id)
+    # print(recommendations)
+    # recommended_books = Book.objects.all().filter(ISBN__in=recommendations)
+
+    all_books_list = list(Book.objects.all())
+    randomly_selected_ISBNs = []
+    for i in range(10):
+        random_book=choice(all_books_list)
+        randomly_selected_ISBNs.append(random_book.ISBN)
+        all_books_list.remove(random_book)
+    recommended_books = Book.objects.all().filter(ISBN__in=randomly_selected_ISBNs)
 
     return render(request, 'show_book_recommendations.html',
-                  {'recommended_books': all_books, 'club_name': club_name})
+                  {'recommended_books': recommended_books, 'club_name': club_name})
 
 
 @login_required
@@ -771,6 +781,7 @@ def meeting_list(request, club_name):
 
 
 @login_required
+@club_and_meeting_exists
 @membership_required
 def show_meeting(request, club_name, meeting_id):
     """Show a meeting"""
@@ -782,6 +793,7 @@ def show_meeting(request, club_name, meeting_id):
 
 
 @login_required
+@club_and_meeting_exists
 @membership_required
 def join_meeting(request, club_name, meeting_id):
     """User becomes an attendee of the meeting"""
@@ -791,6 +803,7 @@ def join_meeting(request, club_name, meeting_id):
 
 
 @login_required
+@club_and_meeting_exists
 @membership_required
 def leave_meeting(request, club_name, meeting_id):
     """User stops being an attendee of the meeting"""
@@ -800,6 +813,7 @@ def leave_meeting(request, club_name, meeting_id):
 
 
 @login_required
+@club_and_meeting_exists
 @membership_required
 def delete_meeting(request, club_name, meeting_id):
     """Meeting is deleted"""
