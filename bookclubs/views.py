@@ -230,12 +230,6 @@ class CreateBookRateReviewView(LoginRequiredMixin, CreateView):
         form.instance.book_id = self.kwargs['ISBN']
         return super().form_valid(form)
 
-    def get_context_data(self, **kwargs):
-        book = Book.objects.get(ISBN=self.kwargs['ISBN'])
-        context = super().get_context_data(**kwargs)
-        context['book'] = book
-        return context
-
     def get_success_url(self):
         book = Book.objects.get(ISBN=self.kwargs['ISBN'])
         return '{}#education'.format(reverse('show_book', kwargs={'ISBN': book.ISBN}))
