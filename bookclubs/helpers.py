@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect
 
-from .models import Club, Role, Application, Book
+from .models import Club, Role, Application, Book, Meeting
 
 
 def login_prohibited(view_function):
@@ -185,5 +185,26 @@ def club_and_book_exists(view_function):
                 return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
             else:
                 return view_function(request, club_name, book_isbn, *args, **kwargs)
+
+    return modified_view_function
+
+
+def club_and_meeting_exists(view_function):
+    """check whether the club and book exists"""
+
+    def modified_view_function(request, club_name, meeting_id, *args, **kwargs):
+        try:
+            club = Club.objects.get(club_name=club_name)
+        except ObjectDoesNotExist:
+            messages.add_message(request, messages.WARNING, "No club found with this name.")
+            return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+        else:
+            try:
+                meeting = Meeting.objects.get(id=meeting_id)
+            except ObjectDoesNotExist:
+                messages.add_message(request, messages.WARNING, "No meeting found with this ID.")
+                return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+            else:
+                return view_function(request, club_name, meeting_id, *args, **kwargs)
 
     return modified_view_function

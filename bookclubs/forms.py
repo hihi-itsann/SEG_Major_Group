@@ -135,6 +135,7 @@ class RateReviewForm(forms.ModelForm):
 
 
 class NewClubForm(forms.ModelForm):
+    """Create and update form"""
     class Meta:
         model = Club
         fields = ['club_name', 'meeting_status', 'location','city','country' ,'public_status', 'genre', 'description']
@@ -193,7 +194,7 @@ class UpdateClubForm(forms.ModelForm):
         public_status = forms.ChoiceField(widget=forms.Select(), label='Status', choices=PRIVACY_CHOICES)
 
 
-class NewApplicationForm(forms.ModelForm):
+class ApplicationForm(forms.ModelForm):
     class Meta:
         model = Application
         fields = ['statement']
@@ -208,21 +209,16 @@ class NewApplicationForm(forms.ModelForm):
         )
         return application
 
-
-class UpdateApplicationForm(forms.ModelForm):
-    class Meta:
-        model = Application
-        fields = ['statement']
-
-    def save(self, user=None, club=None):
+    def update(self, application_id=None):
         super().save(commit=False)
-        delete_application = Application.objects.get(user=user, club=club)
-        past_id = delete_application.id
+        delete_application = Application.objects.get(id=application_id)
+        application_user = delete_application.user
+        application_club = delete_application.club
         delete_application.delete()
         application = Application.objects.create(
-            id=past_id,
-            user=user,
-            club=club,
+            id=application_id,
+            user=application_user,
+            club=application_club,
             statement=self.cleaned_data.get('statement'),
             status='P'
         )
@@ -254,6 +250,9 @@ class CommentForm(forms.ModelForm):
 
 
 class NewMeetingForm(forms.ModelForm):
+
+    # def __init__(self, *args, **kwargs):
+    #     self
 
     class Meta:
         model = Meeting
