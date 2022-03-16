@@ -15,6 +15,7 @@ import ray
 
 ratings = pd.read_csv('../dataset/BX-Book-Ratings.csv', sep = ';', quotechar = '"', encoding = 'latin-1',header = 0 )
 books = pd.read_csv('../dataset/BX-Books.csv', sep = ';', quotechar = '"', encoding = 'latin-1',header = 0 )
+ratings = ratings.loc[ratings["Book-Rating"] != 0]
 
 user_ids = ratings["User-ID"].unique().tolist()
 user2user_encoded = {x: i for i, x in enumerate(user_ids)}
@@ -33,7 +34,7 @@ min_rating = min(ratings["rating"])
 max_rating = max(ratings["rating"])
 
 print(
-    "Number of users: {}, Number of Movies: {}, Min rating: {}, Max rating: {}".format(
+    "Number of users: {}, Number of Books: {}, Min rating: {}, Max rating: {}".format(
         num_users, num_books, min_rating, max_rating
     )
 )
@@ -43,11 +44,12 @@ x = ratings[["user", "book"]].values
 x_test = x[-10000:]
 x = x[:-10000]
 # Normalize the targets between 0 and 1. Makes it easy to train.
-y = ratings["rating"].apply(lambda x: (x - min_rating) / (max_rating - min_rating)).values
+# y = ratings["rating"].apply(lambda x: (x - min_rating) / (max_rating - min_rating)).values
+y = ratings["rating"].values
 y_test = y[-10000:]
 y = y[:-10000]
 # Assuming training on 90% of the data and validating on 10%.
-train_indices = int(0.9 * ratings.shape[0])
+train_indices = int(0.6 * ratings.shape[0])
 x_train, x_val, y_train, y_val = (
     x[:train_indices],
     x[train_indices:],
@@ -95,7 +97,7 @@ class RecommenderNet(keras.Model):
 model = RecommenderNet(num_users, num_books, EMBEDDING_SIZE)
 
 model.compile(optimizer = "adam", loss = tf.keras.losses.MeanSquaredError(),
-              metrics =[tf.keras.metrics.TopKCategoricalAccuracy(), tf.keras.metrics.RootMeanSquaredError()])
+              metrics =[tf.keras.metrics.TopKCategoricalAccuracy(k=1), tf.keras.metrics.RootMeanSquaredError()])
 
 history = model.fit(
     x=x_train,
@@ -109,13 +111,13 @@ history = model.fit(
 print(model.metrics_names)
 print(model.evaluate(x_test, y_test))
 
-plt.plot(history.history["loss"])
-plt.plot(history.history["val_loss"])
-plt.title("model loss")
-plt.ylabel("loss")
-plt.xlabel("epoch")
-plt.legend(["train", "test"], loc="upper left")
-plt.show()
+# plt.plot(history.history["loss"])
+# plt.plot(history.history["val_loss"])
+# plt.title("model loss")
+# plt.ylabel("loss")
+# plt.xlabel("epoch")
+# plt.legend(["train", "test"], loc="upper left")
+# plt.show()
 
 
 # Let us get a user and see the top recommendations.
