@@ -16,12 +16,15 @@ class ApplicationModelTestCase(TestCase):
         self.application = Application.objects.create(
             user=self.user,
             club=self.club,
-            statement='[Statement]'
+            statement='[Statement]',
+            status='P'
         )
 
-    def test_statement_cannot_be_blank(self):
+
+
+    def test_statement_can_be_blank(self):
         self.application.statement = ''
-        self._assert_application_is_invalid()
+        self._assert_application_is_valid()
 
     def test_change_status(self):
         self.application.change_status('P')
@@ -33,7 +36,12 @@ class ApplicationModelTestCase(TestCase):
         self.application.change_status('Z')
         self.assertEqual(self.application.status, 'P')
 
-
     def _assert_application_is_invalid(self):
         with self.assertRaises(ValidationError):
             self.application.full_clean()
+
+    def _assert_application_is_valid(self):
+        try:
+            self.application.full_clean()
+        except ValidationError:
+            self.fail('Test application should be valid')

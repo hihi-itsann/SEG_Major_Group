@@ -25,15 +25,15 @@ class NewApplicationFormTestCase(TestCase):
         form = NewApplicationForm(data=self.form_input)
         self.assertTrue(form.is_valid())
 
-    def test_statement_is_charfield(self):
+    def test_new_application_statement_is_charfield(self):
         form = NewApplicationForm()
         name = form.fields['statement']
         self.assertTrue(isinstance(name, forms.CharField))
 
-    def test_form_rejects_blank_statement(self):
+    def test_new_application_form_accepts_blank_statement(self):
         self.form_input['statement'] = ''
         form = NewApplicationForm(data=self.form_input)
-        self.assertFalse(form.is_valid())
+        self.assertTrue(form.is_valid())
 
     def test_new_application_form_must_save_correctly(self):
         self.client.login(username=self.user.email, password="Password123")
@@ -67,15 +67,15 @@ class UpdateApplicationFormTestCase(TestCase):
         form = UpdateApplicationForm(data=self.form_input)
         self.assertTrue(form.is_valid())
 
-    def test_statement_is_charfield(self):
+    def test_update_application_statement_is_charfield(self):
         form = UpdateApplicationForm()
         name = form.fields['statement']
         self.assertTrue(isinstance(name, forms.CharField))
 
-    def test_form_rejects_blank_statement(self):
+    def test_update_application_form_accepts_blank_statement(self):
         self.form_input['statement'] = ''
         form = UpdateApplicationForm(data=self.form_input)
-        self.assertFalse(form.is_valid())
+        self.assertTrue(form.is_valid())
 
     def test_update_application_form_must_save_correctly(self):
         self.client.login(username=self.user.username, password="Password123")

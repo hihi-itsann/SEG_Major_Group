@@ -153,7 +153,7 @@ class Application(models.Model):
     )
     user = models.ForeignKey('User', on_delete=models.CASCADE)
     club = models.ForeignKey('Club', on_delete=models.CASCADE)
-    statement = models.CharField(max_length=520, blank=False)
+    statement = models.CharField(max_length=520, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=1, choices=STATUS_CHOICES)
 
