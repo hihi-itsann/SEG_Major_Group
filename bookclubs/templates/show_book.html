@@ -43,7 +43,7 @@
                 </div>
                 {% endif %}
                 {% if readingStatus == 'F'%}
-                    <br><button type="button" class="btn btn-outline-primary btn-lg" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="Create Review">Create your feedback here</a></button>
+                    <br><button type="button" class="btn btn-outline-primary btn-lg" data-bs-toggle="modal" data-bs-target="#Modal" data-bs-whatever="Create Review">Create your feedback here</button>
                     {% include 'create_book_rating_review.html' %}
                 {% endif %}
             {% endif %}
@@ -70,6 +70,11 @@
                         &nbsp;&middot;&nbsp;
                         {{ review.created_at }}
                       </span>
+
+                      {% if user.id == review.user.id%}
+                        <a href="{% url 'delete_book_rating_review' book.ISBN review.id%}">(Delete)</a>
+                      {% endif %}
+
                       <b><p class="review-rate">Rate: {{ review.rate  }}</p></b>
                       <b><p class="review-text">Review: {{ review.review  }}</p></b><br>
                   </div>

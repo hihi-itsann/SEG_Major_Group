@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect
 
-from .models import Club, Role, Application, Book
+from .models import Club, Role, Application, Book, Meeting, MeetingAttendance
 
 
 def login_prohibited(view_function):
@@ -40,6 +40,23 @@ def management_required(view_function):
 
     return modified_view_function
 
+def meeting_management_required(view_function):
+    """check whether the user is an attendee or the host"""
+
+    def modified_view_function(request, club_name, meeting_id, *args, **kwargs):
+        current_meeting = Meeting.objects.get(id=meeting_id)
+        if MeetingAttendance.objects.filter(user=request.user, meeting=current_meeting).count() > 0:
+            role = MeetingAttendance.objects.get(user=request.user, meeting=current_meeting).meeting_role
+            if role == 'H':
+                return view_function(request, club_name, meeting_id, *args, **kwargs)
+            else:
+                messages.add_message(request, messages.WARNING, "You are not a host and cannot delete this meeting!")
+                return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+        else:
+            messages.add_message(request, messages.WARNING, "You are not part of this meeting yet!")
+            return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+
+    return modified_view_function
 
 def owner_required(view_function):
     """check whether the user is the owner"""
@@ -185,5 +202,26 @@ def club_and_book_exists(view_function):
                 return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
             else:
                 return view_function(request, club_name, book_isbn, *args, **kwargs)
+
+    return modified_view_function
+
+
+def club_and_meeting_exists(view_function):
+    """check whether the club and meeting exists"""
+
+    def modified_view_function(request, club_name, meeting_id, *args, **kwargs):
+        try:
+            club = Club.objects.get(club_name=club_name)
+        except ObjectDoesNotExist:
+            messages.add_message(request, messages.WARNING, "No club found with this name.")
+            return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+        else:
+            try:
+                meeting = Meeting.objects.get(id=meeting_id)
+            except ObjectDoesNotExist:
+                messages.add_message(request, messages.WARNING, "No meeting found with this ID.")
+                return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+            else:
+                return view_function(request, club_name, meeting_id, *args, **kwargs)
 
     return modified_view_function
