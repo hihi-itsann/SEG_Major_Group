@@ -8,13 +8,13 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 from keras import backend as K
 from tensorflow.keras.applications import ResNet50
-from dkeras import dKeras
+#from dkeras import dKeras
 import numpy as np
-import ray
+#import ray
 
 
-ratings = pd.read_csv('../dataset/BX-Book-Ratings.csv', sep = ';', quotechar = '"', encoding = 'latin-1',header = 0 )
-books = pd.read_csv('../dataset/BX-Books.csv', sep = ';', quotechar = '"', encoding = 'latin-1',header = 0 )
+ratings = pd.read_csv('bookclubs/dataset/BX-Book-Ratings.csv', sep = ';', quotechar = '"', encoding = 'latin-1',header = 0 )
+books = pd.read_csv('bookclubs/dataset/BX-Books.csv', sep = ';', quotechar = '"', encoding = 'latin-1',header = 0 )
 
 user_ids = ratings["User-ID"].unique().tolist()
 user2user_encoded = {x: i for i, x in enumerate(user_ids)}
