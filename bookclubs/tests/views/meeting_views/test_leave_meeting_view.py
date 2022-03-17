@@ -7,10 +7,10 @@ from django.utils import timezone
 from django.contrib import messages
 
 
-class JoinMeetingViewTestCase(TestCase):
+class LeaveMeetingViewTestCase(TestCase):
     """Tests for the creation of a meeting"""
 
-    VIEW = 'join_meeting'
+    VIEW = 'leave_meeting'
 
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
@@ -44,16 +44,21 @@ class JoinMeetingViewTestCase(TestCase):
         )
         self.url = reverse(self.VIEW, kwargs={'club_name': self.club.club_name, 'meeting_id': self.meeting.id})
 
-    def test_join_meeting_url(self):
-        self.assertEqual(self.url,f'/club/{self.club.club_name}/meeting/{self.meeting.id}/join/')
+    def test_leave_meeting_url(self):
+        self.assertEqual(self.url,f'/club/{self.club.club_name}/meeting/{self.meeting.id}/leave/')
 
-    def test_succssfully_join(self):
+    def test_succssfully_leave(self):
         Role.objects.create(user=self.member, club=self.club, club_role='MEM')
+        MeetingAttendance.objects.create(
+            user = self.member,
+            meeting = self.meeting,
+            meeting_role = 'A'
+        )
         self.client.login(username=self.member.username, password="Password123")
         meeting_attendance_count_before = MeetingAttendance.objects.count()
-        response = self.client.post(self.url, follow=True)
+        response = self.client.delete(self.url, follow=True)
         meeting_attendance_count_after = MeetingAttendance.objects.count()
-        self.assertEqual(meeting_attendance_count_after, meeting_attendance_count_before+1)
+        self.assertEqual(meeting_attendance_count_after, meeting_attendance_count_before-1)
         response_url = reverse('meeting_list', kwargs={'club_name': self.club.club_name})
         self.assertRedirects(
             response, response_url,
@@ -61,7 +66,7 @@ class JoinMeetingViewTestCase(TestCase):
             fetch_redirect_response=True
         )
 
-    def test_unsuccessful_when_role_is_ban(self):
+    def test_membership_required_when_role_is_ban(self):
         Role.objects.create(user=self.member, club=self.club, club_role='BAN')
         self.client.login(username=self.member.username, password="Password123")
         response = self.client.post(self.url, follow=True)
@@ -71,7 +76,7 @@ class JoinMeetingViewTestCase(TestCase):
         self.assertEqual(len(messages_list), 1)
         self.assertEqual(messages_list[0].level, messages.WARNING)
 
-    def test_unsuccessful_when_does_not_has_role(self):
+    def test_membership_required_when_does_not_has_role(self):
         self.client.login(username=self.member.username, password="Password123")
         response = self.client.post(self.url, follow=True)
         redirect_url = reverse('feed')
