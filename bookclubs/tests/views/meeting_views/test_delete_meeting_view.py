@@ -60,24 +60,44 @@ class LeaveMeetingViewTestCase(TestCase):
             fetch_redirect_response=True
         )
 
-    # def test_member_unsuccssfully_delete(self):
-    #     Role.objects.create(user=self.member, club=self.club, club_role='MEM')
-    #     MeetingAttendance.objects.create(
-    #         user = self.member,
-    #         meeting = self.meeting,
-    #         meeting_role = 'A'
-    #     )
-    #     self.client.login(username=self.member.username, password="Password123")
-    #     meeting_count_before = Meeting.objects.count()
-    #     response = self.client.post(self.url, follow=True)
-    #     meeting_count_after = Meeting.objects.count()
-    #     self.assertEqual(meeting_count_after, meeting_count_before)
-    #     response_url = reverse('meeting_list', kwargs={'club_name': self.club.club_name})
-    #     self.assertRedirects(
-    #         response, response_url,
-    #         status_code=302, target_status_code=200,
-    #         fetch_redirect_response=True
-    #     )
+    def test_attentee_unsuccssfully_delete(self):
+        Role.objects.create(user=self.member, club=self.club, club_role='MEM')
+        MeetingAttendance.objects.create(
+            user = self.member,
+            meeting = self.meeting,
+            meeting_role = 'A'
+        )
+        self.client.login(username=self.member.username, password="Password123")
+        meeting_count_before = Meeting.objects.count()
+        response = self.client.post(self.url, follow=True)
+        meeting_count_after = Meeting.objects.count()
+        self.assertEqual(meeting_count_after, meeting_count_before)
+        response_url = reverse('feed')
+        self.assertRedirects(
+            response, response_url,
+            status_code=302, target_status_code=200,
+            fetch_redirect_response=True
+        )
+        messages_list = list(response.context['messages'])
+        self.assertEqual(len(messages_list), 1)
+        self.assertEqual(messages_list[0].level, messages.WARNING)
+
+    def test_user_not_in_this_meeting_unsuccssfully_delete(self):
+        Role.objects.create(user=self.member, club=self.club, club_role='MEM')
+        self.client.login(username=self.member.username, password="Password123")
+        meeting_count_before = Meeting.objects.count()
+        response = self.client.post(self.url, follow=True)
+        meeting_count_after = Meeting.objects.count()
+        self.assertEqual(meeting_count_after, meeting_count_before)
+        response_url = reverse('feed')
+        self.assertRedirects(
+            response, response_url,
+            status_code=302, target_status_code=200,
+            fetch_redirect_response=True
+        )
+        messages_list = list(response.context['messages'])
+        self.assertEqual(len(messages_list), 1)
+        self.assertEqual(messages_list[0].level, messages.WARNING)
 
     def test_membership_required_when_role_is_ban(self):
         Role.objects.create(user=self.member, club=self.club, club_role='BAN')

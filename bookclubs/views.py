@@ -815,6 +815,7 @@ def leave_meeting(request, club_name, meeting_id):
 @login_required
 @club_and_meeting_exists
 @membership_required
+@meeting_management_required
 def delete_meeting(request, club_name, meeting_id):
     """Meeting is deleted"""
     meeting = Meeting.objects.get(id=meeting_id)
