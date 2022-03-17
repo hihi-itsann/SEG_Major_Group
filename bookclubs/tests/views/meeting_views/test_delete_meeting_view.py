@@ -10,7 +10,7 @@ from django.contrib import messages
 class LeaveMeetingViewTestCase(TestCase):
     """Tests for the creation of a meeting"""
 
-    VIEW = 'leave_meeting'
+    VIEW = 'delete_meeting'
 
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
@@ -45,26 +45,39 @@ class LeaveMeetingViewTestCase(TestCase):
         self.url = reverse(self.VIEW, kwargs={'club_name': self.club.club_name, 'meeting_id': self.meeting.id})
 
     def test_leave_meeting_url(self):
-        self.assertEqual(self.url,f'/club/{self.club.club_name}/meeting/{self.meeting.id}/leave/')
+        self.assertEqual(self.url,f'/club/{self.club.club_name}/meeting/{self.meeting.id}/delete/')
 
-    def test_succssfully_leave(self):
-        Role.objects.create(user=self.member, club=self.club, club_role='MEM')
-        MeetingAttendance.objects.create(
-            user = self.member,
-            meeting = self.meeting,
-            meeting_role = 'A'
-        )
-        self.client.login(username=self.member.username, password="Password123")
-        meeting_attendance_count_before = MeetingAttendance.objects.count()
+    def test_host_succssfully_delete(self):
+        self.client.login(username=self.owner.username, password="Password123")
+        meeting_count_before = Meeting.objects.count()
         response = self.client.post(self.url, follow=True)
-        meeting_attendance_count_after = MeetingAttendance.objects.count()
-        self.assertEqual(meeting_attendance_count_after, meeting_attendance_count_before-1)
+        meeting_count_after = Meeting.objects.count()
+        self.assertEqual(meeting_count_after, meeting_count_before-1)
         response_url = reverse('meeting_list', kwargs={'club_name': self.club.club_name})
         self.assertRedirects(
             response, response_url,
             status_code=302, target_status_code=200,
             fetch_redirect_response=True
         )
+
+    # def test_member_unsuccssfully_delete(self):
+    #     Role.objects.create(user=self.member, club=self.club, club_role='MEM')
+    #     MeetingAttendance.objects.create(
+    #         user = self.member,
+    #         meeting = self.meeting,
+    #         meeting_role = 'A'
+    #     )
+    #     self.client.login(username=self.member.username, password="Password123")
+    #     meeting_count_before = Meeting.objects.count()
+    #     response = self.client.post(self.url, follow=True)
+    #     meeting_count_after = Meeting.objects.count()
+    #     self.assertEqual(meeting_count_after, meeting_count_before)
+    #     response_url = reverse('meeting_list', kwargs={'club_name': self.club.club_name})
+    #     self.assertRedirects(
+    #         response, response_url,
+    #         status_code=302, target_status_code=200,
+    #         fetch_redirect_response=True
+    #     )
 
     def test_membership_required_when_role_is_ban(self):
         Role.objects.create(user=self.member, club=self.club, club_role='BAN')
