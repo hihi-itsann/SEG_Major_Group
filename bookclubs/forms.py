@@ -262,7 +262,7 @@ class NewMeetingForm(forms.ModelForm):
             'topic': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Topic'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Agenda'}),
             'meeting_status': forms.Select(attrs={'class': 'form-control'}),
-            'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Location'}),
+            'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Location or Online Link'}),
             'date': forms.DateInput(attrs={'class': 'form-control', 'placeholder': 'dd/mm/yyyy'}),
             'time_start': forms.TimeInput(attrs={'class': 'form-control', 'placeholder': 'hh:mm'}),
             'time_end': forms.TimeInput(attrs={'class': 'form-control', 'placeholder': 'hh:mm'})

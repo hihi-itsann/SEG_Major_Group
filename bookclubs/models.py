@@ -375,7 +375,7 @@ class Meeting(models.Model):
     description = models.TextField(max_length=520, blank=True)
     meeting_status = models.CharField(choices=MEETING_CHOICES, default='OFF', max_length=3)
     location = models.CharField(max_length=120, blank=False)
-    date = models.DateTimeField(blank=False)
+    date = models.DateField(blank=False)
     time_start = models.TimeField(blank=False)
     time_end = models.TimeField(blank=False)
 
@@ -390,6 +390,18 @@ class Meeting(models.Model):
 
     def get_host(self):
         return MeetingAttendance.objects.get(meeting=self, meeting_role='H').user
+
+    def get_meeting_status(self):
+        if self.meeting_status == 'ONL':
+            return 'Online'
+        else:
+            return 'In-Person'
+
+    def get_location(self):
+        if self.meeting_status == 'ONL':
+            return f'Meeting Link: {self.location}'
+        else:
+            return f'Meeting Held: {self.location} {self.club.city} {self.club.country}'
 
     class Meta:
         ordering = ['-date']

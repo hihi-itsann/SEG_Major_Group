@@ -17,6 +17,10 @@
                 <p>Start: {{ meeting.time_start }}</p>
                 <p>End: {{ meeting.time_end }}</p>
                 <br>
+                {% if is_host or is_attendee_only %}
+                    <p>{{ meeting.get_meeting_status }}</p>
+                    <p>{{ meeting.get_location }}</p>
+                {% endif %}
                 {% if is_host %}
                     <button type="button" class="btn btn-outline-dark"><a
                             href="{% url 'delete_meeting' club_name=club_name meeting_id=meeting.id %}">Cancel
