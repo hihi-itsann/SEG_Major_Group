@@ -125,6 +125,7 @@ ul.errorlist {
  * Profile
  */
 .profile-image {
+  color:#FEFAE0;
   width: 120px;
   clear:both;
   float:left;
@@ -140,7 +141,7 @@ h3.profile-title {
 }
 
 .profile-username {
-  color: #777777;
+  color: #7F5539;
   font-weight: 300;
   font-style: italic;
 }
@@ -150,7 +151,7 @@ h3.profile-title {
 }
 
 .profile-statistics {
-  color: #777777;
+  color: #7F5539;
   font-weight: 300;
   display: block;
 }
@@ -174,7 +175,7 @@ h3.profile-title {
 
 .post-author-user-details {
   margin-left: 10px;
-  color: #777777;
+  color: #7F5539;
 }
 
 /*
@@ -192,43 +193,43 @@ h3.profile-title {
  */
 .content a {
   text-decoration: none;
-  color: #123555;
+  color: #D4A373;
 }
 .content a:hover {
   text-decoration: underline;
-  color: #D1494E;
+  color: #CCD5AE;
 }
 
 .post-author a {
   text-decoration: none;
-  color:#123555;
+  color:#D4A373;
 }
 .post-author a:hover {
   text-decoration: underline;
-  color:#D1494E;
+  color:#CCD5AE;
 }
 
 /*
  * My clubs
  */
 .card{
-  background-color:#DBD0A7;
-  color:#123555;
+  background-color:#E9EDC9;
+  color:#283618;
 }
 
 .btn-outline-dark{
-  color:#D1494E;
+  color:#283618;
 }
 
 .btn-outline-dark:hover{
-  background-color: #123555
+  background-color: #7F5539
 }
 
 .card:hover{
-  color:#D1494E;
+  color:#7F5539;
   transform:scale(1.1);
 }
 
 .container{
-  color:#123555;
+  color:#283618;
 }
