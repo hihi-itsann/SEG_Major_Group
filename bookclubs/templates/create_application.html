@@ -3,12 +3,16 @@
     <div class="container">
         <div class="row">
             <div class="col-xs-12 col-lg-6 col-xl-4">
-                <h3>new application</h3>
-                <form action="{% url 'create_application' club_name %}" method="post">
+                <h3 style="color:#2F3E46"><b>Apply to this club!</b></h3>
+                <form style="color:#2F3E46" action="{% url 'create_application' club_name %}" method="post">
                     {% csrf_token %}
                     {% include 'partials/bootstrap_form.html' with form=form %}
-                    <button type="submit" class="btn btn-primary">apply</button>
+                    <button type="submit" class="btn btn-apply">APPLY</button>
                 </form>
+                <a href='{%url 'club_list' %}' class="btn-sm btn-normal">
+                    Change your mind?
+                    Click here to go back to club list.
+                </a>
             </div>
             <div class="col-xs-12 col-lg-6 col-xl-8">
             </div>

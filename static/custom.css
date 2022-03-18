@@ -235,3 +235,24 @@ h3.profile-title {
 .club-container{
   color:#2F3E46;
 }
+
+/*
+ * important buttons
+ */
+ .btn-apply{
+   background-color:#ffdd00;
+   color:#2f3e46;
+ }
+
+ .btn-apply:hover{
+   color:#52796F;
+ }
+
+ .btn-normal{
+   background-color:#AEC3B0;
+   color:#2F3E46;
+ }
+
+ .btn-normal:hover{
+   color:#52796F;
+ }

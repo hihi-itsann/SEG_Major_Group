@@ -36,8 +36,8 @@
                                     <td><h2>{{ club.club_name }}</h2></td>
                                     <p>{{ club.description }}</p>
                                     <p>Total members: {{ club.club_members.count }}</p>
-                                    <td><a href='{% url 'create_application' club.club_name %}' class="btn btn-outline-success">
-                                        Apply
+                                    <td><a href='{% url 'create_application' club.club_name %}' class="btn btn-apply">
+                                        APPLY
                                     </a>
                                     </td>
                                 </tr>
