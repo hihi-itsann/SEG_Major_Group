@@ -213,23 +213,23 @@ h3.profile-title {
  * My clubs
  */
 .club-card{
-  background-color:#E9EDC9;
-  color:#283618;
+  background-color:#D8E2DC;
+  color:#52796f;
 }
 
 .btn-outline-dark{
-  color:#283618;
+  color:#354F52;
 }
 
 .btn-outline-dark:hover{
-  background-color: #7F5539
+  background-color:#354F52;
 }
 
 .club-card:hover{
-  color:#7F5539;
+  color:#FFFFFF;
   transform:scale(1.1);
 }
 
 .club-container{
-  color:#283618;
+  color:#2F3E46;
 }
