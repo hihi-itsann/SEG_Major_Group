@@ -2,11 +2,11 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from bookclubs.models import User, Club, Meeting, Book, MeetingAttendance
 
-# TODO: Finish this.
-class MeetingModelTestCase(TestCase):
 
+class MeetingModelTestCase(TestCase):
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
+        'bookclubs/tests/fixtures/other_users.json',
         'bookclubs/tests/fixtures/default_clubs.json',
         'bookclubs/tests/fixtures/default_book.json',
     ]
@@ -36,6 +36,43 @@ class MeetingModelTestCase(TestCase):
         self.assertTrue(self.meeting.is_attending(self.user))
         attendee.delete()
         self.assertFalse(self.meeting.is_attending(self.user))
+
+    def test_is_host(self):
+        host = MeetingAttendance.objects.create(user=self.user, meeting=self.meeting, meeting_role='H')
+        self.assertTrue(self.meeting.is_host(self.user))
+        host.delete()
+        self.assertFalse(self.meeting.is_host(self.user))
+        attendee = MeetingAttendance.objects.create(user=self.user, meeting=self.meeting, meeting_role='A')
+        self.assertFalse(self.meeting.is_host(self.user))
+        attendee.delete()
+        self.assertFalse(self.meeting.is_host(self.user))
+
+    def test_is_attendee_only(self):
+        host = MeetingAttendance.objects.create(user=self.user, meeting=self.meeting, meeting_role='H')
+        self.assertFalse(self.meeting.is_attendee_only(self.user))
+        host.delete()
+        self.assertFalse(self.meeting.is_attendee_only(self.user))
+        attendee = MeetingAttendance.objects.create(user=self.user, meeting=self.meeting, meeting_role='A')
+        self.assertTrue(self.meeting.is_attendee_only(self.user))
+        attendee.delete()
+        self.assertFalse(self.meeting.is_attendee_only(self.user))
+
+    def test_get_host(self):
+        user_two = User.objects.get(username='@janedoe')
+        MeetingAttendance.objects.create(user=self.user, meeting=self.meeting, meeting_role='H')
+        attendee = MeetingAttendance.objects.create(user=user_two, meeting=self.meeting, meeting_role='A')
+        self.assertEqual(self.meeting.get_host(), self.user)
+        self.assertNotEqual(self.meeting.get_host(), attendee)
+
+    def test_get_meeting_status(self):
+        self.assertEqual(self.meeting.get_meeting_status(), 'Online')
+        self.meeting.meeting_status = 'OFF'
+        self.assertEqual(self.meeting.get_meeting_status(), 'In-Person')
+
+    def test_get_location(self):
+        self.assertTrue(self.meeting.get_location().__contains__('Meeting Link:'))
+        self.meeting.meeting_status = 'OFF'
+        self.assertTrue(self.meeting.get_location().__contains__('Meeting Held:'))
 
 
 
