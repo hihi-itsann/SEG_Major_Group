@@ -3,18 +3,32 @@
 Create new club
 {% endblock %}
 {% block content %}
-<div id="newclub-row" class="row justify-content-center align-items-center">
-    <div id="newclub-column" class="col-md-6">
-        <div id="newclub-box" class="col-md-12">
-        <div class="cover-card offset-md offset-lg-3">
-            <h1 class="cover-heading">Create Club</h1>
-            <form action="{% url 'create_club' %}" method="post" class="text-dark">
-              {% csrf_token %}
-              {% include 'partials/bootstrap_form.html' with form=form %}
-              <input type="submit" value="Create club!" class="btn btn-dark">
-            </form>
-            <p><a href="{% url 'feed' %}" class="text-dark">Changed your mind? Go back to feed here.</a></p>
+
+    <section class="h-100 h-custom"">
+      <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+          <div class="col-lg-8 col-xl-6">
+            <div class="card rounded-3">
+              <img src="../static/images/feed3.jpg" class="w-100" style="border-top-left-radius: .3rem; border-top-right-radius: .3rem;" alt="Sample photo">
+              <div class="card-body p-4 p-md-5">
+                <h3 class="mb-4 pb-2 pb-md-0 mb-md-5 px-md-2"style="color:#2F3E46" ><b>Create your own club!</b></h3>
+
+                <form class="px-md-2" action="{% url 'create_club' %}" method="post" style="color:#2F3E46">
+                  <div class="row">
+                    <div class="col">
+                        {% csrf_token %}
+                        {% include 'partials/bootstrap_form.html' with form=form %}
+                        <input type="submit" value="Create club!" class="btn btn-outline-dark">
+
+                    </div>
+                  </div>
+
+                </form>
+
+              </div>
+            </div>
           </div>
         </div>
-    </div>
+      </div>
+    </section>
 {% endblock %}
