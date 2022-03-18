@@ -212,7 +212,7 @@ h3.profile-title {
 /*
  * My clubs
  */
-.card{
+.club-card{
   background-color:#E9EDC9;
   color:#283618;
 }
@@ -225,11 +225,11 @@ h3.profile-title {
   background-color: #7F5539
 }
 
-.card:hover{
+.club-card:hover{
   color:#7F5539;
   transform:scale(1.1);
 }
 
-.container{
+.club-container{
   color:#283618;
 }
