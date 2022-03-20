@@ -23,7 +23,7 @@ def management_required(view_function):
 
     def modified_view_function(request, club_name, *args, **kwargs):
         current_club = Club.objects.get(club_name=club_name)
-        if Role.objects.filter(user=request.user, club=current_club).count() > 0:
+        if Role.objects.filter(user=request.user, club=current_club).count() == 1:
             role = Role.objects.get(user=request.user, club=current_club).club_role
             if role == 'BAN':
                 messages.add_message(request, messages.WARNING, "You have been banned from this club!")
@@ -46,7 +46,7 @@ def owner_required(view_function):
 
     def modified_view_function(request, club_name, *args, **kwargs):
         current_club = Club.objects.get(club_name=club_name)
-        if Role.objects.filter(user=request.user, club=current_club).count() > 0:
+        if Role.objects.filter(user=request.user, club=current_club).count() == 1:
             role = Role.objects.get(user=request.user, club=current_club).club_role
             if role == 'BAN':
                 messages.add_message(request, messages.WARNING, "You have been banned from this club!")
@@ -69,7 +69,7 @@ def membership_required(view_function):
 
     def modified_view_function(request, club_name, *args, **kwargs):
         current_club = Club.objects.get(club_name=club_name)
-        if Role.objects.filter(user=request.user, club=current_club).count() > 0:
+        if Role.objects.filter(user=request.user, club=current_club).count() == 1:
             role = Role.objects.get(user=request.user, club=current_club).club_role
             if role == 'BAN':
                 messages.add_message(request, messages.WARNING, "You have been banned from this club!")
@@ -88,7 +88,7 @@ def non_applicant_required(view_function):
 
     def modified_view_function(request, club_name, *args, **kwargs):
         current_club = Club.objects.get(club_name=club_name)
-        if Role.objects.filter(user=request.user, club=current_club).count() > 0:
+        if Role.objects.filter(user=request.user, club=current_club).count() == 1:
             role = Role.objects.get(user=request.user, club=current_club).club_role
             if role == 'OWN':
                 messages.add_message(request, messages.WARNING, "You are the owner!")
@@ -99,7 +99,7 @@ def non_applicant_required(view_function):
             else:
                 messages.add_message(request, messages.WARNING, "You are already a member!")
                 return redirect(f'/club/{club_name}/feed/')
-        if Application.objects.filter(user=request.user, club=current_club).count() > 0:
+        if Application.objects.filter(user=request.user, club=current_club).count() == 1:
             application_status = Application.objects.get(user=request.user, club=current_club).status
             if application_status == 'R':
                 messages.add_message(request, messages.WARNING, "You are not able to re-apply to this club.")
@@ -123,7 +123,7 @@ def applicant_required(view_function):
 
     def modified_view_function(request, club_name, *args, **kwargs):
         current_club = Club.objects.get(club_name=club_name)
-        if Role.objects.filter(user=request.user, club=current_club).count() > 0:
+        if Role.objects.filter(user=request.user, club=current_club).count() == 1:
             role = Role.objects.get(user=request.user, club=current_club).club_role
             if role == 'OWN':
                 messages.add_message(request, messages.WARNING, "You are the owner!")
@@ -134,7 +134,7 @@ def applicant_required(view_function):
             else:
                 messages.add_message(request, messages.WARNING, "You are already a member!")
                 return redirect(f'/club/{club_name}/feed/')
-        if Application.objects.filter(user=request.user, club=current_club).count() > 0:
+        if Application.objects.filter(user=request.user, club=current_club).count() == 1:
             application_status = Application.objects.get(user=request.user, club=current_club).status
             if application_status == 'R':
                 messages.add_message(request, messages.WARNING, "You are not able to edit your application to this "
@@ -158,12 +158,11 @@ def club_exists(view_function):
     """check whether the club exists"""
 
     def modified_view_function(request, club_name, *args, **kwargs):
-        try:
-            club = Club.objects.get(club_name=club_name)
-        except ObjectDoesNotExist:
-            return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
-        else:
+        if Club.objects.filter(club_name=club_name).count() == 1:
             return view_function(request, club_name, *args, **kwargs)
+        else:
+            messages.add_message(request, messages.WARNING, "No club found with this name.")
+            return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
     return modified_view_function
 
@@ -172,39 +171,31 @@ def club_and_book_exists(view_function):
     """check whether the club and book exists"""
 
     def modified_view_function(request, club_name, book_isbn, *args, **kwargs):
-        try:
-            club = Club.objects.get(club_name=club_name)
-        except ObjectDoesNotExist:
-            messages.add_message(request, messages.WARNING, "No club found with this name.")
-            return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
-        else:
-            try:
-                book = Book.objects.get(ISBN=book_isbn)
-            except ObjectDoesNotExist:
+        if Club.objects.filter(club_name=club_name).count() == 1:
+            if Book.objects.filter(ISBN=book_isbn).count() == 1:
+                return view_function(request, club_name, book_isbn, *args, **kwargs)
+            else:
                 messages.add_message(request, messages.WARNING, "No book found with this ISBN.")
                 return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
-            else:
-                return view_function(request, club_name, book_isbn, *args, **kwargs)
+        else:
+            messages.add_message(request, messages.WARNING, "No club found with this name.")
+            return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
     return modified_view_function
 
 
 def club_and_meeting_exists(view_function):
-    """check whether the club and book exists"""
+    """check whether the club and meeting exists"""
 
     def modified_view_function(request, club_name, meeting_id, *args, **kwargs):
-        try:
-            club = Club.objects.get(club_name=club_name)
-        except ObjectDoesNotExist:
-            messages.add_message(request, messages.WARNING, "No club found with this name.")
-            return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
-        else:
-            try:
-                meeting = Meeting.objects.get(id=meeting_id)
-            except ObjectDoesNotExist:
+        if Club.objects.filter(club_name=club_name).count() == 1:
+            if Meeting.objects.filter(id=meeting_id).count() == 1:
+                return view_function(request, club_name, meeting_id, *args, **kwargs)
+            else:
                 messages.add_message(request, messages.WARNING, "No meeting found with this ID.")
                 return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
-            else:
-                return view_function(request, club_name, meeting_id, *args, **kwargs)
+        else:
+            messages.add_message(request, messages.WARNING, "No club found with this name.")
+            return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
     return modified_view_function
