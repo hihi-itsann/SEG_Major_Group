@@ -256,3 +256,13 @@ h3.profile-title {
  .btn-normal:hover{
    color:#52796F;
  }
+
+ .btn-book{
+   background-color:#AEC3B0;
+   color:#01161E;
+ }
+
+ .btn-book:hover{
+   background-color:#AEC3B0;
+   color:#124559;
+ }

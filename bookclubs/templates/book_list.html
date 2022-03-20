@@ -7,9 +7,9 @@
             <h1>Book List</h1>
             <hr>
             <div class="btn-group-mg">
-            <a href="{% url 'book_list' 'All' %}"class="btn btn-outline-dark">All</a>
+            <a href="{% url 'book_list' 'All' %}"class="btn btn-book">All</a>
             {% for genre in genres %}
-              <a href="{% url 'book_list' genre %}"class="btn btn-outline-dark">{{ genre }}</a>
+              <a href="{% url 'book_list' genre %}"class="btn btn-book">{{ genre }}</a>
             {% endfor %}
            </div>
             <br>

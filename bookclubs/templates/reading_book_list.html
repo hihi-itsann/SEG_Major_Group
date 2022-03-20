@@ -6,9 +6,9 @@
         <h1>Reading List</h1>
         <hr>
           <div class="btn-group-mg">
-          <a href="{% url 'reading_book_list' 'All' %}"class="btn btn-warning">All</a>
+          <a href="{% url 'reading_book_list' 'All' %}"class="btn btn-normal">All</a>
           {% for genre in genres %}
-            <a href="{% url 'reading_book_list' genre %}"class="btn btn-warning">{{ genre }}</a>
+            <a href="{% url 'reading_book_list' genre %}"class="btn btn-normal">{{ genre }}</a>
           {% endfor %}
         </div>
         <div class="col-sm-4" style="background-color: #FFFFE0">
