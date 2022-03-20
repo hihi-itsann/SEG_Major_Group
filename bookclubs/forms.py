@@ -43,7 +43,7 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
         """Form options."""
 
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'bio', 'dob', 'gender', 'location','city','country',
+        fields = ['first_name', 'last_name', 'username', 'email', 'bio', 'dob', 'gender', 'location', 'city', 'country',
                   'meeting_preference']
         widgets = {'dob': forms.DateInput(format='%d/%m/%Y'), 'bio': forms.Textarea()}
 
@@ -88,9 +88,10 @@ class UserForm(forms.ModelForm):
         """Form options."""
 
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'bio', 'dob', 'gender', 'location','city','country',
+        fields = ['first_name', 'last_name', 'username', 'email', 'bio', 'dob', 'gender', 'location', 'city', 'country',
                   'meeting_preference']
         widgets = {'bio': forms.Textarea()}
+
 
 class PasswordForm(NewPasswordMixin):
     """Form enabling users to change their password."""
@@ -128,7 +129,7 @@ class PasswordForm(NewPasswordMixin):
 class RateReviewForm(forms.ModelForm):
     class Meta:
         model = BookRatingReview
-        fields = ['rate','review']
+        fields = ['rate', 'review']
         widgets = {
             'review': forms.Textarea(),
         }
@@ -136,9 +137,10 @@ class RateReviewForm(forms.ModelForm):
 
 class NewClubForm(forms.ModelForm):
     """Create and update form"""
+
     class Meta:
         model = Club
-        fields = ['club_name', 'meeting_status', 'location','city','country' ,'public_status', 'genre', 'description']
+        fields = ['club_name', 'meeting_status', 'location', 'city', 'country', 'public_status', 'genre', 'description']
         widgets = {'description': forms.Textarea()}
 
     MEETING_CHOICES = (
@@ -178,7 +180,7 @@ class UpdateClubForm(forms.ModelForm):
         """Form options."""
 
         model = Club
-        fields = ['club_name', 'meeting_status', 'location','city','country', 'public_status', 'genre', 'description']
+        fields = ['club_name', 'meeting_status', 'location', 'city', 'country', 'public_status', 'genre', 'description']
         widgets = {'description': forms.Textarea()}
 
         MEETING_CHOICES = (
@@ -249,8 +251,7 @@ class CommentForm(forms.ModelForm):
         }
 
 
-class NewMeetingForm(forms.ModelForm):
-
+class MeetingForm(forms.ModelForm):
     # def __init__(self, *args, **kwargs):
     #     self
 
@@ -294,3 +295,17 @@ class NewMeetingForm(forms.ModelForm):
             meeting_role='H'
         )
         return meeting
+
+    # def update(self, meeting_id=None, book=None):
+    #     super().save(commit=False)
+    #     meeting = Meeting.objects.get(
+    #         club=club,
+    #         book=book,
+    #         topic=self.cleaned_data.get('topic'),
+    #         description=self.cleaned_data.get('description'),
+    #         meeting_status=self.cleaned_data.get('meeting_status'),
+    #         location=self.cleaned_data.get('location'),
+    #         date=self.cleaned_data.get('date'),
+    #         time_start=self.cleaned_data.get('time_start'),
+    #         time_end=self.cleaned_data.get('time_end')
+    #     )
