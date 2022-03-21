@@ -4,7 +4,8 @@
     <br>
     <div class="container">
         <div class="col-xs-12 col-xl-9">
-            <h1>Book List</h1>
+            <h1 style="color:#2F3E46">Book List</h1>
+            <p style="color:#2F3E46">Click on book title to view book's details</p>
             <hr>
             <div class="btn-group-mg">
             <a href="{% url 'book_list' 'All' %}"class="btn btn-book">All</a>
@@ -20,14 +21,14 @@
                   <img src="{{ book.image_url_m }}">
                 </div>
                 <div class="col-6">
-                  <h2 style="#606C38"><a href="{% url 'show_book' book.ISBN %}">{{ book.title }}</a></h2>
+                  <h2><a href="{% url 'show_book' book.ISBN %}" style="color:#2F3E46; text-decoration:none;">{{ book.title }}</a></h2>
                   {% if book.getAverageRate == None %}
-                    <h5 style="color:#CCD5AE">No Yet Rated</h5>
+                    <h5 style="color:#354F52">No Yet Rated</h5>
                   {% else %}
-                    <h5 style="color:#CCD5AE">Rating: {{ book.getAverageRate|floatformat:1 }}/10</h5>
+                    <h5 style="color:#354F52">Rating: {{ book.getAverageRate|floatformat:1 }}/10</h5>
                   {% endif %}
-                  <p><em>Author: {{ book.author }}</em></p>
-                  <p><em>ISBN: {{ book.ISBN }}</em></p>
+                  <p style="color:#52796F"><em>Author: {{ book.author }}</em></p>
+                  <p style="color:#52796F"><em>ISBN: {{ book.ISBN }}</em></p>
                 </div>
               </div>
               <hr>
