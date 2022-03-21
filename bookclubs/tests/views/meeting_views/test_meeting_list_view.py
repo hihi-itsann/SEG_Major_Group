@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
+
 from bookclubs.models import User, Book, Club, Meeting, MeetingAttendance, Role
 from bookclubs.tests.helpers import reverse_with_next
 
@@ -97,7 +98,6 @@ class MeetingListViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'meeting_list.html')
         self.assertContains(response, f'{self.meeting.book.title}')
         self.assertContains(response, f'{self.another_meeting.book.title}')
-
 
     def test_meeting_list_successful_when_attendee(self):
         self.log_in(self.user)

@@ -1,10 +1,8 @@
+from django.contrib import messages
 from django.test import TestCase
 from django.urls import reverse
 
 from bookclubs.models import User, Club, Meeting, Role, Book, MeetingAttendance
-from bookclubs.tests.helpers import reverse_with_next
-from django.utils import timezone
-from django.contrib import messages
 
 
 class LeaveMeetingViewTestCase(TestCase):

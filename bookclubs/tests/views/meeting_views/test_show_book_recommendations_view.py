@@ -1,11 +1,11 @@
 from django.test import TestCase
 from django.urls import reverse
-from bookclubs.models import User, Book, BookStatus, Club, Role
+
+from bookclubs.models import User, Book, Club, Role
 from bookclubs.tests.helpers import reverse_with_next
 
 
 class ShowBookRecommendationsViewTestCase(TestCase):
-
     VIEW = 'show_book_recommendations'
 
     fixtures = [
