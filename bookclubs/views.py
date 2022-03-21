@@ -736,13 +736,17 @@ def show_book_recommendations(request, club_name):
     # print(recommendations)
     # recommended_books = Book.objects.all().filter(ISBN__in=recommendations)
 
-    all_books_list = list(Book.objects.all())
+    all_books = Book.objects.all()
+    all_books_list = list(all_books)
     randomly_selected_ISBNs = []
-    for i in range(10):
-        random_book=choice(all_books_list)
-        randomly_selected_ISBNs.append(random_book.ISBN)
-        all_books_list.remove(random_book)
-    recommended_books = Book.objects.all().filter(ISBN__in=randomly_selected_ISBNs)
+    if len(all_books_list) < 10:
+        recommended_books = all_books
+    else:
+        for i in range(10):
+            random_book = choice(all_books_list)
+            randomly_selected_ISBNs.append(random_book.ISBN)
+            all_books_list.remove(random_book)
+        recommended_books = Book.objects.all().filter(ISBN__in=randomly_selected_ISBNs)
 
     return render(request, 'show_book_recommendations.html',
                   {'recommended_books': recommended_books, 'club_name': club_name})
