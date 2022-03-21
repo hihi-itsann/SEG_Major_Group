@@ -7,7 +7,7 @@ from bookclubs.models import User
 from bookclubs.tests.helpers import reverse_with_next
 from datetime import date
 
-class ProfileViewTest(TestCase):
+class ProfileViewTestCase(TestCase):
     """Test suite for the profile view."""
 
     fixtures = [

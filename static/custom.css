@@ -7,6 +7,7 @@
 }
 
 
+
 /*
  * Cover page
  */
@@ -45,7 +46,7 @@ p.cover-text {
 }
 
 .cover-card {
-  background-color: rgba(245, 245, 245, 0.6);
+  background-color:#CAD2C5;
   max-width: 30rem;
   padding-top: 30px;
   padding-left: 50px;
@@ -64,15 +65,15 @@ p.cover-text {
 body {
   margin: 0;
   padding: 0;
-  background-color: #17a2b8;
+  background-color: #ffffff;
   height: 100vh;
 }
-login .container #login-row #login-column #login-box {
+login.container #login-row #login-column #login-box {
   margin-top: 120px;
   max-width: 600px;
   height: 320px;
   border: 1px solid #9C9C9C;
-  background-color: #EAEAEA;
+  background-color: #FFFFFF;
 }
 login .container #login-row #login-column #login-box #login-form {
   padding: 20px;
@@ -99,27 +100,6 @@ ul.errorlist {
 .wrapper {
     display: block;
 }
-
-/***** Feed Page Sidebar *****/
-
-.sidebar {
-    width: 250px;
-    height: 100vh;
-    position: fixed;
-    top: 0;
-    left: -255px;
-    z-index: 999;
-    background: #333;
-    color: #fff;
-    transition: all .3s;
-    box-shadow: 3px 3px 3px rgba(51, 51, 51, 0.5);
-    text-align: left;
-}
-
-.sidebar.active {
-    left: 0;
-}
-
 /***** Content *****/
 
 .content {
@@ -145,6 +125,7 @@ ul.errorlist {
  * Profile
  */
 .profile-image {
+  color:#FEFAE0;
   width: 120px;
   clear:both;
   float:left;
@@ -160,7 +141,7 @@ h3.profile-title {
 }
 
 .profile-username {
-  color: #777777;
+  color: #7F5539;
   font-weight: 300;
   font-style: italic;
 }
@@ -170,7 +151,7 @@ h3.profile-title {
 }
 
 .profile-statistics {
-  color: #777777;
+  color: #7F5539;
   font-weight: 300;
   display: block;
 }
@@ -194,26 +175,95 @@ h3.profile-title {
 
 .post-author-user-details {
   margin-left: 10px;
-  color: #777777;
+  color: #7F5539;
 }
+
+/*
+ * Sidebar
+ */
+.sidebar-image {
+  width: 120px;
+  clear:both;
+  float:left;
+}
+
 
 /*
  * Hyperlinks
  */
 .content a {
   text-decoration: none;
-  color: #0d6efd;
+  color: #D4A373;
 }
 .content a:hover {
   text-decoration: underline;
-  color: #0d6efd;
+  color: #CCD5AE;
 }
 
 .post-author a {
   text-decoration: none;
-  color: black;
+  color:#D4A373;
 }
 .post-author a:hover {
   text-decoration: underline;
-  color: black;
+  color:#CCD5AE;
 }
+
+/*
+ * My clubs
+ */
+.club-card{
+  background-color:#CAD2C5;
+  color:#354F52;
+}
+
+.btn-outline-dark{
+  background-color:#CAD2C5;
+  color:#354F52;
+}
+
+.btn-outline-dark:hover{
+  background-color:#52796F;
+  color:#CAD2C5;
+}
+
+.club-card:hover{
+  color:#52796F;
+  transform:scale(1.1);
+}
+
+.club-container{
+  color:#2F3E46;
+}
+
+/*
+ * important buttons and href link
+ */
+ .btn-apply{
+   background-color:#ffdd00;
+   color:#2f3e46;
+ }
+
+ .btn-apply:hover{
+   color:#52796F;
+ }
+
+ .btn-normal{
+   background-color:#AEC3B0;
+   color:#2F3E46;
+ }
+
+ .btn-normal:hover{
+   color:#52796F;
+ }
+
+ .btn-book{
+   text-decoration: none;
+   background-color:#CAD2C5;
+   color:#2F3E46;
+ }
+
+ .btn-book:hover{
+   background-color:#AEC3B0;
+   color:#52796F;
+ }

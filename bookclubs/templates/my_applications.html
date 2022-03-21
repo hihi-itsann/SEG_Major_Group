@@ -1,0 +1,99 @@
+{% extends 'base_content.html' %}
+{% block content %}
+    <style>
+        h1 {
+            padding: 5px;
+            text-align: left;
+
+        }
+
+        h5 {
+            padding: 5px;
+            text-align: left;
+
+        }
+
+        table {
+            border-collapse: separate;
+            border-spacing: 0 15px;
+        }
+
+        td {
+            width: 150px;
+            text-align: left;
+            padding: 5px;
+        }
+    </style>
+
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+
+    <div class="event-schedule-area-two bg-color pad100">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="section-title text-center">
+                        <div class="title-text">
+                            <h2><b>My Applications </b></h2>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.col end-->
+            </div>
+            <!-- row end-->
+            <div class="container">
+                <div class="row">
+                    <div>
+                        {% if applications_count != 0 %}
+                            {% if applications_count == 1 %}
+                                <h5>You have {{ applications_count }} application.</h5>
+                            {% else %}
+                                <h5>You have {{ applications_count }} applications.</h5>
+                            {% endif %}
+                            <table class="table table-striped">
+                                <thead>
+                                <tr>
+                                    <th>Club</th>
+                                    <th>Statement</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for application in applications %}
+                                    <tr class="row_hover">
+                                        <td>{{ application.club.club_name }}</td>
+                                        <td>{{ application.statement }}</td>
+                                        <td> {{ application.get_status_display }} </td>
+                                        <td>
+                                            {% if application.status == 'P' %}
+                                                <a href="{% url 'edit_application' application.club.club_name %}" class="btn btn-normal">
+                                                    Edit
+                                                </a>
+
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if application.status == 'P' %}
+                                                <a href="{% url 'withdraw_application' application.club.club_name %}"
+                                                   class="btn btn-normal">
+                                                    Withdraw
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <div>
+                                <h5>You haven't applied to any clubs.</h5>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <!-- /row end-->
+        </div>
+    </div>
+{% endblock %}

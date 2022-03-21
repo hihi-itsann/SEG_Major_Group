@@ -2,12 +2,15 @@
 {% block title %} What's on your mind? {% endblock %}
 {% block content %}
 
-<h1>CREATE A POST</h1>
+<div class="container">
 
-<div class="form-group">
-    <form method="POST">
-      {% csrf_token %}
-      {{ form.as_p }}
-      <button type="submit" class="btn btn-secondary">Post publication</button>
+    <h1>CREATE A POST</h1>
+    <h2>Your every thought is worth to be recorded!</h2>
+    <div class="form-group">
+        <form method="POST">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit" class="btn btn-secondary">Let Everyone see your thought!</button>
+    </div>
 </div>
 {% endblock %}

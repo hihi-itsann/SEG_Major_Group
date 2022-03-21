@@ -1,0 +1,18 @@
+{% extends 'base_content.html' %}
+{% block title %}
+| Club Feed
+{% endblock %}
+{% block content %}
+<h1>{{ club.club_name }}</h1>
+<h2>FEED</h2>
+<p1>{{ club.club_name }}</p1>
+<p2>{{ club.meeting_status }}</p2>
+<p3>{{ club.location }}</p3>
+<p4>{{ club.description }}</p4>
+{% if is_owner %}
+<a href='{% url 'update_club_info' club.club_name %}'
+       class="btn btn-outline-dark">
+    update club
+</a>
+{% endif %}
+{% endblock %}

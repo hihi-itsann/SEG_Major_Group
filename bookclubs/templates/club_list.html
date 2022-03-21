@@ -1,0 +1,66 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<br>
+    <center>
+      <form method="POST">
+        {% csrf_token %}
+        <select name="meeting_status" onchange="chooseStatus()">
+          <option disabled selected="true">--Meeting preference--</option>
+          <option value="Online">Online</option>
+          <option value="In person">In person</option>
+        </select>
+        <select name="distance" style="visibility: hidden;">
+          <option value="all places" selected="true">--Distance preference--</option>
+          <option value="same city">Same city</option>
+          <option value="same country">Same country</option>
+        </select>
+        <input type="submit" value="Apply filter">
+      </form>
+    </center>
+    <div class="container">
+        <div class="col-xs-12 col-lg-6 col-xl-8">
+          <h1>Clubs </h1>
+            {% if meeting_status == None %}
+            <p> Filter applied:None </p>
+            {% elif meeting_status == 'Online' %}
+            <p> Filter applied: {{meeting_status}} meeting </p>
+            {% else %}
+            <p> Filter applied: {{meeting_status}} meeting in  {{distance}}</p>
+            {% endif%}
+            {%if club_exists %}
+                {%if is_suitable_clubs%}
+                    {% if clubs %}
+                        {% for club in clubs %}
+                            <div>
+                                <tr>
+                                    <td><h2>{{ club.club_name }}</h2></td>
+                                    <p>{{ club.description }}</p>
+                                    <p>Total members: {{ club.club_members.count }}</p>
+                                    <td><a href='{% url 'create_application' club.club_name %}' class="btn btn-apply">
+                                        APPLY
+                                    </a>
+                                    </td>
+                                </tr>
+                                <hr>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>You are currently a member of all the clubs in the system!</p>
+                        <a href='{% url 'my_clubs' %}' class="btn btn-outline-success">
+                            See my clubs
+                        </a>
+                    {% endif %}
+                {% else %}
+                    <p>There are no clubs matching this criteria!.</p>
+                    <p>You can change criteria and search again.</p>
+                {% endif %}
+        {% else %}
+            <p>There is no clubs now!</p>
+            <a href='{% url 'create_club' %}' class="btn btn-outline-success">
+                Create your club
+            </a>
+        {% endif %}
+        </div>
+    </div>
+
+{% endblock %}

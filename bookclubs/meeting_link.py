@@ -1,4 +1,5 @@
 from argparse import MetavarTypeHelpFormatter
+import base64
 from email.mime.text import MIMEText
 import jwt
 
@@ -50,7 +51,6 @@ def sent_meeting_link():
     invitation_text=response_data['invitation']
 #create_meeting()
 sent_meeting_link()
-create_message(email,"sofiaxia61@gmail.com",invitation_text)
 def create_message(sender, to, subject, message_text):
   """Create a message for an email.
 
@@ -68,6 +68,8 @@ def create_message(sender, to, subject, message_text):
   message['from'] = sender
   message['subject'] = subject
   return {'raw': base64.urlsafe_b64encode(message.as_string())}
+create_message(email,"sofiaxia61@gmail.com",invitation_text)
+
 def send_message(service, user_id, message):
   """Send an email message.
 

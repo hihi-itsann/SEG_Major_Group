@@ -1,0 +1,23 @@
+{% extends 'base_content.html' %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div style="padding-bottom: 10px">
+            <h3>New Meeting</h3>
+            <h4>The book you have chosen is {{ book.title }}</h4>
+            <img src="{{ book.image_url_m }}" alt="Book Cover">
+            </div>
+            <p style="font-size: large" >Meeting will be held {{ club.get_meeting_status }}</p>
+            <p style="font-size: small; line-height: 3px;">(Decision made at the discretion of the club owner)</p>
+        </div>
+        <form action="{% url 'create_meeting' club.club_name book.ISBN %}" method="post">
+            {% csrf_token %}
+            {% include 'partials/bootstrap_form.html' with form=form %}
+            <button type="submit" class="btn btn-primary">Host</button>
+        </form>
+    </div>
+    <div class="col-xs-12 col-lg-6 col-xl-8">
+    </div>
+    </div>
+    </div>
+{% endblock %}

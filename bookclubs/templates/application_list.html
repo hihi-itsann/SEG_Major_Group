@@ -1,0 +1,68 @@
+{% extends 'base_content.html' %}
+{% block content %}
+    <div class="container">
+        <div class="row justify-content-between">
+            <h1 class="col-5">
+                Applicants:
+            </h1>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div>
+                    {% if applications_count != 0 %}
+                        {% if applications_count == 1 %}
+                            <h5>There is {{ applications_count }} application.</h5>
+                        {% else %}
+                            <h5>There are {{ applications_count }} applications.</h5>
+                        {% endif %}
+                        <table class="table table-striped table-hover">
+                            <thead>
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Statement</th>
+                            </tr>
+                            </thead>
+                            {% for application in applications %}
+                                <tr>
+                                    <td>
+                                        <img src="{{ application.user.mini_gravatar }}"
+                                             alt="Gravatar of {{ application.user.username }}" class="rounded-circle">
+                                    </td>
+                                    <td class="align-middle"><a
+                                            href="{% url 'show_user' application.user.id %}">{{ application.user.username }}</a>
+                                    </td>
+                                    <td class="align-middle"> {{ application.user.username }}</td>
+                                    <td class="align-middle"> {{ application.user.bio }}</td>
+                                    <td class="align-middle">
+                                        <form action="{% url 'accept_applicant' current_club.club_name application.user.id %}"
+                                              method="post">
+                                            {% csrf_token %}
+                                            <input type="submit" class="btn btn-outline-success" value="Accept"
+                                                   name="accept-btn"/>
+                                        </form>
+                                    </td>
+                                    <td class="align-middle">
+                                        <form action="{% url 'reject_applicant' current_club.club_name application.user.id %}"
+                                              method="post">
+                                            {% csrf_token %}
+                                            <input type="submit" class="btn btn-outline-danger" value="Reject"
+                                                   name="reject-btn"/>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    {% else %}
+                        <div class="alert alert-warning" role="alert">
+                            <h5 class="alert-heading">There are currently no applicants.</h5>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

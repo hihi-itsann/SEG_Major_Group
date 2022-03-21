@@ -1,0 +1,23 @@
+<style>
+      .navbar-custom {
+          background-color:#354F52;
+      }
+      .navbar-custom .navbar-brand,
+      .navbar-custom .navbar-text {
+          color:#FEFAE0;
+      }
+</style>
+<nav class="navbar navbar-custom navbar-expand-lg">
+  <div class="container">
+    {% if user.is_authenticated %}
+      <a class="navbar-brand" href="{% url 'feed' %}">
+        <span class="bi bi-book"></span>&nbsp;<b>Book Clubs</b>
+      </a>
+      {% include 'partials/menu.html' %}
+    {% else %}
+      <a class="navbar-brand" href="{% url 'home' %}">
+        <span class="bi bi-book"></span>&nbsp;<b>Book Clubs</b>
+      </a>
+    {% endif %}
+  </div>
+</nav>

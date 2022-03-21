@@ -7,7 +7,7 @@ from bookclubs.forms import PasswordForm
 from bookclubs.models import User
 from bookclubs.tests.helpers import reverse_with_next
 
-class PasswordViewTest(TestCase):
+class PasswordViewTestCase(TestCase):
     """Test suite for the password view."""
 
     fixtures = [

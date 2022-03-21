@@ -1,0 +1,54 @@
+[
+   {
+     "model": "bookclubs.club",
+     "pk": 1,
+     "fields": {
+       "club_name": "private_online",
+       "meeting_status": "ONL",
+       "location": "Bush House",
+       "public_status": "PRI",
+       "genre": "Fiction",
+       "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ipsum dolor sit amet consectetur adipiscing. Mauris in aliquam sem fringilla ut morbi tincidunt augue interdum."
+
+     }
+   },
+     {
+     "model": "bookclubs.club",
+     "pk": 2,
+     "fields": {
+       "club_name": "public_online",
+       "meeting_status": "ONL",
+       "location": "Bush House",
+       "public_status": "PUB",
+       "genre": "Fiction",
+       "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ipsum dolor sit amet consectetur adipiscing. Mauris in aliquam sem fringilla ut morbi tincidunt augue interdum."
+
+     }
+   },
+     {
+     "model": "bookclubs.club",
+     "pk": 3,
+     "fields": {
+       "club_name": "private_in-person",
+       "meeting_status": "OFF",
+       "location": "Bush House",
+       "public_status": "PRI",
+       "genre": "Fiction",
+       "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ipsum dolor sit amet consectetur adipiscing. Mauris in aliquam sem fringilla ut morbi tincidunt augue interdum."
+
+     }
+   },
+     {
+     "model": "bookclubs.club",
+     "pk": 4,
+     "fields": {
+       "club_name": "public_in-person",
+       "meeting_status": "OFF",
+       "location": "Bush House",
+       "public_status": "PUB",
+       "genre": "Fiction",
+       "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ipsum dolor sit amet consectetur adipiscing. Mauris in aliquam sem fringilla ut morbi tincidunt augue interdum."
+
+     }
+   }
+]
