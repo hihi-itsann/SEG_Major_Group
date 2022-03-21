@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from bookclubs.forms import MeetingForm
-from bookclubs.models import User, Club, Meeting, Role, Book
+from bookclubs.models import User, Club, Meeting, Role, Book, MeetingAttendance
 from bookclubs.tests.helpers import reverse_with_next
 
 
@@ -82,6 +82,7 @@ class CreateMeetingViewTestCase(TestCase):
         response = self.client.post(self.url, self.form_input, follow=True)
         after_count = Meeting.objects.count()
         self.assertEqual(after_count, before_count + 1)
+        self.assertEqual(MeetingAttendance.objects.all().count(), 1)
         response_url = reverse('meeting_list', kwargs={'club_name': self.club.club_name})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'meeting_list.html')
@@ -92,6 +93,7 @@ class CreateMeetingViewTestCase(TestCase):
         response = self.client.post(self.url, self.form_input, follow=True)
         after_count = Meeting.objects.count()
         self.assertEqual(after_count, before_count + 1)
+        self.assertEqual(MeetingAttendance.objects.all().count(), 1)
         response_url = reverse('meeting_list', kwargs={'club_name': self.club.club_name})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'meeting_list.html')
