@@ -10,11 +10,13 @@ class DeleteBookRateViewTestCase(TestCase):
 
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
+        'bookclubs/tests/fixtures/other_users.json',
         'bookclubs/tests/fixtures/default_book.json'
     ]
 
     def setUp(self):
         self.user = User.objects.get(username='@johndoe')
+        self.other_user = User.objects.get(username='@janedoe')
         self.book = Book.objects.get(ISBN='0195153448')
         self.book_rating_review = BookRatingReview.objects.create(
             user=self.user,
@@ -38,6 +40,19 @@ class DeleteBookRateViewTestCase(TestCase):
         response = self.client.delete(self.url)
         rating_review_count_after = BookRatingReview.objects.count()
         self.assertEqual(rating_review_count_after, rating_review_count_before-1)
+        response_url = reverse('show_book', kwargs={'ISBN': self.book.ISBN})
+        self.assertRedirects(
+            response, response_url,
+            status_code=302, target_status_code=200,
+            fetch_redirect_response=True
+        )
+
+    def test_unsuccessful_delete_rating_review_when_does_not_exist(self):
+        self.client.login(username=self.other_user.username, password='Password123')
+        book_feedback_count_before = BookRatingReview.objects.count()
+        response = self.client.delete(self.url, follow=True)
+        book_feedback_count_after = BookRatingReview.objects.count()
+        self.assertEqual(book_feedback_count_after, book_feedback_count_before)
         response_url = reverse('show_book', kwargs={'ISBN': self.book.ISBN})
         self.assertRedirects(
             response, response_url,

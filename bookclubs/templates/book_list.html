@@ -1,7 +1,5 @@
 {% extends 'base_content.html' %}
 {% load bootstrap_pagination %}
-
-
 {% block content %}
     <br>
     <div class="container">
@@ -9,11 +7,11 @@
             <h1>Book List</h1>
             <hr>
             <div class="btn-group-mg">
-            <a href="{% url 'book_list' 'All' %}"class="btn btn-warning">All</a>
+            <a href="{% url 'book_list' 'All' %}"class="btn btn-book">All</a>
             {% for genre in genres %}
-              <a href="{% url 'book_list' genre %}"class="btn btn-warning">{{ genre }}</a>
+              <a href="{% url 'book_list' genre %}"class="btn btn-book">{{ genre }}</a>
             {% endfor %}
-          </div>
+           </div>
             <br>
             {% bootstrap_paginate page_obj range=6 previous_label="Previous" next_label="Next" show_first_last="true" %}
             {% for book in books %}
@@ -22,11 +20,11 @@
                   <img src="{{ book.image_url_m }}">
                 </div>
                 <div class="col-6">
-                  <h2><a href="{% url 'show_book' book.ISBN %}">{{ book.title }}</a></h2>
+                  <h2 style="#606C38"><a href="{% url 'show_book' book.ISBN %}">{{ book.title }}</a></h2>
                   {% if book.getAverageRate == None %}
-                    <h5 style="color:Green">No Yet Rated</h5>
+                    <h5 style="color:#CCD5AE">No Yet Rated</h5>
                   {% else %}
-                    <h5 style="color:Green">Rating: {{ book.getAverageRate|floatformat:1 }}/10</h5>
+                    <h5 style="color:#CCD5AE">Rating: {{ book.getAverageRate|floatformat:1 }}/10</h5>
                   {% endif %}
                   <p><em>Author: {{ book.author }}</em></p>
                   <p><em>ISBN: {{ book.ISBN }}</em></p>

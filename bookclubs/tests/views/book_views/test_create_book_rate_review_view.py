@@ -43,6 +43,8 @@ class CreateBookRateViewTestCase(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'show_book.html')
+        self.assertContains(response, self.book.title)
+        self.assertEqual(response.context['book'], self.book)
         form = response.context['form']
         self.assertTrue(isinstance(form, RateReviewForm))
         self.assertFalse(form.is_bound)
@@ -55,4 +57,3 @@ class CreateBookRateViewTestCase(TestCase):
         self.assertEqual(after_count, before_count + 1)
         book = Book.objects.get(ISBN='0195153448')
         self.assertTemplateUsed(response, 'show_book.html')
-

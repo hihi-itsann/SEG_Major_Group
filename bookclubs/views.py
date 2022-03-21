@@ -230,12 +230,6 @@ class CreateBookRateReviewView(LoginRequiredMixin, CreateView):
         form.instance.book_id = self.kwargs['ISBN']
         return super().form_valid(form)
 
-    def get_context_data(self, **kwargs):
-        book = Book.objects.get(ISBN=self.kwargs['ISBN'])
-        context = super().get_context_data(**kwargs)
-        context['book'] = book
-        return context
-
     def get_success_url(self):
         book = Book.objects.get(ISBN=self.kwargs['ISBN'])
         return '{}#education'.format(reverse('show_book', kwargs={'ISBN': book.ISBN}))
@@ -243,15 +237,15 @@ class CreateBookRateReviewView(LoginRequiredMixin, CreateView):
 
 @login_required
 def delete_book_rating_review(request, ISBN, pk):
-    book = Book.objects.get(ISBN=ISBN)
-    try:
-        rating_review = BookRatingReview.objects.get(book=book, id=pk)
-    except ObjectDoesNotExist:
-        messages.add_message(request, messages.ERROR, "You have not given that feedback!")
-        return redirect('show_book', ISBN)
-    rating_review.delete();
-    messages.add_message(request, messages.SUCCESS, "This review has successfully been deleted!")
-    return redirect('show_book', ISBN)
+     book = Book.objects.get(ISBN=ISBN)
+     try:
+         rating_review=BookRatingReview.objects.get(book=book, id=pk, user=request.user)
+     except ObjectDoesNotExist:
+         messages.add_message(request, messages.ERROR, "You have not given that feedback!")
+         return redirect('show_book', ISBN)
+     rating_review.delete();
+     messages.add_message(request, messages.SUCCESS, "This review has successfully been deleted!")
+     return redirect('show_book', ISBN)
 
 
 @login_required
@@ -821,6 +815,7 @@ def leave_meeting(request, club_name, meeting_id):
 @login_required
 @club_and_meeting_exists
 @membership_required
+@meeting_management_required
 def delete_meeting(request, club_name, meeting_id):
     """Meeting is deleted"""
     meeting = Meeting.objects.get(id=meeting_id)
