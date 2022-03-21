@@ -5,19 +5,19 @@ Created on Thu May  3 11:11:13 2018
 @author: Frank
 """
 
-from MovieLens import MovieLens
-from RBMAlgorithm import RBMAlgorithm
-from ContentKNNAlgorithm import ContentKNNAlgorithm
-from HybridAlgorithm import HybridAlgorithm
-from Evaluator import Evaluator
+from bookclubs.recommender.Hybrid.BookLens import BookLens
+from bookclubs.recommender.Hybrid.RBMAlgorithm import RBMAlgorithm
+from bookclubs.recommender.Hybrid.ContentKNNAlgorithm import ContentKNNAlgorithm
+from bookclubs.recommender.Hybrid.HybridAlgorithm import HybridAlgorithm
+from bookclubs.recommender.Hybrid.Evaluator import Evaluator
 
 import random
 import numpy as np
 
-def LoadMovieLensData():
-    ml = MovieLens()
+def LoadBookLensData():
+    ml = BookLens()
     print("Loading movie ratings...")
-    data = ml.loadMovieLensLatestSmall()
+    data = ml.loadBookLensLatestSmall()
     print("\nComputing movie popularity ranks so we can measure novelty later...")
     rankings = ml.getPopularityRanks()
     return (ml, data, rankings)
@@ -26,7 +26,7 @@ np.random.seed(0)
 random.seed(0)
 
 # Load up common data set for the recommender algorithms
-(ml, evaluationData, rankings) = LoadMovieLensData()
+(ml, evaluationData, rankings) = LoadBookLensData()
 
 # Construct an Evaluator to, you know, evaluate them
 evaluator = Evaluator(evaluationData, rankings)

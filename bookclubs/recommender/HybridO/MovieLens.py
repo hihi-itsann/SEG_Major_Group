@@ -13,13 +13,13 @@ class MovieLens:
 
     movieID_to_name = {}
     name_to_movieID = {}
-    ratingsPath = '../ml-latest-small/ratings.csv'
-    moviesPath = '../ml-latest-small/movies.csv'
-    
+    ratingsPath = 'bookclubs/ml-latest-small/ratings.csv'
+    moviesPath = 'bookclubs/ml-latest-small/movies.csv'
+
     def loadMovieLensLatestSmall(self):
 
         # Look for files relative to the directory we are running from
-        os.chdir(os.path.dirname(sys.argv[0]))
+        #os.chdir(os.path.dirname(sys.argv[0]))
 
         ratingsDataset = 0
         self.movieID_to_name = {}
@@ -72,7 +72,7 @@ class MovieLens:
             rankings[movieID] = rank
             rank += 1
         return rankings
-    
+
     def getGenres(self):
         genres = defaultdict(list)
         genreIDs = {}
@@ -98,10 +98,10 @@ class MovieLens:
             bitfield = [0] * maxGenreID
             for genreID in genreIDList:
                 bitfield[genreID] = 1
-            genres[movieID] = bitfield            
-        
+            genres[movieID] = bitfield
+
         return genres
-    
+
     def getYears(self):
         p = re.compile(r"(?:\((\d{4})\))?\s*$")
         years = defaultdict(int)
@@ -116,7 +116,7 @@ class MovieLens:
                 if year:
                     years[movieID] = int(year)
         return years
-    
+
     def getMiseEnScene(self):
         mes = defaultdict(list)
         with open("LLVisualFeatures13K_Log.csv", newline='') as csvfile:
@@ -134,13 +134,13 @@ class MovieLens:
                 mes[movieID] = [avgShotLength, meanColorVariance, stddevColorVariance,
                    meanMotion, stddevMotion, meanLightingKey, numShots]
         return mes
-    
+
     def getMovieName(self, movieID):
         if movieID in self.movieID_to_name:
             return self.movieID_to_name[movieID]
         else:
             return ""
-        
+
     def getMovieID(self, movieName):
         if movieName in self.name_to_movieID:
             return self.name_to_movieID[movieName]

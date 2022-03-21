@@ -5,11 +5,11 @@ Created on Thu May  3 11:11:13 2018
 @author: Frank
 """
 
-from MovieLens import MovieLens
-from RBMAlgorithm import RBMAlgorithm
-from ContentKNNAlgorithm import ContentKNNAlgorithm
-from HybridAlgorithm import HybridAlgorithm
-from Evaluator import Evaluator
+from bookclubs.recommender.HybridO.MovieLens import MovieLens
+from bookclubs.recommender.HybridO.RBMAlgorithm import RBMAlgorithm
+from bookclubs.recommender.HybridO.ContentKNNAlgorithm import ContentKNNAlgorithm
+from bookclubs.recommender.HybridO.HybridAlgorithm import HybridAlgorithm
+from bookclubs.recommender.HybridO.Evaluator import Evaluator
 
 import random
 import numpy as np

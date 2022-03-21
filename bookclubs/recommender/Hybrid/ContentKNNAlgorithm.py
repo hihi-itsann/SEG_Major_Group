@@ -7,7 +7,7 @@ Created on Fri May  4 13:08:25 2018
 
 from surprise import AlgoBase
 from surprise import PredictionImpossible
-from MovieLens import MovieLens
+from bookclubs.recommender.Hybrid.BookLens import BookLens
 import math
 import numpy as np
 import heapq
@@ -24,16 +24,16 @@ class ContentKNNAlgorithm(AlgoBase):
         # Compute item similarity matrix based on content attributes
 
         # Load up genre vectors for every movie
-        ml = MovieLens()
+        ml = BookLens()
         genres = ml.getGenres()
         years = ml.getYears()
         mes = ml.getMiseEnScene()
-        
+
         print("Computing content-based similarity matrix...")
-            
+
         # Compute genre distance for every movie combination as a 2x2 matrix
         self.similarities = np.zeros((self.trainset.n_items, self.trainset.n_items))
-        
+
         for thisRating in range(self.trainset.n_items):
             if (thisRating % 100 == 0):
                 print(thisRating, " of ", self.trainset.n_items)
@@ -45,11 +45,11 @@ class ContentKNNAlgorithm(AlgoBase):
                 #mesSimilarity = self.computeMiseEnSceneSimilarity(thisMovieID, otherMovieID, mes)
                 self.similarities[thisRating, otherRating] = genreSimilarity * yearSimilarity
                 self.similarities[otherRating, thisRating] = self.similarities[thisRating, otherRating]
-                
+
         print("...done.")
-                
+
         return self
-    
+
     def computeGenreSimilarity(self, movie1, movie2, genres):
         genres1 = genres[movie1]
         genres2 = genres[movie2]
@@ -60,14 +60,14 @@ class ContentKNNAlgorithm(AlgoBase):
             sumxx += x * x
             sumyy += y * y
             sumxy += x * y
-        
+
         return sumxy/math.sqrt(sumxx*sumyy)
-    
+
     def computeYearSimilarity(self, movie1, movie2, years):
         diff = abs(years[movie1] - years[movie2])
         sim = math.exp(-diff / 10.0)
         return sim
-    
+
     def computeMiseEnSceneSimilarity(self, movie1, movie2, mes):
         mes1 = mes[movie1]
         mes2 = mes[movie2]
@@ -85,27 +85,26 @@ class ContentKNNAlgorithm(AlgoBase):
 
         if not (self.trainset.knows_user(u) and self.trainset.knows_item(i)):
             raise PredictionImpossible('User and/or item is unkown.')
-        
+
         # Build up similarity scores between this item and everything the user rated
         neighbors = []
         for rating in self.trainset.ur[u]:
             genreSimilarity = self.similarities[i,rating[0]]
             neighbors.append( (genreSimilarity, rating[1]) )
-        
+
         # Extract the top-K most-similar ratings
         k_neighbors = heapq.nlargest(self.k, neighbors, key=lambda t: t[0])
-        
+
         # Compute average sim score of K neighbors weighted by user ratings
         simTotal = weightedSum = 0
         for (simScore, rating) in k_neighbors:
             if (simScore > 0):
                 simTotal += simScore
                 weightedSum += simScore * rating
-            
+
         if (simTotal == 0):
             raise PredictionImpossible('No neighbors')
 
         predictedRating = weightedSum / simTotal
 
         return predictedRating
-    

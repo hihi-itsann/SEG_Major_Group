@@ -16,18 +16,18 @@ class BookLens:
 
     BookISBN_to_title = {}
     title_to_bookISBN = {}
-    ratingsPath = '../ml-latest-small/BX-Book-Ratings.csv'
-    booksPath = '../ml-latest-small/BX_Books.csv'
+    ratingsPath = 'bookclubs/ml-latest-small/BX-Book-Ratings.csv'
+    booksPath = 'bookclubs/ml-latest-small/BX_Books.csv'
     def loadRatingData(self):
         df = pd.read_csv(self.ratingsPath, sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0 )
         min_book_ratings = 50
         filter_books = df['ISBN'].value_counts() > min_book_ratings
         filter_books = filter_books[filter_books].index.tolist()
-        
+
         min_user_ratings = 50
         filter_users = df['User-ID'].value_counts() > min_user_ratings
         filter_users = filter_users[filter_users].index.tolist()
-        
+
         df_new = df[(df['ISBN'].isin(filter_books)) & (df['User-ID'].isin(filter_users))]
         print('The original data frame shape:\t{}'.format(df.shape))
         print('The new data frame shape:\t{}'.format(df_new.shape))
@@ -115,10 +115,10 @@ class BookLens:
             bitfield = [0] * maxGenreISBN
             for genreISBN in genreISBNList:
                 bitfield[genreISBN] = 1
-            genres[bookISBN] = bitfield            
-        
+            genres[bookISBN] = bitfield
+
         return genres
-    
+
     def getGenra(self, isbn):
         print(isbn)
         base_api_link = "https://www.googleapis.com/books/v1/volumes?q=isbn:"
@@ -128,9 +128,9 @@ class BookLens:
 
         decoded_text = text.decode("utf-8")
         obj = json.loads(decoded_text) # deserializes decoded_text to a Python object
-        volume_info = obj["items"][0] 
+        volume_info = obj["items"][0]
         return  volume_info["volumeInfo"]["categories"][0]
-               
+
     def getYears(self):
         p = re.compile(r"(?:\((\d{4})\))?\s*$")
         years = defaultdict(int)
@@ -145,7 +145,7 @@ class BookLens:
                 if year:
                     years[bookISBN] = int(year)
         return years
-    
+
     def getMiseEnScene(self):
         mes = defaultdict(list)
         with open("LLVisualFeatures13K_Log.csv", newline='') as csvfile:
@@ -163,15 +163,15 @@ class BookLens:
                 mes[bookISBN] = [avgShotLength, meanColorVariance, stddevColorVariance,
                    meanMotion, stddevMotion, meanLightingKey, numShots]
         return mes
-    
+
     def getBookTitle(self, isbn):
-        if isbn in self.isbn_to_bookTitle:
-            return self.isbn_to_bookTitle[isbn]
+        if isbn in self.BookISBN_to_title:
+            return self.BookISBN_to_title[isbn]
         else:
             return ""
-        
+
     def getIsbn(self, bookTitle):
-        if bookTitle in self.bookTitle_to_isbn:
-            return self.bookTitle_to_isbn
+        if bookTitle in self.title_to_bookISBN:
+            return self.title_to_bookISBN
         else:
             return 0
