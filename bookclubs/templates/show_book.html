@@ -26,10 +26,12 @@
 
             {% if user.is_authenticated %}
                 {% if isInReadingList == False %}
-                  <button type="button" class="btn btn-outline-primary btn-lg"><i class="bi bi-bookmark"></i>&emsp;<a href="{% url 'create_book_status' book.ISBN %}">Add to your reading list</a></button>
+                  <button type="button" class="btn-lg btn-read"><i class="bi bi-bookmark" style="color:#52796F"></i>&emsp;
+                    <a href="{% url 'create_book_status' book.ISBN %}" style="color:#52796F">Add to your reading list</a></button>
                 {% else %}
                 <br>
-                <button type="button" class="btn btn-outline-primary btn-lg"><i class="bi bi-bookmark-check-fill"></i>&emsp;<a href="{% url 'delete_book_status' book.ISBN %}">Delete from your reading list</a></button>
+                <button type="button" class="btn-lg btn-read"><i class="bi bi-bookmark-check-fill" style="color:#52796F">
+                </i>&emsp;<a href="{% url 'delete_book_status' book.ISBN %}" style="color:#52796F">Delete from your reading list</a></button>
                 <br><br>
                 <div class="dropdown">
                   <a class="btn btn-outline-primary dropdown-toggle btn-lg" role="button" data-bs-toggle="dropdown">
@@ -43,7 +45,7 @@
                 </div>
                 {% endif %}
                 {% if readingStatus == 'F'%}
-                    <br><button type="button" class="btns btn-outline-primary btn-lg" data-bs-toggle="modal" data-bs-target="#Modal" data-bs-whatever="Create Review">Create your feedback here</button>
+                    <br><button type="button" class="btn btn-outline-primary btn-lg" data-bs-toggle="modal" data-bs-target="#Modal" data-bs-whatever="Create Review">Create your feedback here</button>
                     {% include 'create_book_rating_review.html' %}
                 {% endif %}
             {% endif %}
