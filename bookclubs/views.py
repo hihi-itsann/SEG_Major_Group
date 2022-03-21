@@ -770,7 +770,7 @@ def create_meeting(request, club_name, book_isbn):
     else:
         form = MeetingForm()
     return render(request, 'create_meeting.html',
-                  {'form': form, 'club_name': club_name, 'book_isbn': book_isbn, 'book': chosen_book})
+                  {'form': form, 'club': current_club, 'book_isbn': book_isbn, 'book': chosen_book})
 
 
 @login_required

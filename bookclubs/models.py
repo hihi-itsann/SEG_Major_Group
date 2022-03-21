@@ -316,6 +316,12 @@ class Club(models.Model):
             self.status = False
         self.save()
 
+    def get_meeting_status(self):
+        if self.meeting_status == 'ONL':
+            return 'Online'
+        else:
+            return 'In-Person'
+
 
 class Role(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

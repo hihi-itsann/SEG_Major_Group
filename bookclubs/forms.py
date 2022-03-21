@@ -252,29 +252,21 @@ class CommentForm(forms.ModelForm):
 
 
 class MeetingForm(forms.ModelForm):
-    # def __init__(self, *args, **kwargs):
-    #     self
+
 
     class Meta:
         model = Meeting
-        fields = ('topic', 'description', 'meeting_status', 'location', 'date', 'time_start', 'time_end')
+        fields = ('topic', 'description', 'location', 'date', 'time_start', 'time_end')
 
         widgets = {
             'topic': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Topic'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Agenda'}),
-            'meeting_status': forms.Select(attrs={'class': 'form-control'}),
             'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Location or Online Link'}),
             'date': forms.DateInput(attrs={'class': 'form-control', 'placeholder': 'dd/mm/yyyy'}),
             'time_start': forms.TimeInput(attrs={'class': 'form-control', 'placeholder': 'hh:mm'}),
             'time_end': forms.TimeInput(attrs={'class': 'form-control', 'placeholder': 'hh:mm'})
         }
 
-    MEETING_CHOICES = (
-        ('ONL', 'Online'),
-        ('OFF', 'In-person')
-    )
-
-    meeting_status = forms.ChoiceField(widget=forms.Select(), label='Meetings Held', choices=MEETING_CHOICES)
 
     def save(self, user=None, club=None, book=None):
         super().save(commit=False)
@@ -283,7 +275,7 @@ class MeetingForm(forms.ModelForm):
             book=book,
             topic=self.cleaned_data.get('topic'),
             description=self.cleaned_data.get('description'),
-            meeting_status=self.cleaned_data.get('meeting_status'),
+            meeting_status=club.meeting_status,
             location=self.cleaned_data.get('location'),
             date=self.cleaned_data.get('date'),
             time_start=self.cleaned_data.get('time_start'),
