@@ -40,23 +40,25 @@ def management_required(view_function):
 
     return modified_view_function
 
+
 def meeting_management_required(view_function):
     """check whether the user is an attendee or the host"""
 
     def modified_view_function(request, club_name, meeting_id, *args, **kwargs):
         current_meeting = Meeting.objects.get(id=meeting_id)
-        if MeetingAttendance.objects.filter(user=request.user, meeting=current_meeting).count() > 0:
+        if MeetingAttendance.objects.filter(user=request.user, meeting=current_meeting).count() == 1:
             role = MeetingAttendance.objects.get(user=request.user, meeting=current_meeting).meeting_role
             if role == 'H':
                 return view_function(request, club_name, meeting_id, *args, **kwargs)
             else:
-                messages.add_message(request, messages.WARNING, "You are not a host and cannot delete this meeting!")
+                messages.add_message(request, messages.WARNING, "You are not the host and cannot delete this meeting!")
                 return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
         else:
             messages.add_message(request, messages.WARNING, "You are not part of this meeting yet!")
             return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
     return modified_view_function
+
 
 def owner_required(view_function):
     """check whether the user is the owner"""
