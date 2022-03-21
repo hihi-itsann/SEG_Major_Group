@@ -12,7 +12,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.shortcuts import redirect, render, get_object_or_404
-from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, ApplicationForm, CommentForm, RateReviewForm, PostForm, NewMeetingForm, UpdateClubForm, ApplicationForm
+from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, ApplicationForm, CommentForm, RateReviewForm, PostForm, MeetingForm, UpdateClubForm, ApplicationForm
 from .helpers import *
 from .models import User, Book, Application, Comment, Post, BookRatingReview, BookStatus, Club, Meeting, \
     MeetingAttendance
@@ -322,7 +322,7 @@ def reading_book_list(request, book_genre='All'):
 @club_exists
 @membership_required
 def club_feed(request, club_name):
-    is_officer = False
+    is_moderator = False
     is_owner = False
     current_club = Club.objects.get(club_name=club_name)
     club_role = current_club.get_club_role(request.user)
@@ -330,10 +330,10 @@ def club_feed(request, club_name):
     management = current_club.get_management()
     if club_role == 'OWN':
         is_owner = True
-    elif club_role == 'OFF':
-        is_officer = True
+    elif club_role == 'MOD':
+        is_moderator = True
     return render(request, 'club_feed.html',
-                  {'club': current_club, 'is_officer': is_officer, 'is_owner': is_owner, 'members': members,
+                  {'club': current_club, 'is_moderator': is_moderator, 'is_owner': is_owner, 'members': members,
                    'management': management})
 
 
@@ -755,16 +755,16 @@ def create_meeting(request, club_name, book_isbn):
     """Creates a new meeting within a club"""
     current_club = Club.objects.get(club_name=club_name)
     chosen_book = Book.objects.get(ISBN=book_isbn)
+    form = MeetingForm(request.POST)
     if request.method == 'POST':
-        form = NewMeetingForm(request.POST)
         if form.is_valid():
             form.save(request.user, current_club, chosen_book)
             messages.add_message(request, messages.SUCCESS, "Meeting set up!")
             return redirect('meeting_list', club_name)
     else:
-        form = NewMeetingForm()
+        form = MeetingForm()
     return render(request, 'create_meeting.html',
-                  {'form': form, 'club_name': club_name, 'book_isbn': book_isbn, 'book': chosen_book})
+                  {'form': form, 'club': current_club, 'book_isbn': book_isbn, 'book': chosen_book})
 
 
 @login_required

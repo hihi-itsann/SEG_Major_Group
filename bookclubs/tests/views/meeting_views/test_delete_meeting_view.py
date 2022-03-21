@@ -47,7 +47,7 @@ class LeaveMeetingViewTestCase(TestCase):
     def test_leave_meeting_url(self):
         self.assertEqual(self.url,f'/club/{self.club.club_name}/meeting/{self.meeting.id}/delete/')
 
-    def test_host_succssfully_delete(self):
+    def test_host_successfully_delete(self):
         self.client.login(username=self.owner.username, password="Password123")
         meeting_count_before = Meeting.objects.count()
         response = self.client.post(self.url, follow=True)
@@ -60,7 +60,7 @@ class LeaveMeetingViewTestCase(TestCase):
             fetch_redirect_response=True
         )
 
-    def test_attentee_unsuccssfully_delete(self):
+    def test_attendee_unsuccessfully_delete(self):
         Role.objects.create(user=self.member, club=self.club, club_role='MEM')
         MeetingAttendance.objects.create(
             user = self.member,
@@ -82,7 +82,7 @@ class LeaveMeetingViewTestCase(TestCase):
         self.assertEqual(len(messages_list), 1)
         self.assertEqual(messages_list[0].level, messages.WARNING)
 
-    def test_user_not_in_this_meeting_unsuccssfully_delete(self):
+    def test_user_not_in_this_meeting_unsuccessfully_delete(self):
         Role.objects.create(user=self.member, club=self.club, club_role='MEM')
         self.client.login(username=self.member.username, password="Password123")
         meeting_count_before = Meeting.objects.count()
@@ -99,7 +99,7 @@ class LeaveMeetingViewTestCase(TestCase):
         self.assertEqual(len(messages_list), 1)
         self.assertEqual(messages_list[0].level, messages.WARNING)
 
-    def test_membership_required_when_role_is_ban(self):
+    def test_membership_required_when_user_is_banned(self):
         Role.objects.create(user=self.member, club=self.club, club_role='BAN')
         self.client.login(username=self.member.username, password="Password123")
         response = self.client.post(self.url, follow=True)
@@ -109,7 +109,7 @@ class LeaveMeetingViewTestCase(TestCase):
         self.assertEqual(len(messages_list), 1)
         self.assertEqual(messages_list[0].level, messages.WARNING)
 
-    def test_membership_required_when_does_not_has_role(self):
+    def test_membership_required_when_user_not_in_club(self):
         self.client.login(username=self.member.username, password="Password123")
         response = self.client.post(self.url, follow=True)
         redirect_url = reverse('feed')
@@ -118,7 +118,7 @@ class LeaveMeetingViewTestCase(TestCase):
         self.assertEqual(len(messages_list), 1)
         self.assertEqual(messages_list[0].level, messages.WARNING)
 
-    def test_get_redirect_when_club_do_not_exist(self):
+    def test_get_redirect_when_club_does_not_exist(self):
         Role.objects.create(user=self.member, club=self.club, club_role='MEM')
         url = reverse(self.VIEW, kwargs={'club_name': 'WrongClubName', 'meeting_id': self.meeting.id})
         self.client.login(username=self.member.username, password="Password123")
@@ -129,7 +129,7 @@ class LeaveMeetingViewTestCase(TestCase):
         self.assertEqual(len(messages_list), 1)
         self.assertEqual(messages_list[0].level, messages.WARNING)
 
-    def test_get_redirect_when_meeting_do_not_exist(self):
+    def test_get_redirect_when_meeting_does_not_exist(self):
         Role.objects.create(user=self.member, club=self.club, club_role='MEM')
         url = reverse(self.VIEW, kwargs={'club_name': self.club.club_name, 'meeting_id': 999})
         self.client.login(username=self.member.username, password="Password123")

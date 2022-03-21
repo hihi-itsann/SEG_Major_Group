@@ -7,6 +7,7 @@ from django.db.models import Avg
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+
 # class Country(models.Model):
 #     name = models.CharField(max_length=30)
 #
@@ -21,7 +22,7 @@ from django.utils.translation import gettext_lazy as _
 #         return self.name
 
 class User(AbstractUser):
-    userID=models.IntegerField(unique=True, null=True)
+    userID = models.IntegerField(unique=True, null=True)
     username = models.CharField(
         max_length=30,
         unique=True,
@@ -91,7 +92,7 @@ class Book(models.Model):
     image_url_s = models.URLField(blank=False)
     image_url_m = models.URLField(blank=False)
     image_url_l = models.URLField(blank=False)
-    genre=models.CharField(max_length=100, blank=True)
+    genre = models.CharField(max_length=100, blank=True)
 
     def getAverageRate(self):
         return self.bookratingreview_set.all().aggregate(Avg('rate'))['rate__avg']
@@ -118,7 +119,6 @@ class BookRatingReview(models.Model):
 
     class Meta:
         ordering = ['-created_at']
-
 
 
 class BookStatus(models.Model):
@@ -213,7 +213,6 @@ class Club(models.Model):
     )
     # country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True)
     # city = models.ForeignKey(City, on_delete=models.CASCADE, null=True)
-
 
     public_status = models.CharField(
         choices=PRIVACY_CHOICES,
@@ -317,6 +316,13 @@ class Club(models.Model):
             self.status = False
         self.save()
 
+    def get_meeting_status(self):
+        if self.meeting_status == 'ONL':
+            return 'Online'
+        else:
+            return 'In-Person'
+
+
 class Role(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     club = models.ForeignKey(Club, on_delete=models.CASCADE)
@@ -335,6 +341,7 @@ class Role(models.Model):
 
     def get_club_role(self):
         return self.RoleOptions(self.club_role).name.title()
+
 
 class Post(models.Model):
     title = models.CharField(max_length=255)
@@ -375,7 +382,7 @@ class Meeting(models.Model):
     description = models.TextField(max_length=520, blank=True)
     meeting_status = models.CharField(choices=MEETING_CHOICES, default='OFF', max_length=3)
     location = models.CharField(max_length=120, blank=False)
-    date = models.DateTimeField(blank=False)
+    date = models.DateField(blank=False)
     time_start = models.TimeField(blank=False)
     time_end = models.TimeField(blank=False)
 
@@ -390,6 +397,18 @@ class Meeting(models.Model):
 
     def get_host(self):
         return MeetingAttendance.objects.get(meeting=self, meeting_role='H').user
+
+    def get_meeting_status(self):
+        if self.meeting_status == 'ONL':
+            return 'Online'
+        else:
+            return 'In-Person'
+
+    def get_location(self):
+        if self.meeting_status == 'ONL':
+            return f'Meeting Link: {self.location}'
+        else:
+            return f'Meeting Held: {self.location} {self.club.city} {self.club.country}'
 
     class Meta:
         ordering = ['-date']
@@ -412,10 +431,10 @@ class ClubBookAverageRating(models.Model):
     club = models.ForeignKey(Club, on_delete=models.CASCADE)
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     rate = models.FloatField(default=0, validators=[MinValueValidator(0.0), MaxValueValidator(10.0)])
-    number_of_ratings=models.IntegerField()
+    number_of_ratings = models.IntegerField()
 
     def add_rating(self, rate):
-        self.rate+=rate
+        self.rate += rate
 
     def increment_number_of_ratings(self):
-        self.number_of_ratings+=1
+        self.number_of_ratings += 1
