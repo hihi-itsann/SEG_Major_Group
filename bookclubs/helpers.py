@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect
+from datetime import datetime
 
 from .models import Club, Role, Application, Book, Meeting, MeetingAttendance
 
@@ -218,3 +219,21 @@ def club_and_meeting_exists(view_function):
             return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
     return modified_view_function
+
+def not_last_host(view_function):
+
+    def modified_view_function(request, club_name, *args, **kwargs):
+        current_club = Club.objects.get(club_name=club_name)
+        latest_meeting = Meeting.objects.filter(club=current_club).order_by('-id')[0]
+        current_date = datetime.now().date()
+
+        if MeetingAttendance.objects.filter(meeting=latest_meeting, user=request.user, meeting_role='H').count() == 1 and current_date < latest_meeting.date:
+            messages.add_message(request, messages.WARNING, "You were the last person to create a meeting. Please "
+                                                            "wait until this meeting has passed or another person "
+                                                            "creates a meeting.")
+            return redirect('meeting_list', club_name)
+        else:
+            return view_function(request, club_name, *args, **kwargs)
+
+    return modified_view_function
+

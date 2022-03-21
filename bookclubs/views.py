@@ -18,6 +18,7 @@ from .models import User, Book, Application, Comment, Post, BookRatingReview, Bo
     MeetingAttendance
 from django.core.paginator import Paginator
 from random import choice
+from datetime import datetime
 
 
 @login_prohibited
@@ -729,6 +730,7 @@ class DeleteCommentView(LoginRequiredMixin, DeleteView):
 @login_required
 @club_exists
 @membership_required
+@not_last_host
 def show_book_recommendations(request, club_name):
     """Choose a book for the meeting"""
     # get_club_books_average_rating()
@@ -775,13 +777,21 @@ def create_meeting(request, club_name, book_isbn):
 @club_exists
 @membership_required
 def meeting_list(request, club_name):
-    """Shows all the meetings to members of the club"""
+    """Shows all current and future meetings to members of the club"""
     current_club = Club.objects.get(club_name=club_name)
     meetings = Meeting.objects.filter(club=current_club)
-    meetings_count = meetings.count()
+    current_date = datetime.now().date()
+    current_meeting_ids = []
+    past_meeting_ids = []
+    for meeting in meetings:
+        if current_date > meeting.date:
+            past_meeting_ids.append(meeting.id)
+        else:
+            current_meeting_ids.append(meeting.id)
+    current_meetings = Meeting.objects.filter(id__in=current_meeting_ids)
+    past_meetings = Meeting.objects.filter(id__in=past_meeting_ids)
     return render(request, 'meeting_list.html',
-                  {'club_name': club_name, 'meetings': meetings,
-                   'meetings_count': meetings_count})
+                  {'club_name': club_name, 'past_meetings': past_meetings, 'current_meetings': current_meetings})
 
 
 @login_required
@@ -826,3 +836,19 @@ def delete_meeting(request, club_name, meeting_id):
     MeetingAttendance.objects.filter(user=request.user, meeting=meeting).delete()
     meeting.delete()
     return redirect('meeting_list', club_name)
+
+@login_required
+@club_exists
+@meeting_management_required
+def edit_meeting(request, club_name, meeting_id):
+    """Deletes current application and replaces it with another application with updated statement"""
+    club_applied = Club.objects.get(club_name=club_name)
+    application = Application.objects.get(user=request.user, club=club_applied)
+    application_id = application.id
+    form = ApplicationForm(request.POST)
+    if request.method == 'POST':
+        if form.is_valid():
+            form.update(application_id)
+            messages.add_message(request, messages.SUCCESS, "Application edited successfully!")
+            return redirect('my_applications')
+    return render(request, 'edit_application.html', {'form': form, 'club_name': club_name})

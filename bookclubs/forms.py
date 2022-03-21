@@ -252,12 +252,9 @@ class CommentForm(forms.ModelForm):
 
 
 class MeetingForm(forms.ModelForm):
-
-
     class Meta:
         model = Meeting
         fields = ('topic', 'description', 'location', 'date', 'time_start', 'time_end')
-
         widgets = {
             'topic': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Topic'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Agenda'}),
@@ -266,7 +263,6 @@ class MeetingForm(forms.ModelForm):
             'time_start': forms.TimeInput(attrs={'class': 'form-control', 'placeholder': 'hh:mm'}),
             'time_end': forms.TimeInput(attrs={'class': 'form-control', 'placeholder': 'hh:mm'})
         }
-
 
     def save(self, user=None, club=None, book=None):
         super().save(commit=False)
@@ -288,16 +284,13 @@ class MeetingForm(forms.ModelForm):
         )
         return meeting
 
-    # def update(self, meeting_id=None, book=None):
-    #     super().save(commit=False)
-    #     meeting = Meeting.objects.get(
-    #         club=club,
-    #         book=book,
-    #         topic=self.cleaned_data.get('topic'),
-    #         description=self.cleaned_data.get('description'),
-    #         meeting_status=self.cleaned_data.get('meeting_status'),
-    #         location=self.cleaned_data.get('location'),
-    #         date=self.cleaned_data.get('date'),
-    #         time_start=self.cleaned_data.get('time_start'),
-    #         time_end=self.cleaned_data.get('time_end')
-    #     )
+    def update(self, meeting_id=None):
+        super().save(commit=False)
+        meeting = Meeting.objects.get(id=meeting_id)
+        meeting.topic = self.cleaned_data.get('topic'),
+        meeting.description = self.cleaned_data.get('description'),
+        meeting.location = self.cleaned_data.get('location'),
+        meeting.date = self.cleaned_data.get('date'),
+        meeting.time_start = self.cleaned_data.get('time_start'),
+        meeting.time_end = self.cleaned_data.get('time_end')
+        meeting.save()
