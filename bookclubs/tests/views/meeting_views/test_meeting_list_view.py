@@ -6,6 +6,8 @@ from bookclubs.tests.helpers import reverse_with_next
 
 
 class MeetingListViewTestCase(TestCase):
+    """Tests for the viewing a list of the clubs meetings"""
+
     VIEW = 'meeting_list'
 
     fixtures = [

@@ -6,7 +6,7 @@ from bookclubs.models import User, Club, Meeting, Role, Book, MeetingAttendance
 
 
 class LeaveMeetingViewTestCase(TestCase):
-    """Tests for the creation of a meeting"""
+    """Tests for the deletion of a meeting"""
 
     VIEW = 'delete_meeting'
 
