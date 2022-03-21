@@ -13,6 +13,7 @@
                               <th scope="col"></th>
                               <th scope="col">Topic</th>
                               <th scope="col">Host</th>
+                              <th scope="col">Date</th>
                               <th scope="col">Held</th>
                               <th scope="col"></th>
                           </tr>
@@ -22,6 +23,7 @@
                                     <td><a href="{% url 'show_book' meeting.book.ISBN %}">{{ meeting.book.title }}</a></td>
                                     <td>{{ meeting.topic }}</td>
                                     <td><a href="{% url 'show_user' meeting.get_host.username %}"> {{ meeting.get_host.full_name }} </a></td>
+                                    <td>{{ meeting.date.day }}/{{ meeting.date.month }}/{{ meeting.date.year }}</td>
                                     <td>{{ meeting.get_meeting_status }}</td>
                                     <td><a href="{% url 'show_meeting' club_name=club_name meeting_id=meeting.id %}"> See More </a></td>
                                 </tr>
