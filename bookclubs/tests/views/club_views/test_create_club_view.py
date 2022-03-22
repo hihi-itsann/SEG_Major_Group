@@ -107,10 +107,8 @@ class CreateClubViewTestCase(TestCase):
         self.form_input_online_private['club_name'] = ''
         self.client.login(username=self.user.username, password='Password123')
         before_count = Club.objects.count()
-        # print(before_count)
         response = self.client.post(self.url, self.form_input_online_private, follow=True)
         after_count = Club.objects.count()
-        # print(after_count)
         self.assertEqual(after_count, before_count)
         response = self.client.post(self.url, self.form_input_online_private)
         self.assertEqual(response.status_code, 200)
@@ -141,10 +139,8 @@ class CreateClubViewTestCase(TestCase):
         self.form_input_in_person_private['club_name'] = ''
         self.client.login(username=self.user.username, password='Password123')
         before_count = Club.objects.count()
-        # print(before_count)
         response = self.client.post(self.url, self.form_input_in_person_private, follow=True)
         after_count = Club.objects.count()
-        # print(after_count)
         self.assertEqual(after_count, before_count)
         response = self.client.post(self.url, self.form_input_in_person_private)
         self.assertEqual(response.status_code, 200)
@@ -175,10 +171,8 @@ class CreateClubViewTestCase(TestCase):
         self.form_input_in_person_public['club_name'] = ''
         self.client.login(username=self.user.username, password='Password123')
         before_count = Club.objects.count()
-        # print(before_count)
         response = self.client.post(self.url, self.form_input_in_person_public, follow=True)
         after_count = Club.objects.count()
-        # print(after_count)
         self.assertEqual(after_count, before_count)
         response = self.client.post(self.url, self.form_input_in_person_public)
         self.assertEqual(response.status_code, 200)
