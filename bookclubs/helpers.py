@@ -229,7 +229,7 @@ def not_last_host(view_function):
             latest_meeting_id = Meeting.objects.filter(club=current_club).latest('id').id
             latest_meeting = Meeting.objects.get(id=latest_meeting_id)
             if MeetingAttendance.objects.filter(meeting=latest_meeting, user=request.user,
-                                                meeting_role='H').count() == 1 and current_date > latest_meeting.date:
+                                                meeting_role='H').count() == 1 and current_date < latest_meeting.date:
                 messages.add_message(request, messages.WARNING, "You were the last person to create a meeting. Please "
                                                                 "wait until this meeting has passed or another person "
                                                                 "creates a meeting.")
