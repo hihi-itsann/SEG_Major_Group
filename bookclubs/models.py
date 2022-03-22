@@ -410,7 +410,6 @@ class Meeting(models.Model):
 
     def get_location(self):
         if self.meeting_status == 'ONL':
-            print(datetime.datetime.now().time())
             if not self.get_is_time():
                 return f"Meeting Link will be available when it's time"
             else:
