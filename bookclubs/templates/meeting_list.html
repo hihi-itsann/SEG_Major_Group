@@ -1,10 +1,11 @@
 {% extends 'base_content.html' %}
 {% block content %}
 <div class="container">
-      <div class="col-xs-12 col-lg-6 col-xl-8">
+      <div>
           <br>
           <h1>{{ club.club_name }} Meetings</h1>
           <div>
+          {% if current_meetings.count > 0 %}
               <hr class="row-divider">
                   <div>
                       <table class="table table-striped">
@@ -17,19 +18,24 @@
                               <th scope="col">Held</th>
                               <th scope="col"></th>
                           </tr>
-                            {% for meeting in meetings %}
+                            {% for meeting in current_meetings %}
                                 <tr>
                                     <td><img src="{{ meeting.book.image_url_m }}" alt="Book Cover"></td>
                                     <td><a href="{% url 'show_book' meeting.book.ISBN %}">{{ meeting.book.title }}</a></td>
                                     <td>{{ meeting.topic }}</td>
                                     <td><a href="{% url 'show_user' meeting.get_host.username %}"> {{ meeting.get_host.full_name }} </a></td>
-                                    <td>{{ meeting.date.day }}/{{ meeting.date.month }}/{{ meeting.date.year }}</td>
+                                    <td>{{ meeting.date }}</td>
                                     <td>{{ meeting.get_meeting_status }}</td>
                                     <td><a href="{% url 'show_meeting' club_name=club_name meeting_id=meeting.id %}"> See More </a></td>
                                 </tr>
                             {% endfor %}
                         </table>
                   </div>
+              {% else %}
+                <h5>There aren't any meetings currently set up for this club!</h5>
+                    <button type="button" class="btn btn-outline-dark"><a
+                            href="{% url 'show_book_recommendations' club_name=club_name %}">Create Meeting</a></button>
+          {% endif %}
           </div>
       </div>
   </div>

@@ -5,23 +5,24 @@
             <div class="col-lg-8 col-xl-6">
                 <div class="card rounded-3">
                     <div class="card-body p-4 p-md-5">
-                        <h2 class="mb-4 pb-2 pb-md-0 mb-md-5 px-md-2" style="color:#2F3E46"><b>New Meeting</b>
+                        <h2 class="mb-4 pb-2 pb-md-0 mb-md-5 px-md-2" style="color:#2F3E46"><b>Edit Meeting #{{ meeting.id }}</b>
                         </h2>
 
                         <h4>The book you have chosen is :</h4>
-                        <h3><b>{{ book.title }}</b> </h3>
+                        <h3><b>{{ meeting.book.title }}</b> </h3>
                         <div style="display: flex; justify-content: center; padding: inherit">
-                            <img src="{{ book.image_url_m }}" alt="Book Cover">
+                            <img src="{{ meeting.book.image_url_m }}" alt="Book Cover">
                         </div>
-                        <p style="font-size: large;">Meeting will be held <b>{{ club.get_meeting_status }}</b></p>
+                        <p style="font-size: small; line-height: 3px;">If you wish to change this, please cancel this meeting and create a new one.</p>
+                        <p style="font-size: large;">Meeting will be held <b>{{ meeting.get_meeting_status }}</b></p>
                         <p style="font-size: small; line-height: 3px;">(Decision made at the discretion of the club
                             owner)</p>
-                    <form class="px-md-2" action="{% url 'create_meeting' club.club_name book.ISBN %}" method="post" style="color:#2F3E46">
+                    <form action="{% url 'edit_meeting' club_name meeting.id %}" class="px-md-2" method="post" style="color:#2F3E46">
                         <div class="row">
                             <div class="col">
                         {% csrf_token %}
                         {% include 'partials/bootstrap_form.html' with form=form %}
-                        <button type="submit" class="btn btn-outline-dark">Host</button>
+                        <button type="submit" class="btn btn-outline-dark">Edit</button>
                      </div>
                   </div>
                     </form>
@@ -31,3 +32,4 @@
     </div>
     </div>
 {% endblock %}
+

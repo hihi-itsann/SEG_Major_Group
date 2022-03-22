@@ -267,3 +267,14 @@ h3.profile-title {
    background-color:#AEC3B0;
    color:#52796F;
  }
+
+ .btn-read{
+   border-color: #AEC3B0;
+   background-color: #EFF6E0;
+   color:#124559;
+ }
+
+ .btn-read:hover{
+   background-color:#CAD2C5;
+   color:#52796F;
+ }

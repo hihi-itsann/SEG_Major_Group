@@ -39,7 +39,7 @@ class MeetingFormTestCase(TestCase):
         form = MeetingForm(data=self.form_input)
         before_count_meeting = Meeting.objects.count()
         before_count_attendance = MeetingAttendance.objects.count()
-        form.save(self.user, self.club, self.book)
+        form.original_save(self.user, self.club, self.book)
         after_count_meeting = Meeting.objects.count()
         after_count_attendance = MeetingAttendance.objects.count()
         self.assertEqual(after_count_meeting, before_count_meeting + 1)

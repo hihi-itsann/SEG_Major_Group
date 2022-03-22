@@ -200,6 +200,8 @@ class ApplicationForm(forms.ModelForm):
     class Meta:
         model = Application
         fields = ['statement']
+        widgets = {'statement': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Why do you want to '
+                                                                                              'join this club?'}),}
 
     def save(self, user=None, club=None):
         super().save(commit=False)
@@ -252,8 +254,6 @@ class CommentForm(forms.ModelForm):
 
 
 class MeetingForm(forms.ModelForm):
-
-
     class Meta:
         model = Meeting
         fields = ('topic', 'description', 'location', 'date', 'time_start', 'duration')
@@ -268,7 +268,7 @@ class MeetingForm(forms.ModelForm):
         }
 
 
-    def save(self, user=None, club=None, book=None, join_link=None, start_link=None):
+    def original_save(self, user=None, club=None, book=None, join_link=None, start_link=None):
         super().save(commit=False)
         meeting = Meeting.objects.create(
             club=club,
@@ -290,16 +290,14 @@ class MeetingForm(forms.ModelForm):
         )
         return meeting
 
-    # def update(self, meeting_id=None, book=None):
-    #     super().save(commit=False)
-    #     meeting = Meeting.objects.get(
-    #         club=club,
-    #         book=book,
-    #         topic=self.cleaned_data.get('topic'),
-    #         description=self.cleaned_data.get('description'),
-    #         meeting_status=self.cleaned_data.get('meeting_status'),
-    #         location=self.cleaned_data.get('location'),
-    #         date=self.cleaned_data.get('date'),
-    #         time_start=self.cleaned_data.get('time_start'),
-    #         time_end=self.cleaned_data.get('time_end')
-    #     )
+    def update(self, meeting_id=None):
+        super().save(commit=False)
+        meeting = Meeting.objects.get(id=meeting_id)
+        # meeting.topic = self.cleaned_data.get('topic'),
+        # meeting.description = self.cleaned_data.get('description'),
+        # meeting.location = self.cleaned_data.get('location'),
+        # meeting.date = self.cleaned_data.get('date'),
+        # meeting.time_start = self.cleaned_data.get('time_start'),
+        # meeting.time_end = self.cleaned_data.get('time_end')
+        meeting.save(force_update=['topic',
+        'description', 'location', 'date', 'time_start', 'time_end'])

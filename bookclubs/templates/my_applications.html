@@ -67,7 +67,7 @@
                                         <td> {{ application.get_status_display }} </td>
                                         <td>
                                             {% if application.status == 'P' %}
-                                                <a href="{% url 'edit_application' application.club.club_name %}" class="btn btn-normal">
+                                                <a href="{% url 'edit_application' application.club.club_name %}" class="btn btn-outline-dark">
                                                     Edit
                                                 </a>
 
@@ -76,7 +76,7 @@
                                         <td>
                                             {% if application.status == 'P' %}
                                                 <a href="{% url 'withdraw_application' application.club.club_name %}"
-                                                   class="btn btn-normal">
+                                                   class="btn btn-outline-dark">
                                                     Withdraw
                                                 </a>
                                             {% endif %}

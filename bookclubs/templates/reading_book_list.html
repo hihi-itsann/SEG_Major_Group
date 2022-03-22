@@ -1,54 +1,79 @@
 {% extends 'base_content.html' %}
 {% block content %}
     <br>
-    <div class="container">
-      <div class = "row">
-        <h1>Reading List</h1>
-        <hr>
-          <div class="btn-group-mg">
-          <a href="{% url 'reading_book_list' 'All' %}"class="btn btn-normal">All</a>
-          {% for genre in genres %}
-            <a href="{% url 'reading_book_list' genre %}"class="btn btn-normal">{{ genre }}</a>
-          {% endfor %}
-        </div>
-        <div class="col-sm-4" style="background-color: #FFFFE0">
-          <h2>Unread Books</h2><br>
-          {% if not unreadBooks %}
-            <h5 >Empty</h5>
-          {% else %}
-            {% for book in unreadBooks%}
-                <img src="{{ book.image_url_m }}">
-                <h5><a href="{% url 'show_book' book.ISBN %}">{{ book.title }}</a></h5>
-                <br>
-            {% endfor %}
-          {% endif %}
-        </div>
+    <header class="text-center" style="color:#2F3E46">
+        <h1 class="fw-light">My Reading List</h1>
+    </header>
 
-        <div class="col-sm-4"style="background-color: #FFFACD">
-          <h2>Reading Books</h2><br>
-          {% if not readingBooks %}
-            <h5 >Empty</h5>
-          {% else %}
-            {% for book in readingBooks%}
-                <img src="{{ book.image_url_m }}">
-                <h5><a href="{% url 'show_book' book.ISBN %}">{{ book.title }}</a></h5>
-                <br>
-            {% endfor %}
-          {% endif %}
-        </div>
-
-        <div class="col-sm-4" style="background-color: #FAFAD2">
-          <h2>Finished Books</h2><br>
-          {% if not finishedBooks %}
-            <h5 >Empty</h5>
-          {% else %}
-            {% for book in finishedBooks%}
-                <img src="{{ book.image_url_m }}">
-                <h5><a href="{% url 'show_book' book.ISBN %}">{{ book.title }}</a></h5>
-                <br>
-            {% endfor %}
-          {% endif %}
-        </div>
-      </div>
+    <!--Genre buttons-->
+    <div class="btn-group-mg">
+      <a href="{% url 'reading_book_list' 'All' %}"class="btn btn-normal">All</a>
+      {% for genre in genres %}
+        <a href="{% url 'reading_book_list' genre %}"class="btn btn-normal">{{ genre }}</a>
+      {% endfor %}
     </div>
+
+    <!-- Page Content -->
+    <div class="container">
+      <div class="row">
+        <!-- Team Member 1 -->
+        <div class="col-xl-4 col-md-6 mb-4">
+          <div class="card border-0 shadow">
+            <div class="card-body text-center">
+              <img src="../../static/images/unread2.jpeg" class="card-img-top">
+              <h5 class="card-title mb-0">Unread Books</h5>
+              <br>
+              {% if not unreadBooks %}
+                <h5 >Empty</h5>
+              {% else %}
+                {% for book in unreadBooks%}
+                    <img src="{{ book.image_url_m }}">
+                    <h5><a href="{% url 'show_book' book.ISBN %}">{{ book.title }}</a></h5>
+                    <br>
+                {% endfor %}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <!-- Team Member 2 -->
+        <div class="col-xl-4 col-md-6 mb-4">
+          <div class="card border-0 shadow">
+            <div class="card-body text-center">
+              <img src="../../static/images/currently.png" class="card-img-top">
+              <h5 class="card-title mb-0">Reading Books</h5>
+              <br>
+              {% if not readingBooks %}
+                <h5 >Empty</h5>
+              {% else %}
+                {% for book in readingBooks%}
+                    <img src="{{ book.image_url_m }}">
+                    <h5><a href="{% url 'show_book' book.ISBN %}">{{ book.title }}</a></h5>
+                    <br>
+                {% endfor %}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <!-- Team Member 3 -->
+        <div class="col-xl-4 col-md-6 mb-4">
+          <div class="card border-0 shadow">
+            <img src="../../static/images/finished.jpg" class="card-img-top">
+            <div class="card-body text-center">
+              <h5 class="card-title mb-0"><em>Finished Books</em></h5>
+              {% if not finishedBooks %}
+                <h5 >Empty</h5>
+              {% else %}
+                {% for book in finishedBooks%}
+                    <img src="{{ book.image_url_m }}">
+                    <h5><a href="{% url 'show_book' book.ISBN %}">{{ book.title }}</a></h5>
+                    <br>
+                {% endfor %}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      <!-- /.row -->
+
+    </div>
+    <!-- /.container -->
 {% endblock %}
