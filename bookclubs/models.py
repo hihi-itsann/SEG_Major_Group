@@ -238,7 +238,6 @@ class Club(models.Model):
     )
 
     genre = models.CharField(
-        choices=Book.get_genres(),
         max_length=100,
         default='Fiction',
         blank=False
