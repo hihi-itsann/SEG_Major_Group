@@ -270,7 +270,7 @@ def own_feedback_exists(view_function):
     return modified_view_function
 
 def bookStatus_does_not_exists(view_function):
-    """check whether the book_and_book_rating_review exists"""
+    """check whether the book status exists"""
 
     def modified_view_function(request, ISBN, *args, **kwargs):
         book = Book.objects.get(ISBN=ISBN)
@@ -283,7 +283,7 @@ def bookStatus_does_not_exists(view_function):
     return modified_view_function
 
 def bookStatus_exists(view_function):
-    """check whether the book_and_book_rating_review exists"""
+    """check whether the book status exists"""
 
     def modified_view_function(request, ISBN, *args, **kwargs):
         book = Book.objects.get(ISBN=ISBN)
