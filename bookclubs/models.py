@@ -1,3 +1,4 @@
+import datetime
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator, MinLengthValidator, MinValueValidator, MaxValueValidator
 from django.db import models
@@ -384,7 +385,15 @@ class Meeting(models.Model):
     location = models.CharField(max_length=120, blank=False)
     date = models.DateField(blank=False)
     time_start = models.TimeField(blank=False)
-    time_end = models.TimeField(blank=False)
+    duration = models.IntegerField(blank=False, default=30)
+    join_link = models.URLField(blank=True)
+    start_link = models.URLField(blank=True)
+    def get_time_end(self):
+        time1 = self.time_start
+        timedelta = datetime.timedelta(minutes=self.duration)
+        tmp_datetime = datetime.datetime.combine(self.date, time1)
+        time2 = (tmp_datetime + timedelta).time()
+        return time2
 
     def is_attending(self, user):
         return (MeetingAttendance.objects.filter(meeting=self, user=user)).count() == 1
@@ -404,9 +413,18 @@ class Meeting(models.Model):
         else:
             return 'In-Person'
 
+    def get_is_time(self):
+        return datetime.datetime.now().date()==self.date and datetime.datetime.now().time() > self.time_start and datetime.datetime.now().time() < self.get_time_end()
+
     def get_location(self):
         if self.meeting_status == 'ONL':
-            return f'Meeting Link: {self.location}'
+            print(datetime.datetime.now().time())
+            if not self.get_is_time():
+                return f"Meeting Link will be available when it's time"
+            else:
+                return f"It's time to join the meeting!"
+
+            
         else:
             return f'Meeting Held: {self.location} {self.club.city} {self.club.country}'
 

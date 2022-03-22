@@ -256,19 +256,19 @@ class MeetingForm(forms.ModelForm):
 
     class Meta:
         model = Meeting
-        fields = ('topic', 'description', 'location', 'date', 'time_start', 'time_end')
+        fields = ('topic', 'description', 'location', 'date', 'time_start', 'duration')
 
         widgets = {
             'topic': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Topic'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Agenda'}),
             'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Location or Online Link'}),
-            'date': forms.DateInput(attrs={'class': 'form-control', 'placeholder': 'dd/mm/yyyy'}),
+            'date': forms.DateInput(attrs={'class': 'form-control', 'format':"%Y-%m-%d",'placeholder': 'yyyy-mm-dd'}),
             'time_start': forms.TimeInput(attrs={'class': 'form-control', 'placeholder': 'hh:mm'}),
-            'time_end': forms.TimeInput(attrs={'class': 'form-control', 'placeholder': 'hh:mm'})
+            'duration': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Minutes'})
         }
 
 
-    def save(self, user=None, club=None, book=None):
+    def save(self, user=None, club=None, book=None, join_link=None, start_link=None):
         super().save(commit=False)
         meeting = Meeting.objects.create(
             club=club,
@@ -279,7 +279,9 @@ class MeetingForm(forms.ModelForm):
             location=self.cleaned_data.get('location'),
             date=self.cleaned_data.get('date'),
             time_start=self.cleaned_data.get('time_start'),
-            time_end=self.cleaned_data.get('time_end')
+            duration=self.cleaned_data.get('duration'),
+            join_link=join_link,
+            start_link=start_link
         )
         host = MeetingAttendance.objects.create(
             user=user,

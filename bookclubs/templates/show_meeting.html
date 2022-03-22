@@ -15,7 +15,7 @@
                 <br>
                 <p>Date: {{ meeting.date.day }}/{{ meeting.date.month }}/{{ meeting.date.year }}</p>
                 <p>Start: {{ meeting.time_start }}</p>
-                <p>End: {{ meeting.time_end }}</p>
+                <p>End: {{ meeting.get_time_end }}</p>
                 <br>
                 {% if is_host or is_attendee_only %}
                     <p>{{ meeting.get_meeting_status }}</p>
@@ -23,9 +23,13 @@
                 {% endif %}
                 {% if is_host %}
                     <button type="button" class="btn btn-outline-dark"><a
-                            href="{% url 'delete_meeting' club_name=club_name meeting_id=meeting.id %}">Cancel
-                        Meeting</a></button>
-                {% else %}
+                        href="{% url 'delete_meeting' club_name=club_name meeting_id=meeting.id %}">Cancel
+                    Meeting</a></button>
+                    {% if meeting.get_meeting_status == 'Online' and meeting.get_is_time %}
+                        <button type="button" class="btn btn-outline-dark"><a
+                            href={{meeting.start_link}}>Start meeting</a></button>
+                    {% endif %}  
+                        {% else %}
                     {% if is_attendee_only %}
 
 
@@ -34,6 +38,11 @@
                         <button type="button" class="btn btn-outline-dark">
                             <a href="{% url 'leave_meeting' club_name=club_name meeting_id=meeting.id %}">Not Going</a>
                         </button>
+                        {% if meeting.get_meeting_status == 'Online' and meeting.get_is_time %}
+                            <button type="button" class="btn btn-outline-dark">
+                                    <a href={{meeting.join_link}}>Join Now </a>
+                                </button>
+                        {% endif %}
                     {% else %}
                         <h7>Want to join us?</h7>
                         <br>

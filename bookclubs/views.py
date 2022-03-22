@@ -1,3 +1,6 @@
+from ntpath import join
+#from os import startfile
+from webbrowser import get
 from django.db.models import Q  # filter exception
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
@@ -18,7 +21,7 @@ from .models import User, Book, Application, Comment, Post, BookRatingReview, Bo
     MeetingAttendance
 from django.core.paginator import Paginator
 from random import choice
-
+from bookclubs.meeting_link import create_zoom_meeting, get_join_link, get_start_link
 
 @login_prohibited
 def home(request):
@@ -762,9 +765,20 @@ def create_meeting(request, club_name, book_isbn):
     form = MeetingForm(request.POST)
     if request.method == 'POST':
         if form.is_valid():
-            form.save(request.user, current_club, chosen_book)
+            join_link=None
+            start_link=None
+            # create_meeting()
+            if current_club.get_meeting_status()=="Online":
+                create_zoom_meeting(request.POST.get("date"),request.POST.get("time_start"),request.POST.get("duration"))
+                join_link=get_join_link()
+                start_link=get_start_link()
+        
+            form.save(request.user, current_club, chosen_book,join_link,start_link)
             messages.add_message(request, messages.SUCCESS, "Meeting set up!")
+            
+
             return redirect('meeting_list', club_name)
+
     else:
         form = MeetingForm()
     return render(request, 'create_meeting.html',
@@ -792,6 +806,7 @@ def show_meeting(request, club_name, meeting_id):
     meeting = Meeting.objects.get(id=meeting_id)
     is_host = meeting.is_host(request.user)
     is_attendee_only = meeting.is_attendee_only(request.user)
+   
     return render(request, 'show_meeting.html', {'meeting': meeting, 'club_name': club_name, 'is_host': is_host,
                                                  'is_attendee_only': is_attendee_only})
 
