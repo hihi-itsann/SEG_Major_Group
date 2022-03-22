@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect
 
-from .models import Club, Role, Application, Book, Meeting, MeetingAttendance
+from .models import Club, Role, Application, Book, BookRatingReview, Meeting, MeetingAttendance
 
 
 def login_prohibited(view_function):
@@ -215,6 +215,25 @@ def club_and_meeting_exists(view_function):
                 return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
         else:
             messages.add_message(request, messages.WARNING, "No club found with this name.")
+            return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+
+    return modified_view_function
+
+def book_and_own_feedback_exists(view_function):
+    """check whether the book_and_book_rating_review exists"""
+
+    def modified_view_function(request, ISBN, pk, *args, **kwargs):
+        if Book.objects.filter(ISBN=ISBN).count() == 1:
+            if BookRatingReview.objects.filter(id=pk, user=request.user).count() == 1:
+                return view_function(request, ISBN, pk, *args, **kwargs)
+            elif BookRatingReview.objects.filter(id=pk).count() == 1:
+                messages.add_message(request, messages.WARNING, "You have not create this feedback for this book.")
+                return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+            else:
+                messages.add_message(request, messages.WARNING, "No feedback with this book found with this ID.")
+                return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+        else:
+            messages.add_message(request, messages.WARNING, "No Book found with this ISBN.")
             return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
     return modified_view_function

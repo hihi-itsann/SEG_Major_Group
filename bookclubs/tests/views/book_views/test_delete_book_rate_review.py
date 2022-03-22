@@ -53,7 +53,7 @@ class DeleteBookRateViewTestCase(TestCase):
         response = self.client.delete(self.url, follow=True)
         book_feedback_count_after = BookRatingReview.objects.count()
         self.assertEqual(book_feedback_count_after, book_feedback_count_before)
-        response_url = reverse('show_book', kwargs={'ISBN': self.book.ISBN})
+        response_url = reverse('feed')
         self.assertRedirects(
             response, response_url,
             status_code=302, target_status_code=200,
