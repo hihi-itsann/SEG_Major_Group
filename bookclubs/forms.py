@@ -45,8 +45,8 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
         model = User
         fields = ['first_name', 'last_name', 'username', 'email', 'bio', 'dob', 'gender', 'location', 'city', 'country',
                   'meeting_preference']
-        widgets = {'dob': forms.DateInput(attrs={'class': 'form-control', 'format': "%Y-%m-%d", 'placeholder': 'yyyy-mm-dd'}),
-                   'bio': forms.Textarea()}
+        widgets = {'dob': forms.DateInput(attrs={'class': 'form-control', 'format': "%d/%m/%Y", 'placeholder': 'dd/mm'
+                                                                                                               '/yyyy'}), 'bio': forms.Textarea()}
 
     def save(self):
         """Create a new user."""
@@ -215,7 +215,7 @@ class MeetingForm(forms.ModelForm):
             'topic': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Topic'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Agenda'}),
             'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Location'}),
-            'date': forms.DateInput(attrs={'class': 'form-control', 'format': "%d/%m/%Y", 'placeholder': 'dd/mm/yyyy'}),
+            'date': forms.DateInput(attrs={'class': 'form-control', 'format': "%Y-%m-%d", 'placeholder': 'yyyy-mm-dd'}),
             'time_start': forms.TimeInput(attrs={'class': 'form-control', 'placeholder': 'hh:mm'}),
             'duration': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Minutes'})
         }
