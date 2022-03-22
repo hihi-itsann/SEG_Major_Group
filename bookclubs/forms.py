@@ -45,7 +45,7 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
         model = User
         fields = ['first_name', 'last_name', 'username', 'email', 'bio', 'dob', 'gender', 'location', 'city', 'country',
                   'meeting_preference']
-        widgets = {'dob': forms.DateInput(attrs={'class': 'form-control', 'format': "%d/%m/%Y", 'placeholder': 'dd/mm/yyyy'}),
+        widgets = {'dob': forms.DateInput(attrs={'class': 'form-control', 'format': "%Y-%m-%d", 'placeholder': 'yyyy-mm-dd'}),
                    'bio': forms.Textarea()}
 
     def save(self):
