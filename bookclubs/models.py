@@ -74,7 +74,8 @@ class User(AbstractUser):
 
     def get_clubs(self):
         users_clubs = Role.objects.filter(user=self).exclude(club_role='BAN').values_list('club', flat=True)
-        return users_clubs
+        return Club.objects.filter(id__in=users_clubs)
+
 
 
 class Book(models.Model):
