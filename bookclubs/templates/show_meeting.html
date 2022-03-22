@@ -1,27 +1,32 @@
 {% extends 'base_content.html' %}
 {% block content %}
-    <div class="container">
+    <div class="container" style="padding-bottom: inherit">
         <div class="row">
-            <div class="col-lg-6 offset-2">
+            <div style="text-align: center">
                 <h1>{{ meeting.club.club_name }} Meeting #{{ meeting.id }}</h1>
-                <p>Host:</p>
-                <p><a href="{% url 'show_user' meeting.get_host.username %}"> {{ meeting.get_host.full_name }} </a>
-                </p><br>
-                <br>
+                <p><b>Host: <a href="{% url 'show_user' meeting.get_host.username %}"> {{ meeting.get_host.full_name }} </a>
+                </b></p>
+                <h3>Book to be read:</h3>
                 <h2>{{ meeting.book.title }} </h2>
-                <img src="{{ meeting.book.image_url_m }}" alt="Book Cover">
-                <h3>{{ meeting.topic }}</h3>
+                              <div style="display: flex; justify-content: center; padding: inherit">
+                            <img src="{{ meeting.book.image_url_m }}" alt="Book Cover">
+                        </div><h3>{{ meeting.topic }}</h3>
                 <p>{{ meeting.description }}</p>
-                <br>
                 <p>Date: {{ meeting.date }}</p>
                 <p>Start: {{ meeting.time_start }}</p>
                 <p>End: {{ meeting.time_end }}</p>
                 <br>
-                {% if is_host or is_attendee_only %}
-                    <p>{{ meeting.get_meeting_status }}</p>
-                    <p>{{ meeting.get_location }}</p>
-                {% endif %}
+            {% if is_host or is_attendee_only %}
+                        <p>{{ meeting.get_meeting_status }}</p>
+                        <p>{{ meeting.get_location }}</p>
+                    {% endif %}
+
+
+
                 {% if is_host %}
+                    <button type="button" class="btn btn-outline-dark"><a
+                            href="{% url 'edit_meeting' club_name=club_name meeting_id=meeting.id %}">Edit
+                        Meeting</a></button>
                     <button type="button" class="btn btn-outline-dark"><a
                             href="{% url 'delete_meeting' club_name=club_name meeting_id=meeting.id %}">Cancel
                         Meeting</a></button>
@@ -43,7 +48,6 @@
                     {% endif %}
                 {% endif %}
 
-            </div>
         </div>
-    </div>
+            </div>
 {% endblock %}

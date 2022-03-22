@@ -12,7 +12,8 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.shortcuts import redirect, render, get_object_or_404
-from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, ApplicationForm, CommentForm, RateReviewForm, PostForm, MeetingForm, UpdateClubForm, ApplicationForm
+from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, ApplicationForm, CommentForm, \
+    RateReviewForm, PostForm, MeetingForm, UpdateClubForm, ApplicationForm
 from .helpers import *
 from .models import User, Book, Application, Comment, Post, BookRatingReview, BookStatus, Club, Meeting, \
     MeetingAttendance
@@ -238,15 +239,15 @@ class CreateBookRateReviewView(LoginRequiredMixin, CreateView):
 
 @login_required
 def delete_book_rating_review(request, ISBN, pk):
-     book = Book.objects.get(ISBN=ISBN)
-     try:
-         rating_review=BookRatingReview.objects.get(book=book, id=pk, user=request.user)
-     except ObjectDoesNotExist:
-         messages.add_message(request, messages.ERROR, "You have not given that feedback!")
-         return redirect('show_book', ISBN)
-     rating_review.delete();
-     messages.add_message(request, messages.SUCCESS, "This review has successfully been deleted!")
-     return redirect('show_book', ISBN)
+    book = Book.objects.get(ISBN=ISBN)
+    try:
+        rating_review = BookRatingReview.objects.get(book=book, id=pk, user=request.user)
+    except ObjectDoesNotExist:
+        messages.add_message(request, messages.ERROR, "You have not given that feedback!")
+        return redirect('show_book', ISBN)
+    rating_review.delete();
+    messages.add_message(request, messages.SUCCESS, "This review has successfully been deleted!")
+    return redirect('show_book', ISBN)
 
 
 @login_required
@@ -764,7 +765,7 @@ def create_meeting(request, club_name, book_isbn):
     form = MeetingForm(request.POST)
     if request.method == 'POST':
         if form.is_valid():
-            form.save(request.user, current_club, chosen_book)
+            form.original_save(request.user, current_club, chosen_book)
             messages.add_message(request, messages.SUCCESS, "Meeting set up!")
             return redirect('meeting_list', club_name)
     else:
@@ -837,18 +838,19 @@ def delete_meeting(request, club_name, meeting_id):
     meeting.delete()
     return redirect('meeting_list', club_name)
 
+
 @login_required
-@club_exists
+@club_and_meeting_exists
 @meeting_management_required
 def edit_meeting(request, club_name, meeting_id):
-    """Deletes current application and replaces it with another application with updated statement"""
-    club_applied = Club.objects.get(club_name=club_name)
-    application = Application.objects.get(user=request.user, club=club_applied)
-    application_id = application.id
-    form = ApplicationForm(request.POST)
+    """Edit details of meeting"""
+    current_club = Club.objects.get(club_name=club_name)
+    meeting = Meeting.objects.get(id=meeting_id)
+    form = MeetingForm(request.POST, instance=meeting)
     if request.method == 'POST':
         if form.is_valid():
-            form.update(application_id)
-            messages.add_message(request, messages.SUCCESS, "Application edited successfully!")
-            return redirect('my_applications')
-    return render(request, 'edit_application.html', {'form': form, 'club_name': club_name})
+            form.save()
+            messages.add_message(request, messages.SUCCESS, "Meeting edited successfully!")
+            return redirect('show_meeting', club_name, meeting_id)
+    return render(request, 'edit_meeting.html', {'form': form, 'club_name': club_name, 'club': current_club,
+                                                 'meeting': meeting, 'meeting_id': meeting_id})

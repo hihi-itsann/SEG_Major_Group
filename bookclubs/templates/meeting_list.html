@@ -1,10 +1,11 @@
 {% extends 'base_content.html' %}
 {% block content %}
 <div class="container">
-      <div class="col-xs-12 col-lg-6 col-xl-8">
+      <div>
           <br>
           <h1>{{ club.club_name }} Meetings</h1>
           <div>
+          {% if current_meetings.count > 0 %}
               <hr class="row-divider">
                   <div>
                       <table class="table table-striped">
@@ -30,6 +31,11 @@
                             {% endfor %}
                         </table>
                   </div>
+              {% else %}
+                <h5>There aren't any meetings currently set up for this club!</h5>
+                    <button type="button" class="btn btn-outline-dark"><a
+                            href="{% url 'show_book_recommendations' club_name=club_name %}">Create Meeting</a></button>
+          {% endif %}
           </div>
       </div>
   </div>
