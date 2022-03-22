@@ -240,7 +240,7 @@ h3.profile-title {
  * important buttons and href link
  */
  .btn-feed:active{
-   
+   border:none;
  }
 
  .btn-apply{

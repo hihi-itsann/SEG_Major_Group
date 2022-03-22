@@ -14,11 +14,21 @@
 		  -ms-transform: translate(-50% , -50%);
 		  transform: translate(-50%, -50%);
 		}
+
+		button{
+			border: none;
+			outline: none;
+		}
+
+		button:activate{
+			border: none;
+			outline:none;
+		}
 </style>
 
 <div class="container-btn">
   <div class="vertical-center-btn">
-		<button type="button" class="btn btn-lg btn-feed" onclick="typeWriter()" style="color:#fb8500; font-size:32px; font-weight:light;">
+		<a  class="btn btn-feed" onclick="typeWriter()" style="color:#fb8500; font-size:32px; font-weight:light;">
 			See your BOOK QUOTE of the day!
 		</button>
 		<p id="randomQuote"></p>
