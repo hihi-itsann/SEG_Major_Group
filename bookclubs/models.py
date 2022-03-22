@@ -9,19 +9,6 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 
-# class Country(models.Model):
-#     name = models.CharField(max_length=30)
-#
-#     def __str__(self):
-#         return self.name
-#
-# class City(models.Model):
-#     country = models.ForeignKey(Country, on_delete=models.CASCADE)
-#     name = models.CharField(max_length=30)
-#
-#     def __str__(self):
-#         return self.name
-
 class User(AbstractUser):
     userID = models.IntegerField(unique=True, null=True)
     username = models.CharField(
@@ -172,6 +159,9 @@ class Application(models.Model):
         self.save()
 
 
+
+
+
 class Club(models.Model):
     MEETING_CHOICES = (
         ('ONL', 'Online'),
@@ -222,8 +212,8 @@ class Club(models.Model):
     )
 
     genre = models.CharField(
-        max_length=520,
-        default='',
+        max_length=100,
+        default='Fiction',
         blank=False
     )
 
@@ -322,6 +312,8 @@ class Club(models.Model):
             return 'Online'
         else:
             return 'In-Person'
+
+
 
 
 class Role(models.Model):
