@@ -2,15 +2,13 @@
 {% block content %}
     <div class="container">
         <div class="row">
+            <h3>Edit Application for {{ club_name }}</h3>
             <div class="col-xs-12 col-lg-6 col-xl-4">
-                <h3>edit application</h3>
                 <form action="{% url 'edit_application' club_name %}" method="post">
                     {% csrf_token %}
                     {% include 'partials/bootstrap_form.html' with form=form %}
-                    <button type="submit" class="btn btn-primary">Apply</button>
+                        <input type="submit" value="Apply" class="btn btn-outline-dark">
                 </form>
-            </div>
-            <div class="col-xs-12 col-lg-6 col-xl-8">
             </div>
         </div>
     </div>
