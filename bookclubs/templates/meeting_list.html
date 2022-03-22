@@ -4,6 +4,10 @@
       <div>
           <br>
           <h1>{{ club.club_name }} Meetings</h1>
+      <div style="text-align: right">
+      <button type="button" class="btn btn-outline-dark"><a
+                            href="{% url 'show_book_recommendations' club_name=club_name %}">Create Meeting</a></button>
+          </div>
           <div>
           {% if current_meetings.count > 0 %}
               <hr class="row-divider">
@@ -33,8 +37,7 @@
                   </div>
               {% else %}
                 <h5>There aren't any meetings currently set up for this club!</h5>
-                    <button type="button" class="btn btn-outline-dark"><a
-                            href="{% url 'show_book_recommendations' club_name=club_name %}">Create Meeting</a></button>
+
           {% endif %}
           </div>
       </div>

@@ -7,7 +7,7 @@
                 <form action="{% url 'edit_application' club_name %}" method="post">
                     {% csrf_token %}
                     {% include 'partials/bootstrap_form.html' with form=form %}
-                        <input type="submit" value="Apply" class="btn btn-outline-dark">
+                        <input type="submit" value="Edit" class="btn btn-outline-dark">
                 </form>
             </div>
         </div>

@@ -499,10 +499,7 @@ def my_clubs(request):
 @login_required
 def club_list(request):
     clubs = []
-    if Club.objects.all().count() == 0:
-        club_exists = False
-    else:
-        club_exists = True
+    club_count = Club.objects.all().count()
 
     if Role.objects.filter(user=request.user):
         relations = Role.objects.filter(user=request.user)
@@ -539,7 +536,7 @@ def club_list(request):
         is_suitable_clubs = True
 
     return render(request, 'club_list.html', {'clubs': clubs, 'meeting_status': meeting_status,
-                                              'distance': distance, 'club_exists': club_exists,
+                                              'distance': distance, 'club_count': club_count, 'user': request.user,
                                               'is_suitable_clubs': is_suitable_clubs})
 
 

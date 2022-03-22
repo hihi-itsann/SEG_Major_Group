@@ -76,6 +76,10 @@ class User(AbstractUser):
         users_clubs = Role.objects.filter(user=self).exclude(club_role='BAN').values_list('club', flat=True)
         return Club.objects.filter(id__in=users_clubs)
 
+    def get_applied_clubs(self):
+        applicant_clubs = Application.objects.filter(user=self, status='P').values_list('club', flat=True)
+        return Club.objects.filter(id__in=applicant_clubs)
+
 
 
 class Book(models.Model):
@@ -335,8 +339,6 @@ class Club(models.Model):
             return 'Online'
         else:
             return 'In-Person'
-
-
 
 
 class Role(models.Model):
