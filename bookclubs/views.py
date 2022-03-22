@@ -782,9 +782,11 @@ def meeting_list(request, club_name):
     current_club = Club.objects.get(club_name=club_name)
     meetings = Meeting.objects.filter(club=current_club)
     current_date = datetime.now().date()
+    club_meeting_ids = meetings.values_list('id', flat=True)
     current_meeting_ids = []
     past_meeting_ids = []
-    for meeting in meetings:
+    for meeting_id in club_meeting_ids:
+        meeting = Meeting.objects.get(id=meeting_id)
         if current_date > meeting.date:
             past_meeting_ids.append(meeting.id)
         else:
