@@ -238,7 +238,8 @@ class Club(models.Model):
     )
 
     genre = models.CharField(
-        choices=Book.get_genres(),
+        # choices=[('Fiction', 'Fiction'), ('Non-Fiction', 'Non-Fiction')]
+        # # choices=Book.get_genres(),
         max_length=100,
         default='Fiction',
         blank=False
@@ -440,7 +441,7 @@ class Meeting(models.Model):
             else:
                 return f"It's time to join the meeting!"
 
-            
+
         else:
             return f'Meeting Held: {self.location} {self.club.city} {self.club.country}'
 

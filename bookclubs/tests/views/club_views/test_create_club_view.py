@@ -23,7 +23,9 @@ class CreateClubViewTestCase(TestCase):
             'city': 'city1',
             'country': 'country1',
             'public_status': 'PUB',
-            'genre': 'Social Science',
+            'genre': 'Non-Fiction',
+            # 'genre': 'Social Science',
+
             'description': 'description',
         }
 
@@ -34,7 +36,7 @@ class CreateClubViewTestCase(TestCase):
             'city': 'city1',
             'country': 'country1',
             'public_status': 'PRI',
-            'genre': 'Social Science',
+            'genre': 'Fiction',
             'description': 'description',
         }
 
@@ -45,7 +47,7 @@ class CreateClubViewTestCase(TestCase):
             'city': 'city1',
             'country': 'country1',
             'public_status': 'PRI',
-            'genre': 'Social Science',
+            'genre': 'Fiction',
             'description': 'description',
         }
 
@@ -56,7 +58,8 @@ class CreateClubViewTestCase(TestCase):
             'city': 'city1',
             'country': 'country1',
             'public_status': 'PUB',
-            'genre': 'Social Science',
+            # 'genre': 'Social Science',
+            'genre': 'Non-Fiction',
             'description': 'description',
         }
 
@@ -100,7 +103,7 @@ class CreateClubViewTestCase(TestCase):
         # self.assertEqual(club.country, 'country1')
         self.assertEqual(club.location, 'location')
         self.assertEqual(club.public_status, 'PUB')
-        self.assertEqual(club.genre, 'Social Science')
+        self.assertEqual(club.genre, 'Non-Fiction')
         self.assertEqual(club.description, 'description')
 
     def test_unsuccesful_online_private_create_club(self):
@@ -132,7 +135,7 @@ class CreateClubViewTestCase(TestCase):
         # self.assertEqual(club.country, 'country1')
         self.assertEqual(club.location, 'location')
         self.assertEqual(club.public_status, 'PRI')
-        self.assertEqual(club.genre, 'Social Science')
+        self.assertEqual(club.genre, 'Fiction')
         self.assertEqual(club.description, 'description')
 
     def test_unsuccesful_in_person_private_create_club(self):
@@ -164,7 +167,7 @@ class CreateClubViewTestCase(TestCase):
         # self.assertEqual(club.country, 'country1')
         self.assertEqual(club.location, 'location')
         self.assertEqual(club.public_status, 'PRI')
-        self.assertEqual(club.genre, 'Social Science')
+        self.assertEqual(club.genre, 'Fiction')
         self.assertEqual(club.description, 'description')
 
     def test_unsuccesful_in_person_public_create_club(self):
@@ -196,5 +199,5 @@ class CreateClubViewTestCase(TestCase):
         # self.assertEqual(club.country, 'country1')
         self.assertEqual(club.location, 'location')
         self.assertEqual(club.public_status, 'PUB')
-        self.assertEqual(club.genre, 'Social Science')
+        self.assertEqual(club.genre, 'Non-Fiction')
         self.assertEqual(club.description, 'description')
