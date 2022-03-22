@@ -10,26 +10,28 @@
           </div>
 
           <div class="col-lg-6 offset-2">
-            <h1>{{ book.title }}</h1>
+            <h1 style="color:#2F3E46"><b>{{ book.title }}</b></h1>
             <hr>
-            <h4><em>Author: {{ book.author }}</em></h4><br>
-            <h4><em>Genre: {{ book.genre }}</em></h4><br>
-            <h4><em>Year: {{ book.year_of_publication }}</em></h4><br>
-            <h4><em>publisher: {{ book.publisher }}</em></h4><br>
-            <h4><em>ISBN: {{ book.ISBN }}</em></h4><br>
+            <h4 style="color:#354F52"><em>Author: {{ book.author }}</em></h4><br>
+            <h4 style="color:#354F52"><em>Genre: {{ book.genre }}</em></h4><br>
+            <h4 style="color:#354F52"><em>Year: {{ book.year_of_publication }}</em></h4><br>
+            <h4 style="color:#354F52"><em>publisher: {{ book.publisher }}</em></h4><br>
+            <h4 style="color:#354F52"><em>ISBN: {{ book.ISBN }}</em></h4><br>
 
             {% if book.getAverageRate == None %}
-              <h1 style="color:Green">Not Yet Rated</h1>
+              <h1 style="color:#ffa200">Not Yet Rated</h1>
             {% else %}
-              <h1 style="color:Green">Rating: {{ book.getAverageRate|floatformat:1 }}/10</h1>
+              <h1 style="color:#ffa200">Rating: {{ book.getAverageRate|floatformat:1 }}/10</h1>
             {% endif %}
 
             {% if user.is_authenticated %}
                 {% if isInReadingList == False %}
-                  <button type="button" class="btn btn-outline-primary btn-lg"><i class="bi bi-bookmark"></i>&emsp;<a href="{% url 'create_book_status' book.ISBN %}">Add to your reading list</a></button>
+                  <button type="button" class="btn-lg btn-read"><i class="bi bi-bookmark" style="color:#52796F"></i>&emsp;
+                    <a href="{% url 'create_book_status' book.ISBN %}" style="color:#52796F">Add to your reading list</a></button>
                 {% else %}
                 <br>
-                <button type="button" class="btn btn-outline-primary btn-lg"><i class="bi bi-bookmark-check-fill"></i>&emsp;<a href="{% url 'delete_book_status' book.ISBN %}">Delete from your reading list</a></button>
+                <button type="button" class="btn-lg btn-read"><i class="bi bi-bookmark-check-fill" style="color:#52796F">
+                </i>&emsp;<a href="{% url 'delete_book_status' book.ISBN %}" style="color:#52796F">Delete from your reading list</a></button>
                 <br><br>
                 <div class="dropdown">
                   <a class="btn btn-outline-primary dropdown-toggle btn-lg" role="button" data-bs-toggle="dropdown">
@@ -51,7 +53,7 @@
           </div>
             <br><br>
             {% if not book.getReview.all %}
-                <h2>No Reviews Yet.</h2>
+                <h2 style="color:#2F3E46">No Reviews Yet.</h2>
             {% else %}
                 <h2>Reviews:</h2>
                 {% for review in book.getReview%}
