@@ -135,8 +135,17 @@ class RateReviewForm(forms.ModelForm):
         }
 
 
-class NewClubForm(forms.ModelForm):
-    """Create and update form"""
+def get_genres():
+    books = Book.objects.all()
+    genres = []
+    for book in books:
+        genres.append((book.genre.title(), book.genre.title()))
+    genres = list(set(genres))
+    return genres
+
+
+class ClubForm(forms.ModelForm):
+    """Create and update club form"""
 
     class Meta:
         model = Club
@@ -151,49 +160,15 @@ class NewClubForm(forms.ModelForm):
         ('PUB', 'Public'),
         ('PRI', 'Private')
     )
+    GENRE_CHOICES = get_genres()
 
     meeting_status = forms.ChoiceField(widget=forms.Select(), label='Meetings Held', choices=MEETING_CHOICES)
     public_status = forms.ChoiceField(widget=forms.Select(), label='Status', choices=PRIVACY_CHOICES)
+    genre = forms.ChoiceField(widget=forms.Select(), choices=GENRE_CHOICES)
 
     def clean(self):
         """Clean the data and generate messages for any errors."""
         super().clean()
-
-    def save(self):
-        """Create a new club."""
-        super().save(commit=False)
-        club = Club.objects.create(
-            club_name=self.cleaned_data.get('club_name'),
-            meeting_status=self.cleaned_data.get('meeting_status'),
-            location=self.cleaned_data.get('location'),
-            public_status=self.cleaned_data.get('public_status'),
-            genre=self.cleaned_data.get('genre'),
-            description=self.cleaned_data.get('description')
-        )
-        return club
-
-
-class UpdateClubForm(forms.ModelForm):
-    """Form to update club details."""
-
-    class Meta:
-        """Form options."""
-
-        model = Club
-        fields = ['club_name', 'meeting_status', 'location', 'city', 'country', 'public_status', 'genre', 'description']
-        widgets = {'description': forms.Textarea()}
-
-        MEETING_CHOICES = (
-            ('ONL', 'Online'),
-            ('OFF', 'In-person')
-        )
-        PRIVACY_CHOICES = (
-            ('PUB', 'Public'),
-            ('PRI', 'Private')
-        )
-
-        meeting_status = forms.ChoiceField(widget=forms.Select(), label='Meetings Held', choices=MEETING_CHOICES)
-        public_status = forms.ChoiceField(widget=forms.Select(), label='Status', choices=PRIVACY_CHOICES)
 
 
 class ApplicationForm(forms.ModelForm):

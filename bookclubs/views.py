@@ -12,8 +12,8 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.shortcuts import redirect, render, get_object_or_404
-from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, NewClubForm, ApplicationForm, CommentForm, \
-    RateReviewForm, PostForm, MeetingForm, UpdateClubForm, ApplicationForm
+from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, ClubForm, ApplicationForm, CommentForm, \
+    RateReviewForm, PostForm, MeetingForm, ApplicationForm
 from .helpers import *
 from .models import User, Book, Application, Comment, Post, BookRatingReview, BookStatus, Club, Meeting, \
     MeetingAttendance
@@ -352,13 +352,13 @@ def club_welcome(request, club_name):
 def create_club(request):
     """a user can create a club"""
     if request.method == 'POST':
-        form = NewClubForm(request.POST)
+        form = ClubForm(request.POST)
         if form.is_valid():
             club = form.save()
             club.club_members.add(request.user, through_defaults={'club_role': 'OWN'})
             return redirect('club_feed', club.club_name)
     else:
-        form = NewClubForm()
+        form = ClubForm()
     return render(request, 'create_club.html', {'form': form})
 
 
@@ -375,15 +375,14 @@ def delete_club(request, club_name):
 @club_exists
 @owner_required
 def update_club_info(request, club_name):
-    """owner change information of club"""
+    """owner can change information of club"""
     club = Club.objects.get(club_name=club_name)
-    form = UpdateClubForm(instance=club)
+    form = ClubForm(request.POST, instance=club)
     if request.method == 'POST':
-        form = UpdateClubForm(request.POST, instance=club)
         if form.is_valid():
             club = form.save()
             return redirect('club_feed', club.club_name)
-    context = {'form': form}
+    context = {'form': form, 'club_name': club_name}
     return render(request, 'update_club_info.html', context)
 
 
