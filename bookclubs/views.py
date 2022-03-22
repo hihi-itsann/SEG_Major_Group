@@ -746,6 +746,7 @@ def show_book_recommendations(request, club_name):
 @login_required
 @club_and_book_exists
 @membership_required
+@not_last_host
 def create_meeting(request, club_name, book_isbn):
     """Creates a new meeting within a club"""
     current_club = Club.objects.get(club_name=club_name)
@@ -763,7 +764,6 @@ def create_meeting(request, club_name, book_isbn):
         
             form.original_save(request.user, current_club, chosen_book,join_link,start_link)
             messages.add_message(request, messages.SUCCESS, "Meeting set up!")
-            
 
             return redirect('meeting_list', club_name)
 
