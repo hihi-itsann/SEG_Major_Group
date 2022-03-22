@@ -1,5 +1,5 @@
 <div class="row content">
-    <div class="col-12">
+    <div class="col">
         <img src="{{ user.gravatar }}" alt="Gravatar of {{ user.full_name }}" class="rounded-circle profile-image">
         <div class="profile-text">
             <h3 class="profile-title">{{ user.full_name }}</h3>
@@ -8,7 +8,8 @@
     </div>
 </div>
 <div class="row content">
-    <div class="col-12">
+    <div class="col">
         <p class="profile-bio">{{ user.bio }}</p>
+        <p>Pronouns: {{ user.get_pronouns }}</p>
     </div>
 </div>

@@ -19,18 +19,23 @@
             {% if is_host or is_attendee_only %}
                         <p>{{ meeting.get_meeting_status }}</p>
                         <p>{{ meeting.get_location }}</p>
+
                     {% endif %}
 
 
 
                 {% if is_host %}
+                    {% if meeting.get_meeting_status == 'Online' and meeting.get_is_time %}
+                        <button type="button" class="btn btn-outline-dark"><a
+                            href={{meeting.start_link}}>Start Meeting</a></button>
+                    {% endif %}
+                    <button type="button" class="btn btn-outline-dark"><a
+                            href="{% url 'edit_meeting' club_name=club_name meeting_id=meeting.id %}">Edit
+                        Meeting</a></button>
                     <button type="button" class="btn btn-outline-dark"><a
                         href="{% url 'delete_meeting' club_name=club_name meeting_id=meeting.id %}">Cancel
                     Meeting</a></button>
-                    {% if meeting.get_meeting_status == 'Online' and meeting.get_is_time %}
-                        <button type="button" class="btn btn-outline-dark"><a
-                            href={{meeting.start_link}}>Start meeting</a></button>
-                    {% endif %}  
+
                         {% else %}
                     {% if is_attendee_only %}
 

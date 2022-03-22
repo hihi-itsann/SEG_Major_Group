@@ -45,7 +45,8 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
         model = User
         fields = ['first_name', 'last_name', 'username', 'email', 'bio', 'dob', 'gender', 'location', 'city', 'country',
                   'meeting_preference']
-        widgets = {'dob': forms.DateInput(format='%d/%m/%Y'), 'bio': forms.Textarea()}
+        widgets = {'dob': forms.DateInput(attrs={'class': 'form-control', 'format': "%d/%m/%Y", 'placeholder': 'dd/mm/yyyy'}),
+                   'bio': forms.Textarea()}
 
     def save(self):
         """Create a new user."""
@@ -135,15 +136,6 @@ class RateReviewForm(forms.ModelForm):
         }
 
 
-def get_genres():
-    books = Book.objects.all()
-    genres = []
-    for book in books:
-        genres.append((book.genre.title(), book.genre.title()))
-    genres = list(set(genres))
-    return genres
-
-
 class ClubForm(forms.ModelForm):
     """Create and update club form"""
 
@@ -160,7 +152,8 @@ class ClubForm(forms.ModelForm):
         ('PUB', 'Public'),
         ('PRI', 'Private')
     )
-    GENRE_CHOICES = get_genres()
+
+    GENRE_CHOICES = Book.get_genres()
 
     meeting_status = forms.ChoiceField(widget=forms.Select(), label='Meetings Held', choices=MEETING_CHOICES)
     public_status = forms.ChoiceField(widget=forms.Select(), label='Status', choices=PRIVACY_CHOICES)
@@ -176,28 +169,13 @@ class ApplicationForm(forms.ModelForm):
         model = Application
         fields = ['statement']
         widgets = {'statement': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Why do you want to '
-                                                                                              'join this club?'}),}
+                                                                                              'join this club?'}), }
 
-    def save(self, user=None, club=None):
+    def original_save(self, user=None, club=None):
         super().save(commit=False)
         application = Application.objects.create(
             user=user,
             club=club,
-            statement=self.cleaned_data.get('statement'),
-            status='P'
-        )
-        return application
-
-    def update(self, application_id=None):
-        super().save(commit=False)
-        delete_application = Application.objects.get(id=application_id)
-        application_user = delete_application.user
-        application_club = delete_application.club
-        delete_application.delete()
-        application = Application.objects.create(
-            id=application_id,
-            user=application_user,
-            club=application_club,
             statement=self.cleaned_data.get('statement'),
             status='P'
         )
@@ -236,12 +214,11 @@ class MeetingForm(forms.ModelForm):
         widgets = {
             'topic': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Topic'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Agenda'}),
-            'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Location or Online Link'}),
-            'date': forms.DateInput(attrs={'class': 'form-control', 'format':"%Y-%m-%d",'placeholder': 'yyyy-mm-dd'}),
+            'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Location'}),
+            'date': forms.DateInput(attrs={'class': 'form-control', 'format': "%d/%m/%Y", 'placeholder': 'dd/mm/yyyy'}),
             'time_start': forms.TimeInput(attrs={'class': 'form-control', 'placeholder': 'hh:mm'}),
             'duration': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Minutes'})
         }
-
 
     def original_save(self, user=None, club=None, book=None, join_link=None, start_link=None):
         super().save(commit=False)
@@ -264,15 +241,3 @@ class MeetingForm(forms.ModelForm):
             meeting_role='H'
         )
         return meeting
-
-    def update(self, meeting_id=None):
-        super().save(commit=False)
-        meeting = Meeting.objects.get(id=meeting_id)
-        # meeting.topic = self.cleaned_data.get('topic'),
-        # meeting.description = self.cleaned_data.get('description'),
-        # meeting.location = self.cleaned_data.get('location'),
-        # meeting.date = self.cleaned_data.get('date'),
-        # meeting.time_start = self.cleaned_data.get('time_start'),
-        # meeting.time_end = self.cleaned_data.get('time_end')
-        meeting.save(force_update=['topic',
-        'description', 'location', 'date', 'time_start', 'time_end'])

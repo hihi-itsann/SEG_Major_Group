@@ -64,6 +64,19 @@ class User(AbstractUser):
         """Return a URL to a miniature version of the user's gravatar."""
         return self.gravatar(size=60)
 
+    def get_pronouns(self):
+        if self.gender == 'M':
+            return f'he/ him'
+        elif self.gender == 'F':
+            return f'she/ her'
+        else:
+            return f'they/ them (consult for other pronouns)'
+
+    def get_clubs(self):
+        users_clubs = Role.objects.filter(user=self).exclude(club_role='BAN').values_list('club', flat=True)
+        return Club.objects.filter(id__in=users_clubs)
+
+
 
 class Book(models.Model):
     ISBN = models.CharField(
@@ -90,6 +103,18 @@ class Book(models.Model):
 
     def get_ISBN(self):
         return self.ISBN
+
+    @staticmethod
+    def get_genres():
+        books = Book.objects.all()
+        if books.count() > 0:
+            genres = []
+            for book in books:
+                genres.append((book.genre.title(), book.genre.title()))
+            genres = list(set(genres))
+        else:
+            genres = [('Fiction', 'Fiction'), ('Non-Fiction', 'Non-Fiction')]
+        return genres
 
     # def getReadingStatus(self,user):
     #     return BookStatus.objects.get(user=user, book=self).status
@@ -159,9 +184,6 @@ class Application(models.Model):
         self.save()
 
 
-
-
-
 class Club(models.Model):
     MEETING_CHOICES = (
         ('ONL', 'Online'),
@@ -212,6 +234,7 @@ class Club(models.Model):
     )
 
     genre = models.CharField(
+        choices=Book.get_genres(),
         max_length=100,
         default='Fiction',
         blank=False
@@ -374,7 +397,7 @@ class Meeting(models.Model):
     topic = models.CharField(max_length=120, default='', blank=False)
     description = models.TextField(max_length=520, blank=True)
     meeting_status = models.CharField(choices=MEETING_CHOICES, default='OFF', max_length=3)
-    location = models.CharField(max_length=120, blank=False)
+    location = models.CharField(max_length=120, blank=True)
     date = models.DateField(blank=False)
     time_start = models.TimeField(blank=False)
     duration = models.IntegerField(blank=False, default=30)
