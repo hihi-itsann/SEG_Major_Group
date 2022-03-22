@@ -35,7 +35,7 @@ class ClubListViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'club_list.html')
         self.assertEqual(len(response.context['clubs']), 5)
-        self.assertEqual(response.context['club_exists'], True)
+        self.assertEqual(response.context['club_count'], 9)
         self.assertQuerysetEqual(Club.objects.filter(public_status='PUB').filter(meeting_status='ONL'), response.context['clubs'], ordered=False)
         for club_id in range(9):
             if club_id % 2 ==0:
@@ -70,11 +70,11 @@ class ClubListViewTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.context['clubs']), 5)
-        self.assertEqual(response.context['club_exists'], True)
+        self.assertEqual(response.context['club_count'], 9)
         form_input = { 'meeting_status': 'In person', 'distance': 'same city' }
         response = self.client.post(self.url, form_input)
         self.assertEqual(len(response.context['clubs']), 4)
-        self.assertEqual(response.context['club_exists'], True)
+        self.assertEqual(response.context['club_count'], 9)
         self.assertEqual(response.context['is_suitable_clubs'], True)
         self.assertEqual(response.context['distance'], 'same city')
         self.assertQuerysetEqual(Club.objects.filter(meeting_status='OFF'), response.context['clubs'], ordered=False)
@@ -90,11 +90,11 @@ class ClubListViewTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.context['clubs']), 5)
-        self.assertEqual(response.context['club_exists'], True)
+        self.assertEqual(response.context['club_count'], 9)
         form_input = { 'meeting_status': 'In person', 'distance': 'same country' }
         response = self.client.post(self.url, form_input)
         self.assertEqual(len(response.context['clubs']), 0)
-        self.assertEqual(response.context['club_exists'], True)
+        self.assertEqual(response.context['club_count'], 9)
         self.assertEqual(response.context['is_suitable_clubs'], False)
         self.assertEqual(response.context['distance'], 'same country')
         self.assertQuerysetEqual(Club.objects.filter(meeting_status='OFF').filter(country='UK'), response.context['clubs'], ordered=False)
