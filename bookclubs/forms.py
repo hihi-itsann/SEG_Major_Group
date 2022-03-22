@@ -153,6 +153,7 @@ class ClubForm(forms.ModelForm):
         ('PRI', 'Private')
     )
 
+    # GENRE_CHOICES = [('Fiction', 'Fiction'), ('Non-Fiction', 'Non-Fiction')],
     GENRE_CHOICES = Book.get_genres()
     # GENRE_CHOICES = [('Fiction', 'Fiction'), ('Non-Fiction', 'Non-Fiction')]
 
