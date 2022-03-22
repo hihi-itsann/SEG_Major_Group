@@ -386,8 +386,8 @@ class Meeting(models.Model):
     date = models.DateField(blank=False)
     time_start = models.TimeField(blank=False)
     duration = models.IntegerField(blank=False, default=30)
-    join_link = models.URLField(blank=True)
-    start_link = models.URLField(blank=True)
+    join_link = models.URLField(blank=True, null=True)
+    start_link = models.URLField(blank=True,null=True)
     def get_time_end(self):
         time1 = self.time_start
         timedelta = datetime.timedelta(minutes=self.duration)
