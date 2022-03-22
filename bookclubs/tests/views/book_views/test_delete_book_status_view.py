@@ -59,4 +59,4 @@ class DeleteBookStatusTest(TestCase):
         )
         messages_list = list(response.context['messages'])
         self.assertEqual(len(messages_list), 1)
-        self.assertEqual(messages_list[0].level, messages.ERROR)
+        self.assertEqual(messages_list[0].level, messages.WARNING)
