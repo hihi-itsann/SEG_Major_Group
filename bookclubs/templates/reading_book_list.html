@@ -20,8 +20,8 @@
         <div class="col-xl-4 col-md-6 mb-4">
           <div class="card border-0 shadow">
             <div class="card-body text-center">
-              <img src="../../static/images/unread2.jpeg" class="card-img-top">
-              <h5 class="card-title mb-0">Unread Books</h5>
+              <img src="../../static/images/unreadbooks.jpg" class="card-img-top" style="width: 100%; height: 320px;">
+              <h5 class="card-title mb-0" style="color:#fb8500">Unread Books</h5>
               <br>
               {% if not unreadBooks %}
                 <h5 >Empty</h5>
@@ -39,8 +39,8 @@
         <div class="col-xl-4 col-md-6 mb-4">
           <div class="card border-0 shadow">
             <div class="card-body text-center">
-              <img src="../../static/images/currently.png" class="card-img-top">
-              <h5 class="card-title mb-0">Reading Books</h5>
+              <img src="../../static/images/currently.png" class="card-img-top" style="width: 100%; height: 320px;">
+              <h5 class="card-title mb-0" style="color:#598392">Reading Books</h5>
               <br>
               {% if not readingBooks %}
                 <h5 >Empty</h5>
@@ -57,9 +57,9 @@
         <!-- Team Member 3 -->
         <div class="col-xl-4 col-md-6 mb-4">
           <div class="card border-0 shadow">
-            <img src="../../static/images/finished.jpg" class="card-img-top">
+            <img src="../../static/images/theend.jpeg" class="card-img-top" style="width: 100%; height: 320px;">
             <div class="card-body text-center">
-              <h5 class="card-title mb-0"><em>Finished Books</em></h5>
+              <h5 class="card-title mb-0" style="color:#40916c"><em>Finished Books</em></h5>
               {% if not finishedBooks %}
                 <h5 >Empty</h5>
               {% else %}
