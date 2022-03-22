@@ -221,7 +221,6 @@ def club_and_meeting_exists(view_function):
     return modified_view_function
 
 
-
 def not_last_host(view_function):
     def modified_view_function(request, club_name, *args, **kwargs):
         current_club = Club.objects.get(club_name=club_name)
@@ -242,6 +241,7 @@ def not_last_host(view_function):
 
     return modified_view_function
 
+
 def book_exists(view_function):
     """check whether the book exists"""
 
@@ -253,6 +253,7 @@ def book_exists(view_function):
             return redirect('book_list', 'All')
 
     return modified_view_function
+
 
 def own_feedback_exists(view_function):
     """check whether the book_and_book_rating_review exists"""
@@ -269,6 +270,7 @@ def own_feedback_exists(view_function):
 
     return modified_view_function
 
+
 def bookStatus_does_not_exists(view_function):
     """check whether the book status exists"""
 
@@ -282,6 +284,7 @@ def bookStatus_does_not_exists(view_function):
 
     return modified_view_function
 
+
 def bookStatus_exists(view_function):
     """check whether the book status exists"""
 
@@ -292,6 +295,5 @@ def bookStatus_exists(view_function):
             return redirect('show_book', ISBN)
         else:
             return view_function(request, ISBN, *args, **kwargs)
-
 
     return modified_view_function

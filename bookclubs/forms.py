@@ -178,26 +178,11 @@ class ApplicationForm(forms.ModelForm):
         widgets = {'statement': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Why do you want to '
                                                                                               'join this club?'}),}
 
-    def save(self, user=None, club=None):
+    def original_save(self, user=None, club=None):
         super().save(commit=False)
         application = Application.objects.create(
             user=user,
             club=club,
-            statement=self.cleaned_data.get('statement'),
-            status='P'
-        )
-        return application
-
-    def update(self, application_id=None):
-        super().save(commit=False)
-        delete_application = Application.objects.get(id=application_id)
-        application_user = delete_application.user
-        application_club = delete_application.club
-        delete_application.delete()
-        application = Application.objects.create(
-            id=application_id,
-            user=application_user,
-            club=application_club,
             statement=self.cleaned_data.get('statement'),
             status='P'
         )

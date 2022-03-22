@@ -406,7 +406,7 @@ def create_application(request, club_name):
         if request.method == 'POST':
             form = ApplicationForm(request.POST)
             if form.is_valid():
-                application = form.save(request.user, current_club)
+                application = form.original_save(request.user, current_club)
                 application.change_status('P')
                 messages.add_message(request, messages.SUCCESS, "Application submitted!")
                 return redirect('my_applications')
@@ -422,11 +422,10 @@ def edit_application(request, club_name):
     """Deletes current application and replaces it with another application with updated statement"""
     club_applied = Club.objects.get(club_name=club_name)
     application = Application.objects.get(user=request.user, club=club_applied)
-    application_id = application.id
-    form = ApplicationForm(request.POST)
+    form = ApplicationForm(request.POST, instance=application)
     if request.method == 'POST':
         if form.is_valid():
-            form.update(application_id)
+            form.save()
             messages.add_message(request, messages.SUCCESS, "Application edited successfully!")
             return redirect('my_applications')
     return render(request, 'edit_application.html', {'form': form, 'club_name': club_name})
