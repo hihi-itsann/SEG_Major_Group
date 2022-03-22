@@ -235,7 +235,8 @@ class CreateBookRateReviewView(LoginRequiredMixin, CreateView):
         return '{}#education'.format(reverse('show_book', kwargs={'ISBN': book.ISBN}))
 
 @login_required
-@book_and_own_feedback_exists
+@book_exists
+@own_feedback_exists
 def delete_book_rating_review(request, ISBN, pk):
     book = Book.objects.get(ISBN=ISBN)
     rating_review=BookRatingReview.objects.get(book=book, id=pk, user=request.user)
@@ -245,31 +246,23 @@ def delete_book_rating_review(request, ISBN, pk):
 
 
 @login_required
+@book_exists
+@bookStatus_does_not_exists
 def create_book_status(request, ISBN):
     book = Book.objects.get(ISBN=ISBN)
-    try:
-        bookStatus = BookStatus.objects.get(user=request.user, book=book)
-    except ObjectDoesNotExist:
-        bookStatus = BookStatus.objects.create(
-            book=book,
-            user=request.user,
-        )
-        messages.add_message(request, messages.SUCCESS, "Add to your reading list successfully!")
-        return redirect('reading_book_list', 'All')
-    messages.add_message(request, messages.ERROR, "The Book has already been added in your reading list!")
-    return redirect('show_book', ISBN)
+    bookStatus = BookStatus.objects.create(book=book, user=request.user)
+    messages.add_message(request, messages.SUCCESS, "Add to your reading list successfully!")
+    return redirect('reading_book_list', 'All')
 
 
 @login_required
+@book_exists
+@bookStatus_exists
 def delete_book_status(request, ISBN):
     book = Book.objects.get(ISBN=ISBN)
-    try:
-        current_book_status = BookStatus.objects.get(user=request.user, book=book)
-    except ObjectDoesNotExist:
-        messages.add_message(request, messages.ERROR, "The Book is not in your reading list!")
-        return redirect('show_book', ISBN)
+    current_book_status = BookStatus.objects.get(user=request.user, book=book)
     current_book_status.delete()
-    messages.add_message(request, messages.ERROR, "The Book has already been deleted in your reading list!")
+    messages.add_message(request, messages.SUCCESS, "The Book has already been deleted in your reading list!")
     return redirect('reading_book_list', 'All')
 
 

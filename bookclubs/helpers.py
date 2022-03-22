@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect
 
-from .models import Club, Role, Application, Book, BookRatingReview, Meeting, MeetingAttendance
+from .models import Club, Role, Application, Book, BookRatingReview, BookStatus, Meeting, MeetingAttendance
 
 
 def login_prohibited(view_function):
@@ -219,21 +219,55 @@ def club_and_meeting_exists(view_function):
 
     return modified_view_function
 
-def book_and_own_feedback_exists(view_function):
+def book_exists(view_function):
+    """check whether the book exists"""
+
+    def modified_view_function(request, ISBN, *args, **kwargs):
+        if Book.objects.filter(ISBN=ISBN).count() == 1:
+            return view_function(request, ISBN, *args, **kwargs)
+        else:
+            messages.add_message(request, messages.WARNING, "No Book found with this name.")
+            return redirect('book_list', 'All')
+
+    return modified_view_function
+
+def own_feedback_exists(view_function):
     """check whether the book_and_book_rating_review exists"""
 
     def modified_view_function(request, ISBN, pk, *args, **kwargs):
-        if Book.objects.filter(ISBN=ISBN).count() == 1:
-            if BookRatingReview.objects.filter(id=pk, user=request.user).count() == 1:
-                return view_function(request, ISBN, pk, *args, **kwargs)
-            elif BookRatingReview.objects.filter(id=pk).count() == 1:
-                messages.add_message(request, messages.WARNING, "You have not create this feedback for this book.")
-                return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
-            else:
-                messages.add_message(request, messages.WARNING, "No feedback with this book found with this ID.")
-                return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+        if BookRatingReview.objects.filter(id=pk, user=request.user).count() == 1:
+            return view_function(request, ISBN, pk, *args, **kwargs)
+        elif BookRatingReview.objects.filter(id=pk).count() == 1:
+            messages.add_message(request, messages.WARNING, "You have not create this feedback for this book.")
+            return redirect('show_book', ISBN)
         else:
-            messages.add_message(request, messages.WARNING, "No Book found with this ISBN.")
-            return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+            messages.add_message(request, messages.WARNING, "No feedback with this book found with this ID.")
+            return redirect('show_book', ISBN)
+
+    return modified_view_function
+
+def bookStatus_does_not_exists(view_function):
+    """check whether the book_and_book_rating_review exists"""
+
+    def modified_view_function(request, ISBN, *args, **kwargs):
+        book = Book.objects.get(ISBN=ISBN)
+        if BookStatus.objects.filter(book=book, user=request.user).count() != 0:
+            messages.add_message(request, messages.WARNING, "The Book has already been added in your reading list!")
+            return redirect('show_book', ISBN)
+        else:
+            return view_function(request, ISBN, *args, **kwargs)
+
+    return modified_view_function
+
+def bookStatus_exists(view_function):
+    """check whether the book_and_book_rating_review exists"""
+
+    def modified_view_function(request, ISBN, *args, **kwargs):
+        book = Book.objects.get(ISBN=ISBN)
+        if BookStatus.objects.filter(book=book, user=request.user).count() == 0:
+            messages.add_message(request, messages.WARNING, "The Book is not in your reading list!")
+            return redirect('show_book', ISBN)
+        else:
+            return view_function(request, ISBN, *args, **kwargs)
 
     return modified_view_function
