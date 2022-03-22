@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.test import TestCase
 from django.urls import reverse
 from bookclubs.models import Post, User, Book, BookStatus
@@ -57,3 +58,13 @@ class CreateBookStatusTest(TestCase):
         redirect_url = reverse_with_next('log_in', self.url)
         response = self.client.get(self.url)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
+
+    def test_unsuccessful_with_invalid_book_isbn(self):
+        url = reverse('create_book_status', kwargs={'ISBN': 'InvalidISBN'})
+        self.client.login(username=self.user.username, password="Password123")
+        response = self.client.post(url, follow=True)
+        redirect_url = reverse('book_list', kwargs={'book_genre': 'All'})
+        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
+        messages_list = list(response.context['messages'])
+        self.assertEqual(len(messages_list), 1)
+        self.assertEqual(messages_list[0].level, messages.WARNING)

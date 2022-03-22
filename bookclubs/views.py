@@ -236,62 +236,48 @@ class CreateBookRateReviewView(LoginRequiredMixin, CreateView):
         book = Book.objects.get(ISBN=self.kwargs['ISBN'])
         return '{}#education'.format(reverse('show_book', kwargs={'ISBN': book.ISBN}))
 
-
 @login_required
+@book_exists
+@own_feedback_exists
 def delete_book_rating_review(request, ISBN, pk):
     book = Book.objects.get(ISBN=ISBN)
-    try:
-        rating_review = BookRatingReview.objects.get(book=book, id=pk, user=request.user)
-    except ObjectDoesNotExist:
-        messages.add_message(request, messages.ERROR, "You have not given that feedback!")
-        return redirect('show_book', ISBN)
+    rating_review=BookRatingReview.objects.get(book=book, id=pk, user=request.user)
     rating_review.delete();
     messages.add_message(request, messages.SUCCESS, "This review has successfully been deleted!")
     return redirect('show_book', ISBN)
 
 
 @login_required
+@book_exists
+@bookStatus_does_not_exists
 def create_book_status(request, ISBN):
     book = Book.objects.get(ISBN=ISBN)
-    try:
-        bookStatus = BookStatus.objects.get(user=request.user, book=book)
-    except ObjectDoesNotExist:
-        bookStatus = BookStatus.objects.create(
-            book=book,
-            user=request.user,
-        )
-        messages.add_message(request, messages.SUCCESS, "Add to your reading list successfully!")
-        return redirect('reading_book_list', 'All')
-    messages.add_message(request, messages.ERROR, "The Book has already been added in your reading list!")
-    return redirect('show_book', ISBN)
-
-
-@login_required
-def delete_book_status(request, ISBN):
-    book = Book.objects.get(ISBN=ISBN)
-    try:
-        current_book_status = BookStatus.objects.get(user=request.user, book=book)
-    except ObjectDoesNotExist:
-        messages.add_message(request, messages.ERROR, "The Book is not in your reading list!")
-        return redirect('show_book', ISBN)
-    current_book_status.delete()
-    messages.add_message(request, messages.ERROR, "The Book has already been deleted in your reading list!")
+    bookStatus = BookStatus.objects.create(book=book, user=request.user)
+    messages.add_message(request, messages.SUCCESS, "Add to your reading list successfully!")
     return redirect('reading_book_list', 'All')
 
 
 @login_required
+@book_exists
+@bookStatus_exists
+def delete_book_status(request, ISBN):
+    book = Book.objects.get(ISBN=ISBN)
+    current_book_status = BookStatus.objects.get(user=request.user, book=book)
+    current_book_status.delete()
+    messages.add_message(request, messages.SUCCESS, "The Book has already been deleted in your reading list!")
+    return redirect('reading_book_list', 'All')
+
+
+@login_required
+@book_exists
+@bookStatus_exists
 def change_book_status(request, ISBN, choice):
     current_book = Book.objects.get(ISBN=ISBN)
-    try:
-        current_book_status = BookStatus.objects.get(user=request.user, book=current_book)
-        current_book_status.change_status(choice)
-    except ObjectDoesNotExist:
-        messages.add_message(request, messages.ERROR, f'Unsuccessfully change the book status!')
-        return redirect('show_book', ISBN)
-    else:
-        messages.add_message(request, messages.SUCCESS,
-                             f'Successfully change the book status to {current_book_status.get_status_display()}!')
-        return redirect('show_book', ISBN)
+    current_book_status = BookStatus.objects.get(user=request.user, book=current_book)
+    current_book_status.change_status(choice)
+    messages.add_message(request, messages.SUCCESS,
+                         f'Successfully change the book status to {current_book_status.get_status_display()}!')
+    return redirect('show_book', ISBN)
 
 
 @login_required
