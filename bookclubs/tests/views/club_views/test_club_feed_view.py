@@ -15,10 +15,14 @@ class ClubFeedViewTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.get(username='@johndoe')
         self.client.login(username=self.user.username, password='Password123')
+        self.user2 = User.objects.get(username='@janedoe')
+        self.user3 = User.objects.get(username='@Alexdoe')
         self.club1 =  Club.objects.get(club_name='private_online')
         self.club2 =  Club.objects.get(club_name='public_online')
         self.club3 =  Club.objects.get(club_name='private_in-person')
         self.club4 =  Club.objects.get(club_name='public_in-person')
+        # user3=self._create_third_user()
+        # print(user3.userID)
         self._create_test_rols()
         self.url1 = reverse('club_feed',kwargs={'club_name':self.club1.club_name})
         self.url2 = reverse('club_feed',kwargs={'club_name':self.club2.club_name})
@@ -71,11 +75,83 @@ class ClubFeedViewTestCase(TestCase):
         self.assertEqual(len(response.context['members']), 0)
         self.assertEqual(len(response.context['management']), 1)
 
+    def test_other_user_cannot_get_club1_feed(self):
+        self.client.login(username=self.user2.username, password='Password123')
+        response = self.client.get(self.url1)
+        response_url = reverse('feed')
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+
+    def test_other_user_cannot_get_club2_feed(self):
+        self.client.login(username=self.user2.username, password='Password123')
+        response = self.client.get(self.url2)
+        response_url = reverse('feed')
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+
+    def test_other_user_cannot_get_club3_feed(self):
+        self.client.login(username=self.user2.username, password='Password123')
+        response = self.client.get(self.url3)
+        response_url = reverse('feed')
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+
+    def test_other_user_cannot_get_club4_feed(self):
+        self.client.login(username=self.user2.username, password='Password123')
+        response = self.client.get(self.url4)
+        response_url = reverse('feed')
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+
+    def test_banned_user_cannot_get_club1_feed(self):
+        self.client.login(username=self.user3.username, password='Password123')
+        response = self.client.get(self.url1)
+        response_url = reverse('feed')
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+
+    def test_banned_user_cannot_get_club2_feed(self):
+        self.client.login(username=self.user3.username, password='Password123')
+        response = self.client.get(self.url2)
+        response_url = reverse('feed')
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+
+    def test_banned_user_cannot_get_club3_feed(self):
+        self.client.login(username=self.user3.username, password='Password123')
+        response = self.client.get(self.url3)
+        response_url = reverse('feed')
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+
+    def test_banned_user_cannot_get_club3_feed(self):
+        self.client.login(username=self.user3.username, password='Password123')
+        response = self.client.get(self.url4)
+        response_url = reverse('feed')
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+    # def _create_third_user(self):
+    #     User.objects.create(
+    #         userID = 3,
+    #         username = "@testuser3",
+    #         first_name = "test",
+    #         last_name = "user",
+    #         email = "testuser3@example.org",
+    #         bio = "Hello, I'm testuser3.",
+    #         dob = "2002-07-14",
+    #         gender = "M",
+    #         location = "Bush house",
+    #         city = "London",
+    #         country = "UK",
+    #         meeting_preference= "P",
+    #         password= "Password123",
+    #         is_active= true
+    #         )
+
+
     def _create_test_rols(self):
         Role.objects.create(
             club = self.club1,
             user = self.user,
             club_role = 'OWN',
+            )
+
+        Role.objects.create(
+            club = self.club1,
+            user = self.user3,
+            club_role = 'BAN',
             )
 
         Role.objects.create(
@@ -85,13 +161,31 @@ class ClubFeedViewTestCase(TestCase):
             )
 
         Role.objects.create(
+            club = self.club2,
+            user = self.user3,
+            club_role = 'BAN',
+            )
+
+        Role.objects.create(
             club = self.club3,
             user = self.user,
             club_role = 'MOD',
             )
 
         Role.objects.create(
+            club = self.club3,
+            user = self.user3,
+            club_role = 'BAN',
+            )
+
+        Role.objects.create(
             club = self.club4,
             user = self.user,
             club_role = 'OWN',
+            )
+
+        Role.objects.create(
+            club = self.club4,
+            user = self.user3,
+            club_role = 'BAN',
             )
