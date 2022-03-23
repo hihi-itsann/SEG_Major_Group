@@ -282,3 +282,11 @@ h3.profile-title {
    background-color:#CAD2C5;
    color:#52796F;
  }
+
+ .parent .popup {
+  display: none;
+}
+
+.parent:hover .popup {
+  display: block;
+}
