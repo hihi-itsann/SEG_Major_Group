@@ -686,7 +686,12 @@ class CreatePostView(LoginRequiredMixin, CreateView):
     model = Post
     form_class = PostForm
     template_name = 'create_post.html'
-    #success_url = reverse_lazy('club_feed')
+    success_url = reverse_lazy('my_clubs')
+
+    def form_valid(self, form):
+        #form.instance.club_id = self.kwargs['pk']
+        form.instance.author = self.request.user
+        return super().form_valid(form)
 
 
 
