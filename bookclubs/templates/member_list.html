@@ -1,1 +1,46 @@
-
+{# {% extends 'base_content.html' %}
+{% block content %}
+    <div class="container">
+        <div class="col-xs-12 col-lg-6 col-xl-8">
+            <br>
+            <h1>{{ club.club_name }}</h1>
+            <div>
+                <p>{{ club.club_location }}</p>
+                <p>{{ club.description }}</p>
+                {% if owner %}
+                  You are owner!
+                {% else %}
+                  <a href="{% url 'leave_club' club.club_name %}" class="btn btn-secondary btn-danger">Leave</a>
+                {% endif %}
+                <hr class="row-divider">
+                  {% if roles %}
+                      <div>
+                          <table class="table table-dark table-striped">
+                              <tr>
+                                  <th scope="col">Position</th>
+                                  <th scope="col">Full name</th>
+                                  <th scope="col">Username</th>
+                              </tr>
+                              {% for relationship in roles %}
+                                  <tr>
+                                      <td>{{ relationship.club_role }}</td>
+                                      <td>{{ relationship.user.full_name }}</td>
+                                      <td>{{ relationship.user.username}}</td>
+                                      {% if is_moderator or is_owner %}
+                                          <td><a>remove</a></td>
+                                          <td><a>banned</a></td>
+                                          <td><a>promote</a></td>
+                                          <td><a>demote</a></td>
+                                          <td><a>transfer ownership</a></td>
+                                      {% endif %}
+                                  </tr>
+                              {% endfor %}
+                          </table>
+                      </div>
+                  {% else %}
+                      <p>No applicants have joined yet.</p>
+                  {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %} #}

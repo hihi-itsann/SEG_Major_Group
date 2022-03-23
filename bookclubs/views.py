@@ -1,5 +1,6 @@
 from ntpath import join
 #from os import startfile
+from django.contrib import messages
 from webbrowser import get
 from django.db.models import Q  # filter exception
 from django.db.models import F
@@ -356,6 +357,24 @@ def delete_club(request, club_name):
     return feed(request)
 
 
+@membership_required
+@club_exists
+@login_required
+def leave_club(request, club_req):
+    club = Club.objects.get(club_name=club_req)
+    user = request.user
+    cur_role= Role.objects.get(club=club,user = user)
+    number_owner_club = Role.objects.filter(club=club, club_role='OWN').count()
+    # print(number_owner_club)
+    if cur_role.club_role == 'OWN' and (number_owner_club==1):
+        messages.warning(request, 'Owner cannot leave, if the club has only 1 owner!!! You can transfer owner to others.')
+        return redirect('member_list', club_name=club.club_name)
+    else:
+        Role.objects.filter(user=request.user, club=club).delete()
+        messages.success(request, f'You have now left the club {club.club_name}.')
+        return redirect('my_clubs')
+
+
 @login_required
 @club_exists
 @owner_required
@@ -636,13 +655,16 @@ def promote_member(request, club_name, user_id):
 @membership_required
 def member_list(request, club_name):
     is_owner = False
+    is_moderator = False
     club = Club.objects.get(club_name=club_name)
     cur_user = request.user
     roles = Role.objects.filter(club=club).exclude(club_role='BAN')
     club_role = club.get_club_role(cur_user)
     if club_role == 'OWN':
         is_owner = True
-    context = {'club': club, 'roles': roles, 'is_owner': is_owner}
+    if club_role == 'MOD':
+        is_moderator = True
+    context = {'club': club, 'roles': roles, 'is_owner': is_owner, 'is_moderator': is_moderator}
     return render(request, "member_list.html", context)
 
 @login_required
