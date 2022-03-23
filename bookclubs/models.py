@@ -238,10 +238,6 @@ class Club(models.Model):
     )
 
     genre = models.CharField(
-<<<<<<< HEAD
-        choices=[('Fiction', 'Fiction'), ('Non-Fiction', 'Non-Fiction')],
-=======
->>>>>>> 0904d32bea133c37db0694a71641879966a20ab4
         max_length=100,
         default='Fiction',
         blank=False
