@@ -161,14 +161,9 @@ class ClubForm(forms.ModelForm):
         ('PRI', 'Private')
     )
 
-<<<<<<< HEAD
-    GENRE_CHOICES = [('Fiction', 'Fiction'), ('Non-Fiction', 'Non-Fiction')]
-
-=======
     # GENRE_CHOICES = [('Fiction', 'Fiction'), ('Non-Fiction', 'Non-Fiction')],
     GENRE_CHOICES = Book.get_genres()
-    # GENRE_CHOICES = [('Fiction', 'Fiction'), ('Non-Fiction', 'Non-Fiction')]
->>>>>>> 0904d32bea133c37db0694a71641879966a20ab4
+
 
     meeting_status = forms.ChoiceField(widget=forms.Select(), label='Meetings Held', choices=MEETING_CHOICES)
     public_status = forms.ChoiceField(widget=forms.Select(), label='Status', choices=PRIVACY_CHOICES)
