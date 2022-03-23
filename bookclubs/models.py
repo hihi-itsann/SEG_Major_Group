@@ -238,7 +238,7 @@ class Club(models.Model):
     )
 
     genre = models.CharField(
-        choices=Book.get_genres(),
+        choices=[('Fiction', 'Fiction'), ('Non-Fiction', 'Non-Fiction')],
         max_length=100,
         default='Fiction',
         blank=False
@@ -362,6 +362,7 @@ class Role(models.Model):
 
 
 class Post(models.Model):
+
     title = models.CharField(max_length=255)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     body = models.TextField()
@@ -373,6 +374,46 @@ class Post(models.Model):
 
     def get_absolute_url(self):
         return reverse('feed')
+
+    def toggle_upvote(self, user):
+        if Vote.objects.filter(post=self, user=user).count() == 1:
+            vote = Vote.objects.get(post=self, user=user)
+            if vote.vote_type == True:
+                vote.delete()
+            else:
+                vote.delete()
+                Vote.objects.create(post=self, user=user, vote_type=True)
+        else:
+            Vote.objects.create(post=self, user=user, vote_type=True)
+
+    def toggle_downvote(self, user):
+        if Vote.objects.filter(post=self, user=user).count() == 1:
+            vote = Vote.objects.get(post=self, user=user)
+            if vote.vote_type == False:
+                vote.delete()
+            else:
+                vote.delete()
+                Vote.objects.create(post=self, user=user, vote_type=False)
+
+        else:
+            Vote.objects.create(post=self, user=user, vote_type=False)
+
+    def get_upvotes(self):
+        return Vote.objects.filter(post=self, vote_type=True).count()
+
+    def get_downvotes(self):
+        return Vote.objects.filter(post=self, vote_type=False).count()
+
+
+
+
+class Vote(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='post_vote')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_vote')
+    vote_type = models.BooleanField()
+
+    class Meta:
+        unique_together = ('user', 'post')
 
 
 class Comment(models.Model):
@@ -440,7 +481,7 @@ class Meeting(models.Model):
             else:
                 return f"It's time to join the meeting!"
 
-            
+
         else:
             return f'Meeting Held: {self.location} {self.club.city} {self.club.country}'
 

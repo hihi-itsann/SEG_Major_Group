@@ -6,25 +6,44 @@
 <h1>POSTs</h1>
 <ul>
 {% for post in object_list%}
-    <li>
-      <b><u>{{ post.title }}</u> - <i>{{ post.author }}</i> {{ post.post_date }} {{ post.post_datetime }}</b>
-      <small>
-          {% if user.is_authenticated %}
-            <a href="{% url 'create_comment' post.pk%}">(Comment)</a>
-            {% if user.id == post.author.id%}
-              <a href="{% url 'delete_post' post.pk %}">(Delete)</a>
-            {% endif %}
 
-          {% endif %}
-      </small><br/>
+<div class="post" id={{post.id}}>
+  <div class="ui fluid card">
+    <div class="content">
+      <div class="right floated meta">
+      <div class="ui grid">
+        <div class="row">
+          <b><u>{{ post.title }}</u> - <i>{{ post.author }}</i> {{ post.post_date }} {{ post.post_datetime }}</b>
+          </div>
+        </div>
+        </div>
+ <div class="content">
+        <p>  {{ post.body }} </p>
 
-      {{ post.body}}
 
-      <br/><br/>
+      <div class="card-action">
+                     <a href="{% url 'post_upvote' post.id %}">Upvote</a>{{ post.get_upvotes }}
+                     <a href="{% url 'post_downvote' post.id %}">Downvote</a>{{ post.get_downvotes }}
+{# <i class="material-icons">thumb_up</i> #}
+{# <i class="material-icons">thumb_down</i> #}
+      </div>
+
+
+          <small>
+              {% if user.is_authenticated %}
+                <a href="{% url 'create_comment' post.pk%}">(Comment)</a>
+                {% if user.id == post.author.id%}
+                  <a href="{% url 'delete_post' post.pk %}">(Delete)</a>
+                {% endif %}
+              {% endif %}
+          </small>
+
+
+      <br/>
         {% if not post.comments.all %}
             <b>No Comments Yet</b>
         {% else %}
-            <b>Comment:</b>
+            <b>Comments:</b>
             <br/>
             {% for comment in post.comments.all%}
                 <b><i>{{ comment.author.username }}</i> - <i>{{ post.post_datetime }}</i></b>
@@ -43,8 +62,12 @@
         {% endif %}
 
       <br/><br/>
-
-    </li>
+    </div>
+  </div>
+</div>
 {% endfor %}
 </ul>
+
+
+
 {% endblock %}

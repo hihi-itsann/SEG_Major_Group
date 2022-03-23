@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Application, Club, Role, Book, BookRatingReview, BookStatus, Comment, Post, Meeting, \
+from .models import User, Application, Club, Role, Book, BookRatingReview, BookStatus, Vote, Comment, Post, Meeting, \
     MeetingAttendance
 
 
@@ -46,6 +46,12 @@ class BookRatingReviewAdmin(admin.ModelAdmin):
 class BookStatusAdmin(admin.ModelAdmin):
     list_display = [
         'status', 'book', 'user'
+    ]
+
+@admin.register(Vote)
+class VoteAdmin(admin.ModelAdmin):
+    list_display = [
+        'user','post'
     ]
 
 @admin.register(Comment)

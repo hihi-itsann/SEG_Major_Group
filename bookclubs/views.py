@@ -2,11 +2,14 @@ from ntpath import join
 #from os import startfile
 from webbrowser import get
 from django.db.models import Q  # filter exception
+from django.db.models import F
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ImproperlyConfigured
 from django.http import Http404
+from django.http import JsonResponse
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
 from django.views import View
@@ -14,16 +17,17 @@ from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
-from django.shortcuts import redirect, render, get_object_or_404
+from django.shortcuts import redirect, render, get_object_or_404, HttpResponseRedirect
 from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, ClubForm, ApplicationForm, CommentForm, \
     RateReviewForm, PostForm, MeetingForm, ApplicationForm
 from .helpers import *
-from .models import User, Book, Application, Comment, Post, BookRatingReview, BookStatus, Club, Meeting, \
+from .models import User, Book, Application, Vote, Comment, Post, BookRatingReview, BookStatus, Club, Meeting, \
     MeetingAttendance
 from django.core.paginator import Paginator
 from random import choice
 from bookclubs.meeting_link import create_zoom_meeting, get_join_link, get_start_link
 from datetime import datetime
+
 
 
 @login_prohibited
@@ -675,6 +679,25 @@ def member_list(request, club_name):
     context = {'club': club, 'roles': roles, 'is_owner': is_owner}
     return render(request, "member_list.html", context)
 
+@login_required
+def post_upvote(request, post_id):
+    user_upvoting = request.user
+    post = Post.objects.get(id=post_id)
+    post.toggle_upvote(user_upvoting)
+    # The #post_id redirects to the part of the page with the post
+    return redirect(f'/post_comment/#{post_id}')
+
+
+@login_required
+def post_downvote(request, post_id):
+    user_downvoting = request.user
+    post = Post.objects.get(id=post_id)
+    post.toggle_downvote(user_downvoting)
+    # The #post_id redirects to the part of the page with the post
+    return redirect(f'/post_comment/#{post_id}')
+
+
+
 
 class PostCommentView(LoginRequiredMixin, ListView):
     model = Post
@@ -758,7 +781,7 @@ def create_meeting(request, club_name, book_isbn):
                 create_zoom_meeting(request.POST.get("date"),request.POST.get("time_start"),request.POST.get("duration"))
                 join_link=get_join_link()
                 start_link=get_start_link()
-        
+
             form.original_save(request.user, current_club, chosen_book,join_link,start_link)
             messages.add_message(request, messages.SUCCESS, "Meeting set up!")
 
@@ -801,7 +824,7 @@ def show_meeting(request, club_name, meeting_id):
     meeting = Meeting.objects.get(id=meeting_id)
     is_host = meeting.is_host(request.user)
     is_attendee_only = meeting.is_attendee_only(request.user)
-   
+
     return render(request, 'show_meeting.html', {'meeting': meeting, 'club_name': club_name, 'is_host': is_host,
                                                  'is_attendee_only': is_attendee_only})
 
