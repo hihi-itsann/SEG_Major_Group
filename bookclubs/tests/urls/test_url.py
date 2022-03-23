@@ -4,7 +4,7 @@ import random
 from bookclubs.views import home, feed, SignUpView, LogInView, log_out, ProfileUpdateView,\
                             show_user, PasswordView ,BookListView, ShowBookView, CreateBookRateReviewView,\
                             create_book_status, delete_book_status, change_book_status, reading_book_list,\
-                            club_feed, club_welcome, create_club, delete_club, create_application,\
+                            club_feed, create_club, delete_club, create_application,\
                             withdraw_application, my_applications, application_list, accept_applicant, \
                             reject_applicant, club_list, my_clubs, member_list, PostCommentView, \
                             CreatePostView, DeletePostView, CreateCommentView, DeleteCommentView,\
@@ -77,10 +77,6 @@ class TestUrls(SimpleTestCase):
     def test_club_feed_url_is_resolved(self):
         url = reverse('club_feed',args=['some-str'])
         self.assertEquals(resolve(url).func, club_feed)
-
-    def test_club_welcome_url_is_resolved(self):
-        url = reverse('club_welcome',args=['some-str'])
-        self.assertEquals(resolve(url).func, club_welcome)
 
     def test_create_club_url_is_resolved(self):
         url = reverse('create_club')

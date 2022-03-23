@@ -1,0 +1,43 @@
+{% extends 'base_content.html' %}
+{% block title %}
+| Member List
+{% endblock %}
+
+{% block content %}
+<head>
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card text-center" style="border:none">
+          <div class="card-body" style="background-color:#EFF6E0; border:none;">
+            <h5 class="card-title text-uppercase mb-0">{{ club.club_name }}</h5>
+            <p>Member List</p>
+            {% if is_owner %}
+              <p>You are owner!</p>
+            {% endif %}
+          </div>
+
+          <div class="table-responsive">
+            <table class="table no-wrap user-table mb-0" style="background-color:#EFF6E0; border:none;">
+              <thead>
+                    <tr>
+                      <th scope="col" class="border-0 text-uppercase font-medium">Position</th>
+                      <th scope="col" class="border-0 text-uppercase font-medium">Name</th>
+                      <th scope="col" class="border-0 text-uppercase font-medium">Username</th>
+                      {% if owner %}
+                        <th scope="col" class="border-0 text-uppercase font-medium">Manage</th>
+                      {% endif %}
+                    </tr>
+                </thead>
+
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+{% endblock %}
