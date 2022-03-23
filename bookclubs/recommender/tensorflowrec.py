@@ -78,7 +78,6 @@ def modelTrain(): #club_subject
         # "Book-Rating": x["Book-Rating"]
     })
     books = books.map(lambda x: x["ISBN"])
-    print(type(ratings))
     calculate_model(ratings,books)
 
 def data_for_recommendations():
@@ -88,11 +87,17 @@ def data_for_recommendations():
     get_club_books_average_rating()
     global ratings
     ratings = pd.DataFrame(list(ClubBookAverageRating.objects.all().values()))
+    ratings['Book-Rating']=ratings['rate']/ratings['number_of_ratings']
+    ratings['ISBN']=ratings['book_id']
+    ratings['User-ID']=ratings['club_id']
+
     ratings = tf.data.Dataset.from_tensor_slices((dict(ratings)))
+
     global books
-    books = pd.DataFrame(list(Book.objects.all().values()))
+    books = pd.DataFrame(list(Book.objects.all().values()))[["ISBN"]]
     books = tf.data.Dataset.from_tensor_slices((dict(books)))
-   
+    books = books.map(lambda x: x["ISBN"])
+
     
 def calculate_model(ratings, books):
     print("nice")
@@ -122,13 +127,19 @@ def calculate_model(ratings, books):
 
     # Train for 3 epochs.
     model.fit(ratings.batch(4096), epochs=3)
+    print("everything s fine")
     return model
 
 
 def get_recommendations():
   # Use brute-force search to set up retrieval using the trained representations.
+
+  #training
   modelTrain()
+
+  
   data_for_recommendations()
+
   model=calculate_model(ratings,books)
   index = tfrs.layers.factorized_top_k.BruteForce(model.user_model)
   index.index_from_dataset(
