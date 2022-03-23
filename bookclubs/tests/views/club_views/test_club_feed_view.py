@@ -117,7 +117,7 @@ class ClubFeedViewTestCase(TestCase):
         response_url = reverse('feed')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
 
-    def test_banned_user_cannot_get_club3_feed(self):
+    def test_banned_user_cannot_get_club4_feed(self):
         self.client.login(username=self.user3.username, password='Password123')
         response = self.client.get(self.url4)
         response_url = reverse('feed')
@@ -139,6 +139,12 @@ class ClubFeedViewTestCase(TestCase):
     #         password= "Password123",
     #         is_active= true
     #         )
+    def test_cannot_get_no_eixts_club_feed(self):
+        self.client.login(username=self.user3.username, password='Password123')
+        self.url5=reverse('club_feed',kwargs={'club_name':'club5'})
+        response = self.client.get(self.url5)
+        response_url = reverse('feed')
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
 
 
     def _create_test_rols(self):
