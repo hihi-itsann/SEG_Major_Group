@@ -105,16 +105,6 @@ def getTenISBN(userID):
         validation_data=(x_val, y_val),
     )
 
-    # plt.plot(history.history["loss"])
-    # plt.plot(history.history["val_loss"])
-    # plt.title("model loss")
-    # plt.ylabel("loss")
-    # plt.xlabel("epoch")
-    # plt.legend(["train", "test"], loc="upper left")
-    # plt.show()
-
-
-    # Let us get a user and see the top recommendations.
     user_id = userID
 
     books_watched_by_user = ratings[ratings['User-ID'] == user_id]
@@ -141,28 +131,6 @@ def getTenISBN(userID):
         book_encoded2book.get(books_not_watched[x][0]) for x in top_ratings_indices
     ]
 
-    # print("Showing recommendations for user: {}".format(user_id))
-    # print("====" * 9)
-    # print("Movies with high ratings from user")
-    # print("----" * 8)
-    # top_books_user = (
-    #     books_watched_by_user.sort_values(by="rating", ascending=False)
-    #     .head(5)
-    #     .ISBN.values
-    # )
-    # books_rows = books[books["ISBN"].isin(top_books_user)]
-    # for row in books_rows.itertuples():
-    #     print(row[2], ":", row[4])
-    #
-    # print("----" * 8)
-    # print("Top 10 book recommendations")
-    # print("----" * 8)
-    # recommended_books = books[books["ISBN"].isin(recommended_book_ids)]
-
-    print(recommended_book_ids)
     return recommended_book_ids
 
-    # return(recommended_book_ids)
-    # for row in recommended_books.itertuples():
-    #     print(row[2], ":", row[4])
 getTenISBN(11677)
