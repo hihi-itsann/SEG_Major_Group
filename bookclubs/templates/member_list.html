@@ -1,32 +1,151 @@
 {% extends 'base_content.html' %}
+{% block title %}
+| Member List
+{% endblock %}
+
 {% block content %}
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {font-family: Arial, Helvetica, sans-serif;}
+
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+/* The Close Button */
+.close {
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+
 <div class="container">
-      <div class="col-xs-12 col-lg-6 col-xl-8">
-          <br>
-          <h1>{{ club.club_name }}</h1>
-          <div>
-              <p>Member List</p>
-              {% if owner %}
-                You are owner!
-              {% endif %}
-              <hr class="row-divider">
-                  <div>
-                      <table class="table table-dark table-striped">
-                          <tr>
-                              <th scope="col">Position</th>
-                              <th scope="col">Full name</th>
-                              <th scope="col">Username</th>
-                          </tr>
-                            {% for role in roles %}
-                                <tr>
-                                    <td>{{ role.club_role }}</td>
-                                    <td>{{ role.user.full_name }}</td>
-                                    <td><a href="{% url 'show_user' username=role.user.username %}"> {{ role.user.username}} </a></td>
-                                </tr>
-                            {% endfor %}
-                        </table>
-                  </div>
-          </div>
-      </div>
-  </div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card text-center" style="border:none">
+            <div class="card-body" style="background-color:#EFF6E0; border:none;">
+                <h5 class="card-title text-uppercase mb-0">{{ club.club_name }}</h5>
+                <p>Member List</p>
+                {% if is_owner %}
+                  <p>You are owner!</p>
+                {% endif %}
+            </div>
+            <div class="table-responsive">
+                <table class="table no-wrap user-table mb-0" style="background-color:#EFF6E0; border:none;">
+                  <thead>
+                    <tr>
+                      <th scope="col" class="border-0 text-uppercase font-medium">Position</th>
+                      <th scope="col" class="border-0 text-uppercase font-medium">Name</th>
+                      <th scope="col" class="border-0 text-uppercase font-medium">Username</th>
+                      {% if owner %}
+                        <th scope="col" class="border-0 text-uppercase font-medium">Manage</th>
+                      {% endif %}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for role in roles %}
+                        <tr>
+                            <td>{{ role.club_role }}</td>
+                            <td>
+                              {{ role.user.full_name }}
+
+                            </td>
+                            <td id="myBtn">{{ role.user.username}}</td>
+                            <!-- The Modal -->
+                            <div id="myModal" class="modal">
+
+                              <!-- Modal content -->
+                              <div class="modal-content">
+                                <span class="close">&times;</span>
+                                <p>Email: {{role.user.email}}</p>
+                                <p>Bio: {{role.user.bio}}</p>
+                                <p>Date of Birth: {{role.user.dob}}</p>
+                                <p>Gender: {{role.user.gender}}</p>
+                                <p>Location: {{role.user.location}}</p>
+                                <p>City: {{role.user.city}}</p>
+                                <p>Country: {{role.user.country}}</p>
+                              </div>
+
+                            </div>
+
+                            <script>
+                                // Get the modal
+                                var modal = document.getElementById("myModal");
+
+                                // Get the button that opens the modal
+                                var btn = document.getElementById("myBtn");
+
+                                // Get the <span> element that closes the modal
+                                var close = document.getElementsByClassName("close")[0];
+
+                                // When the user clicks the button, open the modal
+                                btn.onclick = function() {
+                                  modal.style.display = "block";
+                                }
+
+                                // When the user clicks on <span> (x), close the modal
+                                close.onclick = function() {
+                                  modal.style.display ="none";
+                                }
+
+                                // When the user clicks anywhere outside of the modal, close it
+                                window.onclick = function(event) {
+                                  if (event.target == modal) {
+                                    modal.style.display = "none";
+                                  }
+                                }
+                            </script>
+
+                            {% if is_owner %}
+                            <td>
+                              <button type="button" class="btn btn-outline-info btn-circle btn-lg btn-circle"><i class="fa fa-key"></i> </button>
+                              <button type="button" class="btn btn-outline-info btn-circle btn-lg btn-circle ml-2"><i class="fa fa-trash"></i> </button>
+                              <button type="button" class="btn btn-outline-info btn-circle btn-lg btn-circle ml-2"><i class="fa fa-edit"></i> </button>
+                              <button type="button" class="btn btn-outline-info btn-circle btn-lg btn-circle ml-2"><i class="fa fa-upload"></i> </button>
+                            </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+
+                  </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</body>
 {% endblock %}

@@ -334,29 +334,6 @@ def club_feed(request, club_name):
 
 
 @login_required
-@club_exists
-def club_welcome(request, club_name):
-    is_member = False
-    is_banned = False
-    club = Club.objects.get(club_name=club_name)
-    user = request.user
-    try:
-        club_role = club.get_club_role(user)
-    except Role.DoesNotExist:
-        return render(request, 'club_welcome.html',
-                      {'club': club, 'user': user, 'is_member': is_member,
-                       'is_banned': is_banned})
-    else:
-        if club_role == 'BAN':
-            is_banned = True
-        elif club_role == 'MEM' or club_role == 'OWN' or club_role == 'OFF':
-            is_member = True
-    return render(request, 'club_welcome.html',
-                  {'club': club, 'user': user, 'is_member': is_member,
-                   'is_banned': is_banned})
-
-
-@login_required
 def create_club(request):
     """a user can create a club"""
     if request.method == 'POST':
