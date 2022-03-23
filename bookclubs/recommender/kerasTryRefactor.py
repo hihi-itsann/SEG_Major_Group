@@ -11,13 +11,44 @@ from tensorflow.keras.applications import ResNet50
 #from dkeras import dKeras
 import numpy as np
 #import ray
+from bookclubs.models import Book, ClubBookAverageRating, Club
 
-def getTenISBN(userID):
+def get_club_books_average_rating():
+    """ Saves the average rating of books read by users of each club (banned member are not included) """
+    clubs=Club.objects.all()
+    for club in clubs:
+        members=club.get_moderators()|club.get_members()|club.get_management()
+        for user in members:
+            for rating in user.get_rated_books():
+                clubBookRating=ClubBookAverageRating.objects.all().filter(club=club,book=rating.book)
+                if clubBookRating:
+                    clubBookRating.get().add_rating(clubBookRating.get().rate)
+                    clubBookRating.get().increment_number_of_ratings()
+                else:
+                    ClubBookAverageRating.objects.create(
+                        club=club,
+                        book=rating.book,
+                        rate=rating.rate,
+                        number_of_ratings=1
+                    )
+def get_data_for_recommendations():
+    ClubBookAverageRating.objects.all().delete()
 
+    get_club_books_average_rating()
+    ratings = pd.DataFrame(list(ClubBookAverageRating.objects.all().values()))
+    books = pd.DataFrame(list(Book.objects.all().values()))
+    ratings['Book-Rating']=ratings['rate']/ratings['number_of_ratings']
+    ratings['ISBN']=ratings['book_id']
+    ratings['User-ID']=ratings['club_id']
+    return (ratings, books)
+
+def train():
     ratings = pd.read_csv('bookclubs/dataset/BX-Book-Ratings.csv', sep = ';', quotechar = '"', encoding = 'latin-1',header = 0 )
     books = pd.read_csv('bookclubs/dataset/BX-Books.csv', sep = ';', quotechar = '"', encoding = 'latin-1',header = 0 )
     ratings = ratings.loc[ratings["Book-Rating"] != 0]
+    get_model(ratings)
 
+def get_model(ratings):
     user_ids = ratings["User-ID"].unique().tolist()
     user2user_encoded = {x: i for i, x in enumerate(user_ids)}
     userencoded2user = {i: x for i, x in enumerate(user_ids)}
@@ -53,7 +84,6 @@ def getTenISBN(userID):
         y[:train_indices],
         y[train_indices:],
     )
-    print("something1")
 
 
     EMBEDDING_SIZE = 50
@@ -93,7 +123,6 @@ def getTenISBN(userID):
 
 
     model = RecommenderNet(num_users, num_books, EMBEDDING_SIZE)
-    print("something2")
 
     model.compile(optimizer = "adam", loss = tf.keras.losses.MeanSquaredError(),
                   metrics =[tf.keras.metrics.TopKCategoricalAccuracy(k=1), tf.keras.metrics.RootMeanSquaredError()])
@@ -106,15 +135,21 @@ def getTenISBN(userID):
         verbose=1,
         validation_data=(x_val, y_val),
     )
+    return (model,user2user_encoded,book2book_encoded,book_encoded2book)
 
-    print("something3")
+def getTenISBN(userID):
+
+    train()
+    (ratings, books)=get_data_for_recommendations()
+    (model,user2user_encoded,book2book_encoded,book_encoded2book)=get_model(ratings)
+        
+
 
     user_id = userID
 
     books_watched_by_user = ratings[ratings['User-ID'] == user_id]
     if (len(books_watched_by_user) == 0) :
         return []
-    print("something4")
 
     books_not_watched = books[
         ~books["ISBN"].isin(books_watched_by_user.ISBN.values)
@@ -123,7 +158,6 @@ def getTenISBN(userID):
     books_not_watched = list(
         set(books_not_watched).intersection(set(book2book_encoded.keys()))
     )
-    print("something5")
 
     books_not_watched = [[book2book_encoded.get(x)] for x in books_not_watched]
     user_encoder = user2user_encoded.get(user_id)
@@ -132,12 +166,12 @@ def getTenISBN(userID):
     )
     ratings = model.predict(user_book_array).flatten()
     top_ratings_indices = ratings.argsort()[-10:][::-1]
-    print("something6")
 
     recommended_book_ids = [
         book_encoded2book.get(books_not_watched[x][0]) for x in top_ratings_indices
     ]
-    print("something7")
+    print("something")
+
     print(recommended_book_ids)
     return recommended_book_ids
 
