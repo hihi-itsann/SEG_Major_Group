@@ -339,6 +339,12 @@ class Club(models.Model):
         else:
             return 'In-Person'
 
+    def get_public_status(self):
+        if self.public_status == 'PRI':
+            return 'Private'
+        else:
+            return 'Public'
+
 
 class Role(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

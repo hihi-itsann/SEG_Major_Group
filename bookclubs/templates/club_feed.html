@@ -3,16 +3,25 @@
 | Club Feed
 {% endblock %}
 {% block content %}
-<h1>{{ club.club_name }}</h1>
-<h2>FEED</h2>
-<p1>{{ club.club_name }}</p1>
-<p2>{{ club.meeting_status }}</p2>
-<p3>{{ club.location }}</p3>
-<p4>{{ club.description }}</p4>
-{% if is_owner %}
-<a href='{% url 'update_club_info' club.club_name %}'
-       class="btn btn-outline-dark">
-    update club
-</a>
-{% endif %}
+
+<div class="col-lg-6 offset-2">
+  <h1 style="color:#2F3E46">
+    <b>{{ club.club_name }}</b>
+    {% if is_owner %}
+        <a href='{% url 'update_club_info' club.club_name %}'
+               class="btn btn-outline-dark">
+            update club
+        </a>
+    {% endif %}
+  </h1>
+
+  <hr>
+  <h4 style="color:#354F52"><em>Meeting Status: {{ club.get_meeting_status }}</em></h4><br>
+  <h4 style="color:#354F52"><em>Public Status: {{ club.get_public_status }}</em></h4><br>
+  <h4 style="color:#354F52"><em>City: {{ club.city }}</em></h4><br>
+  <h4 style="color:#354F52"><em>Country: {{ club.country }}</em></h4><br>
+  <h4 style="color:#354F52"><em>Description: {{ club.description }}</em></h4><br>
+
+
+
 {% endblock %}
