@@ -680,7 +680,6 @@ def post_downvote(request, post_id):
 class PostCommentView(LoginRequiredMixin, ListView):
     model = Post
     template_name = 'club_feed.html'
-    ordering = ['-post_date', '-post_datetime', ]
 
 
 class CreatePostView(LoginRequiredMixin, CreateView):
@@ -694,7 +693,7 @@ class CreatePostView(LoginRequiredMixin, CreateView):
 class DeletePostView(LoginRequiredMixin, DeleteView):
     model = Post
     template_name = 'delete_post.html'
-    #success_url = reverse_lazy('club_feed')
+    success_url = reverse_lazy('my_clubs')
 
 
 class CreateCommentView(LoginRequiredMixin, CreateView):
@@ -713,7 +712,7 @@ class CreateCommentView(LoginRequiredMixin, CreateView):
 class DeleteCommentView(LoginRequiredMixin, DeleteView):
     model = Comment
     template_name = 'delete_comment.html'
-    #success_url = reverse_lazy('club_feed')
+    #success_url = reverse_lazy('my_clubs')
 
 
 @login_required

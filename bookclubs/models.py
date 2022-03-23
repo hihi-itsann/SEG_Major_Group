@@ -375,11 +375,14 @@ class Post(models.Model):
     post_date = models.DateField(auto_now_add=True)
     post_datetime = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        ordering = ['-post_date', '-post_datetime']
+
     def __str__(self):
         return self.title + ' | ' + str(self.author)
 
-    def get_absolute_url(self):
-        return reverse('feed')
+    # def get_absolute_url(self):
+    #     return reverse('feed')
 
     def toggle_upvote(self, user):
         if Vote.objects.filter(post=self, user=user).count() == 1:
@@ -428,8 +431,8 @@ class Comment(models.Model):
     related_post = models.ForeignKey(Post, related_name="comments", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def get_absolute_url(self):
-        return reverse('feed')
+    # def get_absolute_url(self):
+    #     return reverse('feed')
 
     class Meta:
         ordering = ['-created_at']
