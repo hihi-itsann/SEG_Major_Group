@@ -41,7 +41,7 @@ class ShowMeetingViewTestCase(TestCase):
             location='Bush House',
             date='2022-04-01',
             time_start='10:00',
-            time_end='11:00'
+            duration=60
         )
         MeetingAttendance.objects.create(
             user=self.host,
