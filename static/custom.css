@@ -237,8 +237,12 @@ h3.profile-title {
 }
 
 /*
- * important buttons
+ * important buttons and href link
  */
+ .btn-feed:active{
+   border:none;
+ }
+
  .btn-apply{
    background-color:#ffdd00;
    color:#2f3e46;
@@ -258,11 +262,31 @@ h3.profile-title {
  }
 
  .btn-book{
-   background-color:#AEC3B0;
-   color:#01161E;
+   text-decoration: none;
+   background-color:#CAD2C5;
+   color:#2F3E46;
  }
 
  .btn-book:hover{
    background-color:#AEC3B0;
+   color:#52796F;
+ }
+
+ .btn-read{
+   border-color: #AEC3B0;
+   background-color: #EFF6E0;
    color:#124559;
  }
+
+ .btn-read:hover{
+   background-color:#CAD2C5;
+   color:#52796F;
+ }
+
+ .parent .popup {
+  display: none;
+}
+
+.parent:hover .popup {
+  display: block;
+}
