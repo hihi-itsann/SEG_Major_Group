@@ -41,9 +41,9 @@ class MeetingListViewTestCase(TestCase):
             description='delta foxtrot golf hotel india',
             meeting_status='OFF',
             location='Bush House',
-            date='2022-04-01',
+            date='2024-04-01',
             time_start='10:00',
-            time_end='11:00'
+            duration=60
         )
         self.another_meeting = Meeting.objects.create(
             club=self.club,
@@ -52,9 +52,9 @@ class MeetingListViewTestCase(TestCase):
             description='delta foxtrot golf hotel india',
             meeting_status='OFF',
             location='Bush House',
-            date='2022-04-01',
+            date='2024-04-01',
             time_start='10:00',
-            time_end='11:00'
+            duration=60
         )
         MeetingAttendance.objects.create(
             user=self.host,

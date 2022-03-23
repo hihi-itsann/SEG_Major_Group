@@ -27,7 +27,7 @@ class MeetingFormTestCase(TestCase):
             'location': 'Bush House',
             'date': '2022-04-01',
             'time_start': '10:00',
-            'time_end': '11:00'
+            'duration': 11
         }
 
     def test_valid_new_meeting_form(self):
@@ -39,7 +39,7 @@ class MeetingFormTestCase(TestCase):
         form = MeetingForm(data=self.form_input)
         before_count_meeting = Meeting.objects.count()
         before_count_attendance = MeetingAttendance.objects.count()
-        form.save(self.user, self.club, self.book)
+        form.original_save(self.user, self.club, self.book)
         after_count_meeting = Meeting.objects.count()
         after_count_attendance = MeetingAttendance.objects.count()
         self.assertEqual(after_count_meeting, before_count_meeting + 1)

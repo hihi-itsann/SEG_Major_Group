@@ -24,7 +24,7 @@ class MeetingModelTestCase(TestCase):
             location='Bush House',
             date='2022-04-01',
             time_start='11:00',
-            time_end='13:00'
+            duration=60
         )
 
     def test_is_attending(self):
@@ -70,7 +70,7 @@ class MeetingModelTestCase(TestCase):
         self.assertEqual(self.meeting.get_meeting_status(), 'In-Person')
 
     def test_get_location(self):
-        self.assertTrue(self.meeting.get_location().__contains__('Meeting Link:'))
+        self.assertTrue(self.meeting.get_location().__contains__('Meeting Link'))
         self.meeting.meeting_status = 'OFF'
         self.assertTrue(self.meeting.get_location().__contains__('Meeting Held:'))
 

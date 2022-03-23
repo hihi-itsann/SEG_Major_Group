@@ -43,7 +43,6 @@ urlpatterns = [
 
     # Club Views
     path('club/<str:club_name>/feed/', views.club_feed, name='club_feed'),
-    path('club/<str:club_name>/', views.club_welcome, name='club_welcome'),
     path('create_club/', views.create_club, name='create_club'),
     path('club/<str:club_name>/delete/', views.delete_club, name='delete_club'),
     path('club_list/', views.club_list, name='club_list'),
@@ -66,10 +65,12 @@ urlpatterns = [
     path('club/<str:club_name>/accept/<int:user_id>/', views.accept_applicant, name='accept_applicant'),
     path('club/<str:club_name>/reject/<int:user_id>/', views.reject_applicant, name='reject_applicant'),
 
-    # Post Views
+    # Post Comment Views
     path('post_comment/', views.PostCommentView.as_view(), name='post_comment'),
     path('create_post/', views.CreatePostView.as_view(), name='create_post'),
     path('article/delete/<int:pk>/', views.DeletePostView.as_view(), name='delete_post'),
+    path('upvote/<post_id>/', views.post_upvote, name='post_upvote'),
+    path('downvote/<post_id>/', views.post_downvote, name='post_downvote'),
     path('create_comment/<int:pk>/', views.CreateCommentView.as_view(), name='create_comment'),
     path('delete_comment/<int:pk>/', views.DeleteCommentView.as_view(), name='delete_comment'),
 
@@ -81,5 +82,6 @@ urlpatterns = [
     path('club/<str:club_name>/meeting/<int:meeting_id>/join/', views.join_meeting, name='join_meeting'),
     path('club/<str:club_name>/meeting/<int:meeting_id>/leave/', views.leave_meeting, name='leave_meeting'),
     path('club/<str:club_name>/meeting/<int:meeting_id>/delete/', views.delete_meeting, name='delete_meeting'),
+    path('club/<str:club_name>/meeting/<int:meeting_id>/edit/', views.edit_meeting, name='edit_meeting'),
 
 ]

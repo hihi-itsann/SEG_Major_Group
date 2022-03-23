@@ -1,4 +1,8 @@
 {% extends 'base_content.html' %}
+{% block title %}
+| Show Recommendations
+{% endblock %}
+
 {% block content %}
     <style>
         h1 {
@@ -54,7 +58,7 @@
                                 <td>{{ book.author }}</td>
                                 <td> {{ book.ISBN }} </td>
                                 <td>
-                                        <a href="{% url 'create_meeting' club_name=club_name book_isbn=book.ISBN %}" class=button>
+                                        <a href="{% url 'create_meeting' club_name=club_name book_isbn=book.ISBN %}" class="btn btn-outline-dark">
                                             Choose
                                         </a>
                                 </td>

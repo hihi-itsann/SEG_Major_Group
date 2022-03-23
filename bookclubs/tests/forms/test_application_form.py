@@ -39,7 +39,7 @@ class ApplicationFormTestCase(TestCase):
         self.client.login(username=self.user.email, password="Password123")
         form = ApplicationForm(data=self.form_input)
         before_count = Application.objects.count()
-        form.save(self.user, self.club)
+        form.original_save(self.user, self.club)
         after_count = Application.objects.count()
         self.assertEqual(after_count, before_count + 1)
         application = Application.objects.get(user=self.user, club=self.club)

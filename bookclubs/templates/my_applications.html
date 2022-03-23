@@ -1,4 +1,8 @@
 {% extends 'base_content.html' %}
+{% block title %}
+| My Applications
+{% endblock %}
+
 {% block content %}
     <style>
         h1 {
@@ -25,7 +29,7 @@
         }
     </style>
 
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
 
     <div class="event-schedule-area-two bg-color pad100">
         <div class="container">
@@ -34,6 +38,10 @@
                     <div class="section-title text-center">
                         <div class="title-text">
                             <h2><b>My Applications </b></h2>
+                     <div style="text-align: right">
+                                <button type="button" class="btn btn-outline-dark"><a
+                                        href="{% url 'club_list' %}">Explore Clubs</a></button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -44,11 +52,7 @@
                 <div class="row">
                     <div>
                         {% if applications_count != 0 %}
-                            {% if applications_count == 1 %}
-                                <h5>You have {{ applications_count }} application.</h5>
-                            {% else %}
-                                <h5>You have {{ applications_count }} applications.</h5>
-                            {% endif %}
+
                             <table class="table table-striped">
                                 <thead>
                                 <tr>
@@ -67,7 +71,8 @@
                                         <td> {{ application.get_status_display }} </td>
                                         <td>
                                             {% if application.status == 'P' %}
-                                                <a href="{% url 'edit_application' application.club.club_name %}" class="btn btn-normal">
+                                                <a href="{% url 'edit_application' application.club.club_name %}"
+                                                   class="btn btn-outline-dark">
                                                     Edit
                                                 </a>
 
@@ -76,7 +81,7 @@
                                         <td>
                                             {% if application.status == 'P' %}
                                                 <a href="{% url 'withdraw_application' application.club.club_name %}"
-                                                   class="btn btn-normal">
+                                                   class="btn btn-outline-dark">
                                                     Withdraw
                                                 </a>
                                             {% endif %}
@@ -87,6 +92,8 @@
                             </table>
                         {% else %}
                             <div>
+                            <div style="text-align: right">
+
                                 <h5>You haven't applied to any clubs.</h5>
                             </div>
                         {% endif %}

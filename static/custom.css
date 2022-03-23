@@ -239,10 +239,6 @@ h3.profile-title {
 /*
  * important buttons and href link
  */
- .btn-feed:active{
-   border:none;
- }
-
  .btn-apply{
    background-color:#ffdd00;
    color:#2f3e46;

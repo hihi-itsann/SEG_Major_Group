@@ -1,4 +1,8 @@
 {% extends 'base_content.html' %}
+{% block title %}
+| My Clubs
+{% endblock %}
+
 {% block content %}
 <head>
   <title>Bootstrap Example</title>
@@ -12,6 +16,10 @@
             <br>
             {% if clubs %}
                 <h1><b>My Clubs</b></h1>
+                <div style="text-align: right">
+                                <button type="button" class="btn btn-outline-dark"><a
+                                        href="{% url 'club_list' %}">Explore More</a></button>
+                </div>
                 <br>
                 <div class="club">
                   <div class="row row-cols-3">
