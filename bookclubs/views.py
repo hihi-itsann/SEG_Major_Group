@@ -324,13 +324,14 @@ def club_feed(request, club_name):
     club_role = current_club.get_club_role(request.user)
     members = current_club.get_members()
     management = current_club.get_management()
+    posts = Post.objects.all()
     if club_role == 'OWN':
         is_owner = True
     elif club_role == 'MOD':
         is_moderator = True
     return render(request, 'club_feed.html',
                   {'club': current_club, 'is_moderator': is_moderator, 'is_owner': is_owner, 'members': members,
-                   'management': management})
+                   'management': management, 'posts':posts})
 
 
 @login_required
@@ -678,7 +679,7 @@ def post_downvote(request, post_id):
 
 class PostCommentView(LoginRequiredMixin, ListView):
     model = Post
-    template_name = 'post_comment.html'
+    template_name = 'club_feed.html'
     ordering = ['-post_date', '-post_datetime', ]
 
 
