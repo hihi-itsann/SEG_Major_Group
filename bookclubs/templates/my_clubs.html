@@ -4,17 +4,17 @@
   <title>Bootstrap Example</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </head>
+
     <div class="container">
             <br>
             {% if clubs %}
                 <h1><b>My Clubs</b></h1>
                 <br>
                 <div class="club">
-                  <div class=row row-cols-3">
+                  <div class="row row-cols-3">
                   {% for club in clubs %}
                   <div class="col-6 club-card card-custom">
                       <h1 class="card-title">
@@ -38,5 +38,4 @@
                     or <a href="{% url 'create_club' %}">here</a> to create a new club.</p>
             {% endif %}
         </div>
-    </div>
 {% endblock %}
