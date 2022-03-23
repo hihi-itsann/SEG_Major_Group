@@ -32,7 +32,7 @@ class NewPasswordMixin(forms.Form):
         password_confirmation = self.cleaned_data.get('password_confirmation')
         if new_password != password_confirmation:
             self.add_error('password_confirmation', 'Confirmation does not match password.')
-            
+
 def validate_date_not_in_future(value):
         if value <= timezone.now().date():
             raise forms.ValidationError('date needs to be in the future')
@@ -161,8 +161,8 @@ class ClubForm(forms.ModelForm):
         ('PRI', 'Private')
     )
 
-    # GENRE_CHOICES = [('Fiction', 'Fiction'), ('Non-Fiction', 'Non-Fiction')],
-    GENRE_CHOICES = Book.get_genres()
+    GENRE_CHOICES = [('Fiction', 'Fiction'), ('Non-Fiction', 'Non-Fiction')]
+    #GENRE_CHOICES = Book.get_genres()
 
 
     meeting_status = forms.ChoiceField(widget=forms.Select(), label='Meetings Held', choices=MEETING_CHOICES)
