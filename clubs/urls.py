@@ -43,7 +43,7 @@ urlpatterns = [
 
     # Club Views
     path('club/<str:club_name>/feed/', views.club_feed, name='club_feed'),
-    path('club/<str:club_name>/', views.club_welcome, name='club_welcome'),
+    #path('club/<str:club_name>/', views.club_welcome, name='club_welcome'),
     path('create_club/', views.create_club, name='create_club'),
     path('club/<str:club_name>/delete/', views.delete_club, name='delete_club'),
     path('club_list/', views.club_list, name='club_list'),
