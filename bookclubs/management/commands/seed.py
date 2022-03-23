@@ -145,7 +145,7 @@ class Command(BaseCommand):
             image_url_s = book['Image-URL-S'],
             image_url_m =book['Image-URL-M'],
             image_url_l = book['Image-URL-L'],
-            genre=self.getgenre(book['ISBN'])[0]
+            genre=(self.getgenre(book['ISBN'])[0]).upper()
         )
 
 

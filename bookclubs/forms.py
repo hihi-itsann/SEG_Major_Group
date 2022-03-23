@@ -4,10 +4,8 @@ from .models import User, Club, Application, Role, Post, Comment, BookRatingRevi
 from django.contrib.auth import authenticate
 # from django.forms.widgets import DateInput
 from django.db import IntegrityError
-import datetime
-
+from django.utils import timezone
 from .models import Post
-
 
 # from django.forms.widgets import DateInput
 
@@ -34,10 +32,19 @@ class NewPasswordMixin(forms.Form):
         password_confirmation = self.cleaned_data.get('password_confirmation')
         if new_password != password_confirmation:
             self.add_error('password_confirmation', 'Confirmation does not match password.')
+            
+def validate_date_not_in_future(value):
+        if value <= timezone.now().date():
+            raise forms.ValidationError('date needs to be in the future')
+def validate_date_not_in_past(value):
+        if value >= timezone.now().date():
+            raise forms.ValidationError('Date needs to be in the past')
 
 
 class SignUpForm(NewPasswordMixin, forms.ModelForm):
     """Form enabling unregistered users to sign up."""
+
+    dob=forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}),validators=[validate_date_not_in_past])
 
     class Meta:
         """Form options."""
@@ -45,8 +52,7 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
         model = User
         fields = ['first_name', 'last_name', 'username', 'email', 'bio', 'dob', 'gender', 'location', 'city', 'country',
                   'meeting_preference']
-        widgets = {'dob': forms.DateInput(attrs={'class': 'form-control', 'format': "%d/%m/%Y", 'placeholder': 'dd/mm'
-                                                                                                               '/yyyy'}), 'bio': forms.Textarea()}
+        widgets = { 'bio': forms.Textarea()}
 
     def save(self):
         """Create a new user."""
@@ -84,6 +90,8 @@ class LogInForm(forms.Form):
 
 class UserForm(forms.ModelForm):
     """Form to update user profiles."""
+    dob=forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}),validators=[validate_date_not_in_past])
+
 
     class Meta:
         """Form options."""
@@ -209,6 +217,13 @@ class CommentForm(forms.ModelForm):
 
 
 class MeetingForm(forms.ModelForm):
+
+    date=forms.DateField(
+    widget=forms.SelectDateWidget(),
+    initial=timezone.now().date(),
+    validators=[validate_date_not_in_future]
+    )
+
     class Meta:
         model = Meeting
         fields = ('topic', 'description', 'location', 'date', 'time_start', 'duration')
@@ -217,7 +232,7 @@ class MeetingForm(forms.ModelForm):
             'topic': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Topic'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Agenda'}),
             'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Location'}),
-            'date': forms.DateInput(attrs={'class': 'form-control', 'format': "%Y-%m-%d", 'placeholder': 'yyyy-mm-dd'}),
+            #'date': forms.DateInput(attrs={'class': 'form-control', 'format': "%Y-%m-%d", 'placeholder': 'yyyy-mm-dd'}),
             'time_start': forms.TimeInput(attrs={'class': 'form-control', 'placeholder': 'hh:mm'}),
             'duration': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Minutes'})
         }
