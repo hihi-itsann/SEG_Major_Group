@@ -70,6 +70,8 @@ urlpatterns = [
     path('post_comment/', views.PostCommentView.as_view(), name='post_comment'),
     path('create_post/', views.CreatePostView.as_view(), name='create_post'),
     path('article/delete/<int:pk>/', views.DeletePostView.as_view(), name='delete_post'),
+    path('upvote/<post_id>/', views.post_upvote, name='post_upvote'),
+    path('downvote/<post_id>/', views.post_downvote, name='post_downvote'),
     path('create_comment/<int:pk>/', views.CreateCommentView.as_view(), name='create_comment'),
     path('delete_comment/<int:pk>/', views.DeleteCommentView.as_view(), name='delete_comment'),
 
@@ -81,5 +83,6 @@ urlpatterns = [
     path('club/<str:club_name>/meeting/<int:meeting_id>/join/', views.join_meeting, name='join_meeting'),
     path('club/<str:club_name>/meeting/<int:meeting_id>/leave/', views.leave_meeting, name='leave_meeting'),
     path('club/<str:club_name>/meeting/<int:meeting_id>/delete/', views.delete_meeting, name='delete_meeting'),
+    path('club/<str:club_name>/meeting/<int:meeting_id>/edit/', views.edit_meeting, name='edit_meeting'),
 
 ]

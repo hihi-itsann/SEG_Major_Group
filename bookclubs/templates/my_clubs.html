@@ -12,9 +12,13 @@
             <br>
             {% if clubs %}
                 <h1><b>My Clubs</b></h1>
+                <div style="text-align: right">
+                                <button type="button" class="btn btn-outline-dark"><a
+                                        href="{% url 'club_list' %}">Explore More</a></button>
+                </div>
                 <br>
                 <div class="club">
-                  <div class=row row-cols-3">
+                  <div class="row row-cols-3">
                   {% for club in clubs %}
                   <div class="col-6 club-card card-custom">
                       <h1 class="card-title">
