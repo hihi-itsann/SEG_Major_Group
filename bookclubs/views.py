@@ -433,7 +433,6 @@ def my_applications(request):
                   {'applications': applications, 'applications_count': applications_count})
 
 
-# TODO: Fix data shown
 @login_required
 @club_exists
 @management_required
@@ -631,16 +630,6 @@ def promote_member(request, club_name, user_id):
         return redirect('feed')
     else:
         return members_management_list(request, current_club.club_name)
-
-
-@login_required
-@club_exists
-@owner_required
-def change_club_to_public_status(request, club_name):
-    """Changes club status to private"""
-    current_club = Club.objects.get(club_name=club_name)
-    current_club.change_club_status(True)
-    return redirect('feed')
 
 
 @login_required

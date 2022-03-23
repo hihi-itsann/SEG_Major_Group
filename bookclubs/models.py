@@ -1,4 +1,6 @@
 import datetime
+import traceback
+
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator, MinLengthValidator, MinValueValidator, MaxValueValidator
 from django.db import models
@@ -110,15 +112,17 @@ class Book(models.Model):
 
     @staticmethod
     def get_genres():
-        books = Book.objects.all()
-        if books.count() > 0:
-            genres = []
-            for book in books:
-                genres.append((book.genre.title(), book.genre.title()))
-            genres = list(set(genres))
-        else:
-            genres = [('Fiction', 'Fiction'), ('Non-Fiction', 'Non-Fiction')]
-        return genres
+        genres = [('Fiction', 'Fiction'), ('Non-Fiction', 'Non-Fiction')]
+        try:
+            books = Book.objects.all()
+            if books.count() > 0:
+                for book in books:
+                    genres.append((book.genre.title(), book.genre.title()))
+                genres = list(set(genres))
+        except:
+            print(traceback.format_exc())
+        finally:
+            return genres
 
     # def getReadingStatus(self,user):
     #     return BookStatus.objects.get(user=user, book=self).status
@@ -325,13 +329,6 @@ class Club(models.Model):
     def remove_user_from_club(self, user):
         role = Role.objects.get(club=self, user=user)
         role.delete()
-
-    def change_club_status(self, choice):
-        if choice == True:
-            self.public_status = True
-        else:
-            self.status = False
-        self.save()
 
     def get_meeting_status(self):
         if self.meeting_status == 'ONL':

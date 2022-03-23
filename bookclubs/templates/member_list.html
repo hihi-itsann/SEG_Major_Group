@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% extends 'base_content.html' %}
 {% block title %}
 | Member List
@@ -6,6 +7,7 @@
 {% block content %}
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
 body {font-family: Arial, Helvetica, sans-serif;}
 
@@ -79,55 +81,39 @@ body {font-family: Arial, Helvetica, sans-serif;}
                     {% for role in roles %}
                         <tr>
                             <td>{{ role.club_role }}</td>
-                            <td>
-                              {{ role.user.full_name }}
+                            <td>{{ role.user.full_name }}</td>
+                            <td><a id="myBtn" class ="btn btn-normal">{{ role.user.username}}
+                              <div id="myModal" class="modal">
 
-                            </td>
-                            <td id="myBtn">{{ role.user.username}}</td>
-                            <!-- The Modal -->
-                            <div id="myModal" class="modal">
+                                <!-- Modal content -->
+                                <div class="modal-content" id="myModal" class="modal">
+                                  <span class="close">&times;</span>
+                                  <p>Email: {{role.user.email}}</p>
+                                  <p>Bio: {{role.user.bio}}</p>
+                                  <p>Date of Birth: {{role.user.dob}}</p>
+                                  <p>Gender: {{role.user.gender}}</p>
+                                  <p>Location: {{role.user.location}}</p>
+                                  <p>City: {{role.user.city}}</p>
+                                  <p>Country: {{role.user.country}}</p>
+                                </div>
+                                <script>
+                                    var btn = document.getElementById("myBtn");
+                                    var modal = document.getElementById("myModal");
+                                    var close = document.getElementsByClassName("close")[0];
+                                    btn.onclick = function() {
+                                      modal.style.display = "block";
+                                    }
+                                    close.onclick = function() {
+                                      modal.style.display ="none";
+                                    }
+                                    window.onclick = function(event) {
+                                      if (event.target == modal) {
+                                        modal.style.display = "none";
+                                      }
+                                    }
+                                </script>
+                              </div></a></td>
 
-                              <!-- Modal content -->
-                              <div class="modal-content">
-                                <span class="close">&times;</span>
-                                <p>Email: {{role.user.email}}</p>
-                                <p>Bio: {{role.user.bio}}</p>
-                                <p>Date of Birth: {{role.user.dob}}</p>
-                                <p>Gender: {{role.user.gender}}</p>
-                                <p>Location: {{role.user.location}}</p>
-                                <p>City: {{role.user.city}}</p>
-                                <p>Country: {{role.user.country}}</p>
-                              </div>
-
-                            </div>
-
-                            <script>
-                                // Get the modal
-                                var modal = document.getElementById("myModal");
-
-                                // Get the button that opens the modal
-                                var btn = document.getElementById("myBtn");
-
-                                // Get the <span> element that closes the modal
-                                var close = document.getElementsByClassName("close")[0];
-
-                                // When the user clicks the button, open the modal
-                                btn.onclick = function() {
-                                  modal.style.display = "block";
-                                }
-
-                                // When the user clicks on <span> (x), close the modal
-                                close.onclick = function() {
-                                  modal.style.display ="none";
-                                }
-
-                                // When the user clicks anywhere outside of the modal, close it
-                                window.onclick = function(event) {
-                                  if (event.target == modal) {
-                                    modal.style.display = "none";
-                                  }
-                                }
-                            </script>
 
                             {% if is_owner %}
                             <td>
@@ -149,3 +135,6 @@ body {font-family: Arial, Helvetica, sans-serif;}
 </div>
 </body>
 {% endblock %}
+=======
+
+>>>>>>> ba55ab6a961b910131a90530e10e3786a1ce132f
