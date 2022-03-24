@@ -650,9 +650,14 @@ def promote_member(request, club_name, user_id):
 @club_exists
 @membership_required
 def member_list(request, club_name):
+    is_owner=False
     current_club = Club.objects.get(club_name=club_name)
     current_user = request.user
     current_user_role = Role.objects.get(club=current_club, user=current_user).club_role
+    if current_user_role == 'own':
+        is_owner = True
+    roles = Role.objects.filter(club=current_club).exclude(club_role='BAN')
+    roles_num= roles.count()
     club_owner = Role.objects.get(club=current_club, club_role='OWN').user
     moderator_ids = Role.objects.filter(club=current_club, club_role='MOD').values_list('user', flat=True)
     club_moderators = User.objects.filter(id__in=moderator_ids)
@@ -662,7 +667,7 @@ def member_list(request, club_name):
     club_banned = User.objects.filter(id__in=banned_ids)
     context = {'club': current_club, 'current_user': current_user, 'current_user_role': current_user_role,
                'club_owner': club_owner, 'club_moderators': club_moderators, 'club_members': club_members,
-               'club_banned': club_banned}
+               'club_banned': club_banned, 'is_owner':is_owner, 'roles':roles, 'roles_num':roles_num}
     return render(request, 'member_list.html', context)
 
 
