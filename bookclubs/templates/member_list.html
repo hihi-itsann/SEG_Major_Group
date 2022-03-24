@@ -22,18 +22,16 @@
               </tr>
             </thead>
             <tbody>
-                <tr class="btn-normal">
-                    <td>user position </td>
-                    <td>user fullname </td>
+              {% for role in roles %}
+                  <tr class="btn-normal">
+                    <td>{{ role.club_role }}</td>
+                    <td>{{ role.user.full_name }}</td>
                     <td>
-                        <!--Don't change button's parameters otherwise it won't work -->
-                        <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">
-                            user username
-                        </button>
-                        <!-- Also here, try to avoid changing class name or other stuff-->
-                        <div class="modal fade" id="myModal" role="dialog">
-                            <div class="modal-dialog">
-
+                      <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">
+                          user username
+                      </button>
+                      <div class="modal fade" id="myModal" role="dialog">
+                          <div class="modal-dialog">
                             <!-- Modal content-->
                             <div class="modal-content">
 
@@ -56,10 +54,11 @@
 
                     </td>
                 </tr>
+              {% endfor %}
             </tbody>
         </table>
 
 
 
   </div>
-  {% endblock %}
+{% endblock %}
