@@ -26,6 +26,11 @@ class DeleteCommentTest(TestCase):
             related_post=self.post,
             body="this is a comment."
         )
+        self.role = Role.objects.create(
+             user=self.user,
+             club=self.club,
+             club_role='MEM'
+        )
         self.url = reverse('delete_comment', kwargs={'pk': self.comment.id})
 
     def test_delete_comment_url(self):

@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
-from bookclubs.models import Post, User, Comment, Club
+from bookclubs.models import Post, User, Comment, Club, Role
 from bookclubs.tests.helpers import reverse_with_next
 
 
@@ -20,6 +20,11 @@ class CreateCommentTest(TestCase):
             author=self.user,
             club=self.club,
             body="The quick brown fox jumps over the lazy dog."
+        )
+        self.role = Role.objects.create(
+             user=self.user,
+             club=self.club,
+             club_role='MEM'
         )
         self.url = reverse('create_comment', kwargs={'pk': self.post.id})
         self.data = { 'body': 'The quick brown fox jumps over the lazy dog.' }
@@ -46,9 +51,9 @@ class CreateCommentTest(TestCase):
             response, response_url,
             status_code=302, target_status_code=200
         )
-        #self.assertTemplateUsed(response, 'club_feed.html')
+        self.assertTemplateUsed(response, 'club_feed.html')
 
-    def test_unsuccessful_create_comment(self):
+    def test_unsuccessful_create_comment_with_blank_body(self):
         self.client.login(username='@johndoe', password='Password123')
         comment_count_before = Comment.objects.count()
         self.data['body'] = ""
