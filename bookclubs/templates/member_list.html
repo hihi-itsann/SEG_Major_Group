@@ -35,10 +35,10 @@
                   </thead>
                   <tbody>
                     {% for role in roles %}
-                        <tr>
+                        <tr data-bs-toggle="collapse" data-bs-target="#info">
                             <td>{{ role.club_role }}</td>
                             <td>{{ role.user.full_name }}</td>
-                            <td data-bs-toggle="collapse" data-bs-target="#info">{{ role.user.username}}</td>
+                            <td>{{ role.user.username}}</td>
                             <div id="info" class="collapse">
                                 <p>Email: {{role.user.email}}</p>
                                 <p>Bio: {{role.user.bio}}</p>
@@ -48,6 +48,7 @@
                                 <p>City: {{role.user.city}}</p>
                                 <p>Country: {{role.user.country}}</p>
                             </div>
+
 
                             {% if is_owner %}
                             <td>
