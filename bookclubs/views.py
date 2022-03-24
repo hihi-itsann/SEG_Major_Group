@@ -641,11 +641,10 @@ def demote_moderator(request, club_name, user_id):
 @management_required
 def promote_member(request, club_name, user_name):
     current_club = Club.objects.get(club_name=club_name)
-    print(user_id)
     changing_user = User.objects.get(username=user_name)
     print(changing_user.username)
     try:
-        changing_user = User.objects.get(id=user_id)
+        changing_user = User.objects.get(username=user_name)
         # current_club.toggle_moderator(member)
         role = Role.objects.get(user=changing_user, club=current_club)
         print(role.club_role)
@@ -654,11 +653,8 @@ def promote_member(request, club_name, user_name):
         elif role.club_role == 'MOD':
             messages.add_message(request, messages.ERROR, "The user you selected is already a club Moderator!")
         else:
-            print(3)
             role.club_role = 'MOD'
-            print(1)
             messages.success(request, "Saved changes.")
-            print(2)
             role.save()
         return redirect('member_list', club_name = current_club.club_name)
 
