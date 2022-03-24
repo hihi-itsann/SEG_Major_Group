@@ -710,7 +710,6 @@ class CreatePostView(LoginRequiredMixin, CreateView):
         return reverse('club_feed', kwargs={'club_name': club.club_name})
 
 
-
 class DeletePostView(LoginRequiredMixin, DeleteView):
     model = Post
     template_name = 'delete_post.html'

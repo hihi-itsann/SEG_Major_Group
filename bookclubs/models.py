@@ -399,9 +399,6 @@ class Post(models.Model):
     def __str__(self):
         return self.title + ' | ' + str(self.author)
 
-    # def get_absolute_url(self):
-    #     return reverse('feed')
-
     def toggle_upvote(self, user):
         if Vote.objects.filter(post=self, user=user).count() == 1:
             vote = Vote.objects.get(post=self, user=user)
@@ -448,7 +445,6 @@ class Comment(models.Model):
     body = models.CharField(max_length=520, blank=False)
     related_post = models.ForeignKey(Post, related_name="comments", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-
 
     class Meta:
         ordering = ['-created_at']
