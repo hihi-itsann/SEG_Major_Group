@@ -487,8 +487,9 @@ def leave_club(request, club_req):
 def update_club_info(request, club_name):
     """owner can change information of club"""
     club = Club.objects.get(club_name=club_name)
-    form = ClubForm(request.POST, instance=club)
+    form = ClubForm(instance=club)
     if request.method == 'POST':
+        form =  ClubForm(request.POST,instance=club)
         if form.is_valid():
             club = form.save()
             return redirect('club_feed', club.club_name)
