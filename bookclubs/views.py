@@ -590,15 +590,6 @@ def remove_member(request, club_name, user_id):
 @login_required
 @club_exists
 @owner_required
-def moderator_list(request, club_name):
-    current_club = Club.objects.get(club_name=club_name)
-    moderators = current_club.get_moderators()
-    return render(request, 'moderator_list.html', {'moderators': moderators, 'current_club': current_club})
-
-
-@login_required
-@club_exists
-@owner_required
 def transfer_ownership(request, club_name, user_id):
     current_club = Club.objects.get(club_name=club_name)
     try:

@@ -43,7 +43,6 @@ urlpatterns = [
 
     # Club Views
     path('club/<str:club_name>/feed/', views.club_feed, name='club_feed'),
-    # path('club/<str:club_name>/', views.club_feed, name='club_feed'),
     path('club_list/', views.club_list, name='club_list'),
     path('my_clubs/', views.my_clubs, name='my_clubs'),
     path('create_club/', views.create_club, name='create_club'),
@@ -58,7 +57,6 @@ urlpatterns = [
     path('club/<str:club_name>/transfer_ownership/<int:user_id>/', views.transfer_ownership, name='transfer_ownership'),
     path('club/<str:club_name>/member_list/', views.member_list, name='member_list'),
 
-    # path('club/<str:club_name>/moderator_management/', views.moderator_list, name='moderator_list'),
 
     # Application Views
     path('my_applications/', views.my_applications, name='my_applications'),
