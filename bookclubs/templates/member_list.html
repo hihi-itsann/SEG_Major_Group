@@ -2,52 +2,70 @@
 {% block title %}
 | Member List
 {% endblock %}
-
 {% block content %}
 <div class="container">
-  <h5 class="card-title text-uppercase mb-0">{{ club.club_name }}</h5>
-  <p>Member List</p>
-  {% if is_owner %}
-    <p>You are owner!</p>
-  {% endif %}
-  <table class="table no-wrap user-table mb-0" style="background-color:#EFF6E0; border:none;">
-    <thead>
-      <tr>
-        <th scope="col" class="border-0 text-uppercase font-medium">Position</th>
-        <th scope="col" class="border-0 text-uppercase font-medium">Name</th>
-        <th scope="col" class="border-0 text-uppercase font-medium">Username</th>
-        {% if owner %}
-          <th scope="col" class="border-0 text-uppercase font-medium">Manage</th>
-        {% endif %}
-      </tr>
-    </thread>
-    <tbody>
-      {% for role in roles %}
-        <tr class="btn-normal">
-          <td>{{ role.club_role }}</td>
-          <td name="a">{{ role.user }}</td>
-          <td>
-            <!-- Trigger/Open The Modal -->
-            <button id="{{role.user.full_name}}" class="myBtn">{{role.user.username}}</button>
-            <!-- The Modal -->
-            <div id="{{role.user.club_role}}" class="modal">
-              <!-- Modal content -->
-              <div class="modal-content">
-                <span class="close">×</span>
-                <p>Email: {{role.user.email}}</p>
-                <p>Bio: {{role.user.bio}}</p>
-                <p>Date of Birth: {{role.user.dob}}</p>
-                <p>Gender: {{role.user.gender}}</p>
-                <p>Location: {{role.user.location}}</p>
-                <p>City: {{role.user.city}}</p>
-                <p>Country: {{role.user.country}}</p>
-              </div>
-            </div>
-          </td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <div class ="row">
+    <div class="col-md-12">
+      <div class="card text-center" style="border:none">
+        <div class="card-body" style="background-color:#EFF6E0; border:none;">
+          <h1 class="card-title text-uppercase mb-0" style="color:#344E41">{{ club.club_name }}</h1>
+            <h4 style="color:#344E41">Member List</h4>
+            {% if is_owner %}
+              <p style="color:#f4978e">You are owner!</p>
+            {% endif %}
+            <table class="table no-wrap user-table mb-0" style="background-color:#EFF6E0; border:none;">
+              <thead>
+                <tr>
+                  <th scope="col" class="border-0 text-uppercase font-medium" style="color:#f08080">Position</th>
+                  <th scope="col" class="border-0 text-uppercase font-medium" style="color:#f08080">Name</th>
+                  <th scope="col" class="border-0 text-uppercase font-medium" style="color:#f08080">Username</th>
+                  {% if is_owner %}
+                    <th scope="col" class="border-0 text-uppercase font-medium" style="color:#f08080">Manage</th>
+                  {% endif %}
+                </tr>
+              </thread>
+              <tbody>
+                {% for role in roles %}
+                  <tr>
+                    <td>{{ role.club_role }}</td>
+                    <td name="a">{{ role.user }}</td>
+                    <td>
+                      <!-- Trigger/Open The Modal -->
+                      <div id="{{role.user.full_name}}" class="myBtn btn btn-normal">{{role.user.username}}</div>
+                      <!-- The Modal -->
+                      <div id="{{role.user.club_role}}" class="modal">
+                        <!-- Modal content -->
+                        <div class="modal-content">
+                          <span class="close">×</span>
+                          <p>Email: {{role.user.email}}</p>
+                          <p>Bio: {{role.user.bio}}</p>
+                          <p>Date of Birth: {{role.user.dob}}</p>
+                          <p>Gender: {{role.user.gender}}</p>
+                          <p>Location: {{role.user.location}}</p>
+                          <p>City: {{role.user.city}}</p>
+                          <p>Country: {{role.user.country}}</p>
+                        </div>
+                      </div>
+                    </td>
+                    {% if is_owner %}
+                        <td>
+                          {% if is_moderator %}
+                          <button type="button" class="btn btn-normal">Tansfer Ownership</button>
+                          {% endif %}
+                          <button type="button" class="btn btn-normal">Demote</button>
+                          <button type="button" class="btn btn-normal">Ban</button>
+                          {% if is_ban %}
+                          <button type="button" class="btn btn-normal">Unban</button>
+                          {% endif %}
+                        </td>
+                    {% endif %}
+                  {% endfor %}
+              </tbody>
+            </table>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 <script>
     var modal = document.getElementsByClassName('modal');
