@@ -120,7 +120,8 @@ class Book(models.Model):
                     genres.append((book.genre.title(), book.genre.title()))
                 genres = list(set(genres))
         except:
-            print(traceback.format_exc())
+            # print(traceback.format_exc())
+            print("Genres are being set to the default of Fiction and Non-Fiction until books are added to the system.")
         finally:
             return genres
 
