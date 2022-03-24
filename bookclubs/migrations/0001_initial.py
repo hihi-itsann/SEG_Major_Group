@@ -105,11 +105,15 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('title', models.CharField(max_length=255)),
-                ('body', models.TextField()),
+                ('body', models.CharField(max_length=520)),
                 ('post_date', models.DateField(auto_now_add=True)),
                 ('post_datetime', models.DateTimeField(auto_now_add=True)),
                 ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('club', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='bookclubs.club')),
             ],
+            options={
+                'ordering': ['-post_date', '-post_datetime'],
+            },
         ),
         migrations.CreateModel(
             name='Role',
@@ -119,6 +123,9 @@ class Migration(migrations.Migration):
                 ('club', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='bookclubs.club')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
+            options={
+                'unique_together': {('user', 'club')},
+            },
         ),
         migrations.CreateModel(
             name='Comment',

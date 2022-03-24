@@ -5,7 +5,7 @@ from .models import User, Application, Club, Role, Book, BookRatingReview, BookS
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ['userID','username',
+    list_display = ['id', 'userID','username',
                     'email','meeting_preference','location','country','city']
 
 
@@ -63,7 +63,7 @@ class CommentAdmin(admin.ModelAdmin):
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
     list_display = [
-        'title', 'author', 'body', 'post_date', 'post_datetime'
+        'title', 'author','club', 'body', 'post_date', 'post_datetime'
     ]
 
 @admin.register(Meeting)
