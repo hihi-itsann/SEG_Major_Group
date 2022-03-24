@@ -257,6 +257,15 @@ h3.profile-title {
    color:#52796F;
  }
 
+ .btn-show-user{
+   background-color:#AEC3B0;
+   color:#2F3E46;
+ }
+
+ .btn-show-user:hover{
+   color:#52796F;
+ }
+
  .btn-book{
    text-decoration: none;
    background-color:#CAD2C5;
