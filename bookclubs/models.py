@@ -120,7 +120,8 @@ class Book(models.Model):
                     genres.append((book.genre.title(), book.genre.title()))
                 genres = list(set(genres))
         except:
-            print(traceback.format_exc())
+            # print(traceback.format_exc())
+            print("Genres are being set to the default of Fiction and Non-Fiction until books are added to the system.")
         finally:
             return genres
 
@@ -354,6 +355,12 @@ class Club(models.Model):
         else:
             return 'In-Person'
 
+    def get_public_status(self):
+        if self.public_status == 'PRI':
+            return 'Private'
+        else:
+            return 'Public'
+
 
 class Role(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -369,6 +376,7 @@ class Role(models.Model):
         max_length=3,
         choices=RoleOptions.choices,
         default=RoleOptions.MEMBER,
+        unique=True,
     )
 
     class Meta:
@@ -382,15 +390,16 @@ class Post(models.Model):
 
     title = models.CharField(max_length=255)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    body = models.TextField()
+    club = models.ForeignKey(Club, on_delete=models.CASCADE)
+    body = models.CharField(max_length=520, blank=False)
     post_date = models.DateField(auto_now_add=True)
     post_datetime = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        ordering = ['-post_date', '-post_datetime']
+
     def __str__(self):
         return self.title + ' | ' + str(self.author)
-
-    def get_absolute_url(self):
-        return reverse('feed')
 
     def toggle_upvote(self, user):
         if Vote.objects.filter(post=self, user=user).count() == 1:
@@ -438,9 +447,6 @@ class Comment(models.Model):
     body = models.CharField(max_length=520, blank=False)
     related_post = models.ForeignKey(Post, related_name="comments", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-
-    def get_absolute_url(self):
-        return reverse('feed')
 
     class Meta:
         ordering = ['-created_at']

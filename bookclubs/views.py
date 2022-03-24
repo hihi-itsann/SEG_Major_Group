@@ -118,14 +118,14 @@ def log_out(request):
     return redirect('home')
 
 
-@login_required
-def show_user(request, username):
-    if User.objects.filter(username=username).count() == 1:
-        user = User.objects.get(username=username)
-        return render(request, 'show_user.html', {'user': user})
-    else:
-        messages.add_message(request, messages.WARNING, "User not found.")
-        return redirect('feed')
+# @login_required
+# def show_user(request, username):
+#     if User.objects.filter(username=username).count() == 1:
+#         user = User.objects.get(username=username)
+#         return render(request, 'show_user.html', {'user': user})
+#     else:
+#         messages.add_message(request, messages.WARNING, "User not found.")
+#         return redirect('feed')
 
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
@@ -172,6 +172,8 @@ class PasswordView(LoginRequiredMixin, FormView):
         messages.add_message(self.request, messages.SUCCESS, "Password updated!")
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
+
+#----------------------------------book functions-----------------------------------
 
 class BookListView(LoginRequiredMixin, ListView):
     """View that shows a list of all books"""
@@ -315,6 +317,8 @@ def reading_book_list(request, book_genre='All'):
     return render(request, 'reading_book_list.html', args)
 
 
+#--------------------------application functions---------------------------------
+
 
 @login_required
 @club_exists
@@ -420,6 +424,7 @@ def reject_applicant(request, club_name, user_id):
 
 
 #----------------------------club functions---------------------------------------
+
 @login_required
 @club_exists
 @membership_required
@@ -430,13 +435,14 @@ def club_feed(request, club_name):
     club_role = current_club.get_club_role(request.user)
     members = current_club.get_members()
     management = current_club.get_management()
+    posts = Post.objects.all().filter(club=current_club)
     if club_role == 'OWN':
         is_owner = True
     elif club_role == 'MOD':
         is_moderator = True
     return render(request, 'club_feed.html',
                   {'club': current_club, 'is_moderator': is_moderator, 'is_owner': is_owner, 'members': members,
-                   'management': management})
+                   'management': management, 'posts':posts})
 
 
 @login_required
@@ -487,8 +493,9 @@ def leave_club(request, club_req):
 def update_club_info(request, club_name):
     """owner can change information of club"""
     club = Club.objects.get(club_name=club_name)
-    form = ClubForm(request.POST, instance=club)
+    form = ClubForm(instance=club)
     if request.method == 'POST':
+        form =  ClubForm(request.POST,instance=club)
         if form.is_valid():
             club = form.save()
             return redirect('club_feed', club.club_name)
@@ -670,60 +677,91 @@ def member_list(request, club_name):
                'club_banned': club_banned, 'is_owner':is_owner, 'roles':roles, 'roles_num':roles_num}
     return render(request, 'member_list.html', context)
 
+
+
+#-----------------------post and comment functions-------------------------------
+
+
 @login_required
 def post_upvote(request, post_id):
     user_upvoting = request.user
     post = Post.objects.get(id=post_id)
+    club = Club.objects.get(id=post.club.id)
     post.toggle_upvote(user_upvoting)
     # The #post_id redirects to the part of the page with the post
-    return redirect(f'/post_comment/#{post_id}')
+    return redirect(f'/club/{club.club_name}/feed/#{post_id}')
 
 
 @login_required
 def post_downvote(request, post_id):
     user_downvoting = request.user
     post = Post.objects.get(id=post_id)
+    club = Club.objects.get(id=post.club.id)
     post.toggle_downvote(user_downvoting)
     # The #post_id redirects to the part of the page with the post
-    return redirect(f'/post_comment/#{post_id}')
+    return redirect(f'/club/{club.club_name}/feed/#{post_id}')
 
 
 class PostCommentView(LoginRequiredMixin, ListView):
     model = Post
-    template_name = 'post_comment.html'
-    ordering = ['-post_date', '-post_datetime', ]
+    template_name = 'club_feed.html'
 
 
 class CreatePostView(LoginRequiredMixin, CreateView):
     model = Post
     form_class = PostForm
     template_name = 'create_post.html'
-    success_url = reverse_lazy('post_comment')
+
+    def form_valid(self, form):
+        form.instance.club_id = self.kwargs['pk']
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        club = Club.objects.get(id=self.kwargs['pk'])
+        return reverse('club_feed', kwargs={'club_name': club.club_name})
 
 
 class DeletePostView(LoginRequiredMixin, DeleteView):
     model = Post
     template_name = 'delete_post.html'
-    success_url = reverse_lazy('post_comment')
+
+    def get_success_url(self):
+        post = Post.objects.get(id=self.kwargs['pk'])
+        club = Club.objects.get(id=post.club.id)
+        return reverse('club_feed', kwargs={'club_name': club.club_name})
 
 
 class CreateCommentView(LoginRequiredMixin, CreateView):
     model = Comment
     form_class = CommentForm
     template_name = 'create_comment.html'
-    success_url = reverse_lazy('post_comment')
 
     def form_valid(self, form):
         form.instance.related_post_id = self.kwargs['pk']
         form.instance.author = self.request.user
         return super().form_valid(form)
 
+    def get_success_url(self):
+        post = Post.objects.get(id=self.kwargs['pk'])
+        club = Club.objects.get(id=post.club.id)
+        return reverse('club_feed', kwargs={'club_name': club.club_name})
+
+
 
 class DeleteCommentView(LoginRequiredMixin, DeleteView):
     model = Comment
     template_name = 'delete_comment.html'
-    success_url = reverse_lazy('post_comment')
 
+    def get_success_url(self):
+        comment = Comment.objects.get(id=self.kwargs['pk'])
+        post = Post.objects.get(id=comment.related_post.id)
+        club = Club.objects.get(id=post.club.id)
+        return reverse('club_feed', kwargs={'club_name': club.club_name})
+
+
+
+#--------------------meeting functions-----------------------------------------
 
 @login_required
 @club_exists
