@@ -659,12 +659,6 @@ def member_list(request, club_name):
                'club_banned': club_banned}
     return render(request, 'member_list.html', context)
 
-
-
-
-
-
-
 @login_required
 def post_upvote(request, post_id):
     user_upvoting = request.user
