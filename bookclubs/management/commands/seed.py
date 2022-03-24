@@ -111,6 +111,7 @@ class Command(BaseCommand):
             book=book,
             user=user
         )
+
     def create_books(self):
         for index, book in self.df_books.head(100).iterrows():
             # print(f"Seeding book {index}/{len(self.df_books)}", end='\r')
@@ -301,8 +302,8 @@ class Command(BaseCommand):
     def create_post(self):
         post = Post()
         post.title = self.faker.text(max_nb_chars=255)
-        post.author = self.get_random_user()
         post.club = self.get_random_club()
+        post.author = self.get_random_member(post.club)
         post.body = self.faker.text(max_nb_chars=280)
         post.save()
         datetime = self.faker.past_datetime(start_date='-365d', tzinfo=pytz.UTC)
@@ -315,17 +316,20 @@ class Command(BaseCommand):
         print("Comment seeding complete.      ")
 
     def create_comment(self):
+        club = self.get_random_club()
         comment = Comment()
-        comment.author = self.get_random_user()
+        comment.author = self.get_random_member(club)
         comment.body = self.faker.text(max_nb_chars=280)
-        comment.related_post = self.get_random_post()
+        comment.related_post = self.get_random_post(club)
         comment.save()
         datetime = self.faker.past_datetime(start_date='-365d', tzinfo=pytz.UTC)
         Comment.objects.filter(id=comment.id).update(created_at = datetime)
 
-    def get_random_post(self):
-        index = randint(0,self.posts.count()-1)
-        return self.posts[index]
+    # get random post from a specific club
+    def get_random_post(self,club):
+        club_post = Post.objects.all().filter(club=club)
+        index = randint(0,club_post.count()-1)
+        return club_post[index]
 
     def create_meetings(self):
         meeting_count = 0
@@ -361,6 +365,11 @@ class Command(BaseCommand):
     def get_random_club(self):
         index = randint(0,self.clubs.count()-1)
         return self.clubs[index]
+
+    def get_random_member(self, club):
+        member_roles = Role.objects.all().filter(club=club).exclude(club_role='BAN')
+        index = randint(0,member_roles.count()-1)
+        return member_roles[index].user
 
 def create_username(first_name, last_name):
     return '@' + first_name.lower() + last_name.lower()
