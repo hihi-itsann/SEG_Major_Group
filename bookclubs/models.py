@@ -1,6 +1,6 @@
 import datetime
 import traceback
-
+from django.contrib import messages
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator, MinLengthValidator, MinValueValidator, MaxValueValidator
 from django.db import models
@@ -255,19 +255,26 @@ class Club(models.Model):
     club_members = models.ManyToManyField(User, through='Role')
 
     def get_club_name(self):
+        """Return club name"""
         return self.club_name
 
     def get_club_role(self, user):
+        """Return the club role for the user (already part of the club)"""
         return Role.objects.get(club=self, user=user).club_role
 
     def toggle_member(self, user):
+        """User that is part of the club becomes a member"""
         role = Role.objects.get(club=self, user=user)
-        role.club_role = 'MEM'
-        role.save()
+        if role.club_role == 'OWN' or role.club_role == 'BAN':
+            return
+        else:
+            role.club_role = 'MEM'
+            role.save()
 
     def toggle_moderator(self, user):
+        """User that is part of the club becomes a moderator"""
         role = Role.objects.get(club=self, user=user)
-        if role.club_role == 'BAN':
+        if role.club_role == 'OWN' or role.club_role == 'BAN':
             return
         else:
             role.club_role = 'MOD'
@@ -275,33 +282,48 @@ class Club(models.Model):
             return
 
     def ban_member(self, user):
+        """User is banned from the club, they cannot re-apply to join"""
         role = Role.objects.get(club=self, user=user)
-        if role.club_role == 'MEM':
+        if role.club_role == 'OWN' or role.club_role == 'BAN':
+            return
+        else:
             role.club_role = 'BAN'
+            role.save()
+            return
+
+    def unban_member(self, user):
+        """Unban a banned user, they can now re-apply to join the club."""
+        role = Role.objects.get(club=self, user=user)
+        if role.club_role == 'BAN':
+            role.club_role = 'MEM'
             role.save()
             return
         else:
             return
 
-    def unban_member(self, user):
-        role = Role.objects.get(club=self, user=user)
-        if role.club_role == 'BAN':
-            role.delete()
-            return
-        else:
-            return
-
     def transfer_ownership(self, old_owner, new_owner):
+        """Transfer ownership to a moderator in the club"""
         new_owner_role = Role.objects.get(club=self, user=new_owner)
         old_owner_role = Role.objects.get(club=self, user=old_owner)
-        if new_owner_role.club_role == 'MOD':
+        if old_owner_role.club_role == 'OWN' and new_owner_role.club_role == 'MOD':
             new_owner_role.club_role = 'OWN'
             new_owner_role.save()
             old_owner_role.club_role = 'MOD'
             old_owner_role.save()
             return
+
         else:
             return
+
+    def remove_user_from_club(self, user):
+        """User is removed from the club, however they can re-apply to join the club immediately after"""
+        role = Role.objects.get(club=self, user=user)
+        if role.club_role == 'OWN' or role.club_role == 'BAN':
+            return
+        else:
+            role.delete()
+            if Application.objects.filter(user=user, club=self).count() == 1:
+                Application.objects.get(user=user, club=self).delete()
 
     def get_members(self):
         return self.club_members.all().filter(
@@ -325,10 +347,6 @@ class Club(models.Model):
         return User.objects.all().filter(
             club__club_name=self.club_name,
             role__club_role='OWN')
-
-    def remove_user_from_club(self, user):
-        role = Role.objects.get(club=self, user=user)
-        role.delete()
 
     def get_meeting_status(self):
         if self.meeting_status == 'ONL':
@@ -358,6 +376,9 @@ class Role(models.Model):
         choices=RoleOptions.choices,
         default=RoleOptions.MEMBER,
     )
+
+    class Meta:
+        unique_together = ('user', 'club')
 
     def get_club_role(self):
         return self.RoleOptions(self.club_role).name.title()
