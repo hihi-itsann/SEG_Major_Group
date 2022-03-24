@@ -1,5 +1,6 @@
 from ntpath import join
-#from os import startfile
+# from os import startfile
+from django.contrib import messages
 from webbrowser import get
 from django.db.models import Q  # filter exception
 from django.db.models import F
@@ -27,7 +28,6 @@ from django.core.paginator import Paginator
 from random import choice
 from bookclubs.meeting_link import create_zoom_meeting, get_join_link, get_start_link
 from datetime import datetime
-
 
 
 @login_prohibited
@@ -244,12 +244,13 @@ class CreateBookRateReviewView(LoginRequiredMixin, CreateView):
         book = Book.objects.get(ISBN=self.kwargs['ISBN'])
         return '{}#education'.format(reverse('show_book', kwargs={'ISBN': book.ISBN}))
 
+
 @login_required
 @book_exists
 @own_feedback_exists
 def delete_book_rating_review(request, ISBN, pk):
     book = Book.objects.get(ISBN=ISBN)
-    rating_review=BookRatingReview.objects.get(book=book, id=pk, user=request.user)
+    rating_review = BookRatingReview.objects.get(book=book, id=pk, user=request.user)
     rating_review.delete();
     messages.add_message(request, messages.SUCCESS, "This review has successfully been deleted!")
     return redirect('show_book', ISBN)
@@ -313,62 +314,6 @@ def reading_book_list(request, book_genre='All'):
     args = {'unreadBooks': unreadBooks, 'readingBooks': readingBooks, 'finishedBooks': finishedBooks, 'genres': genres}
     return render(request, 'reading_book_list.html', args)
 
-
-@login_required
-@club_exists
-@membership_required
-def club_feed(request, club_name):
-    is_moderator = False
-    is_owner = False
-    current_club = Club.objects.get(club_name=club_name)
-    club_role = current_club.get_club_role(request.user)
-    members = current_club.get_members()
-    management = current_club.get_management()
-    if club_role == 'OWN':
-        is_owner = True
-    elif club_role == 'MOD':
-        is_moderator = True
-    return render(request, 'club_feed.html',
-                  {'club': current_club, 'is_moderator': is_moderator, 'is_owner': is_owner, 'members': members,
-                   'management': management})
-
-
-@login_required
-def create_club(request):
-    """a user can create a club"""
-    if request.method == 'POST':
-        form = ClubForm(request.POST)
-        if form.is_valid():
-            club = form.save()
-            club.club_members.add(request.user, through_defaults={'club_role': 'OWN'})
-            return redirect('club_feed', club.club_name)
-    else:
-        form = ClubForm()
-    return render(request, 'create_club.html', {'form': form})
-
-
-@login_required
-@club_exists
-@owner_required
-def delete_club(request, club_name):
-    current_club = Club.objects.get(club_name=club_name)
-    current_club.delete()
-    return feed(request)
-
-
-@login_required
-@club_exists
-@owner_required
-def update_club_info(request, club_name):
-    """owner can change information of club"""
-    club = Club.objects.get(club_name=club_name)
-    form = ClubForm(request.POST, instance=club)
-    if request.method == 'POST':
-        if form.is_valid():
-            club = form.save()
-            return redirect('club_feed', club.club_name)
-    context = {'form': form, 'club_name': club_name}
-    return render(request, 'update_club_info.html', context)
 
 
 @login_required
@@ -470,6 +415,87 @@ def reject_applicant(request, club_name, user_id):
     return redirect(f'/club/{club_name}/applications/')
 
 
+
+
+
+
+#----------------------------club functions---------------------------------------
+@login_required
+@club_exists
+@membership_required
+def club_feed(request, club_name):
+    is_moderator = False
+    is_owner = False
+    current_club = Club.objects.get(club_name=club_name)
+    club_role = current_club.get_club_role(request.user)
+    members = current_club.get_members()
+    management = current_club.get_management()
+    if club_role == 'OWN':
+        is_owner = True
+    elif club_role == 'MOD':
+        is_moderator = True
+    return render(request, 'club_feed.html',
+                  {'club': current_club, 'is_moderator': is_moderator, 'is_owner': is_owner, 'members': members,
+                   'management': management})
+
+
+@login_required
+def create_club(request):
+    """a user can create a club"""
+    if request.method == 'POST':
+        form = ClubForm(request.POST)
+        if form.is_valid():
+            club = form.save()
+            club.club_members.add(request.user, through_defaults={'club_role': 'OWN'})
+            return redirect('club_feed', club.club_name)
+    else:
+        form = ClubForm()
+    return render(request, 'create_club.html', {'form': form})
+
+
+@login_required
+@club_exists
+@owner_required
+def delete_club(request, club_name):
+    current_club = Club.objects.get(club_name=club_name)
+    current_club.delete()
+    return feed(request)
+
+
+@membership_required
+@club_exists
+@login_required
+def leave_club(request, club_req):
+    club = Club.objects.get(club_name=club_req)
+    user = request.user
+    cur_role = Role.objects.get(club=club, user=user)
+    number_owner_club = Role.objects.filter(club=club, club_role='OWN').count()
+    # print(number_owner_club)
+    if cur_role.club_role == 'OWN' and (number_owner_club == 1):
+        messages.warning(request,
+                         'Owner cannot leave, if the club has only 1 owner!!! You can transfer owner to others.')
+        return redirect('member_list', club_name=club.club_name)
+    else:
+        Role.objects.filter(user=request.user, club=club).delete()
+        messages.success(request, f'You have now left the club {club.club_name}.')
+        return redirect('my_clubs')
+
+
+@login_required
+@club_exists
+@owner_required
+def update_club_info(request, club_name):
+    """owner can change information of club"""
+    club = Club.objects.get(club_name=club_name)
+    form = ClubForm(request.POST, instance=club)
+    if request.method == 'POST':
+        if form.is_valid():
+            club = form.save()
+            return redirect('club_feed', club.club_name)
+    context = {'form': form, 'club_name': club_name}
+    return render(request, 'update_club_info.html', context)
+
+
 @login_required
 def my_clubs(request):
     clubs = Role.objects.filter(~Q(club_role='BAN'), user=request.user)
@@ -520,50 +546,36 @@ def club_list(request):
                                               'is_suitable_clubs': is_suitable_clubs})
 
 
-@login_required
-@club_exists
-@management_required
-def members_management_list(request, club_name):
-    banned_is_empty = False
-    member_is_empty = False
-    current_club = Club.objects.get(club_name=club_name)
-    members = current_club.get_members()
-    banned = current_club.get_banned_members()
-    if members.count() == 0:
-        member_is_empty = True
-    if banned.count() == 0:
-        banned_is_empty = True
-    return render(request, 'member_management.html',
-                  {'banned': banned, 'members': members, 'banned_is_empty': banned_is_empty,
-                   'member_is_empty': member_is_empty, 'current_club': current_club})
-
 
 @login_required
 @club_exists
-@management_required
+@owner_required
 def ban_member(request, club_name, user_id):
     current_club = Club.objects.get(club_name=club_name)
     try:
-        member = User.objects.get(id=user_id, club__club_name=current_club.club_name, role__club_role='MEM')
+        member = User.objects.get(id=user_id, club__club_name=current_club.club_name)
         current_club.ban_member(member)
-    except ObjectDoesNotExist:
-        return redirect('feed')
+        messages.add_message(request, messages.SUCCESS, f'You have banned {member.username}.')
+    except (ObjectDoesNotExist):
+        messages.add_message(request, messages.WARNING, "User doesn't exist")
+        return redirect('member_list', club_name)
     else:
-        return members_management_list(request, current_club.club_name)
-
+        return redirect('member_list', club_name)
 
 @login_required
 @club_exists
-@management_required
+@owner_required
 def unban_member(request, club_name, user_id):
     current_club = Club.objects.get(club_name=club_name)
     try:
-        banned = User.objects.get(id=user_id, club__club_name=current_club.club_name, role__club_role='BAN')
+        banned = User.objects.get(id=user_id, club__club_name=current_club.club_name)
         current_club.unban_member(banned)
+        messages.add_message(request, messages.SUCCESS, f'You have unbanned {banned.username}.')
     except ObjectDoesNotExist:
-        return redirect('feed')
+        messages.add_message(request, messages.WARNING, "User doesn't exist")
+        return redirect('member_list', club_name)
     else:
-        return members_management_list(request, current_club.club_name)
+        return redirect('member_list', club_name)
 
 
 @login_required
@@ -572,21 +584,13 @@ def unban_member(request, club_name, user_id):
 def remove_member(request, club_name, user_id):
     current_club = Club.objects.get(club_name=club_name)
     try:
-        member = User.objects.get(id=user_id, club__club_name=current_club.club_name, role__club_role='MEM')
+        member = User.objects.get(id=user_id, club__club_name=current_club.club_name)
         current_club.remove_user_from_club(member)
     except ObjectDoesNotExist:
-        return redirect('feed')
+        messages.add_message(request, messages.WARNING, "User doesn't exist")
+        return redirect('member_list', club_name)
     else:
-        return members_management_list(request, current_club.club_name)
-
-
-@login_required
-@club_exists
-@owner_required
-def moderator_list(request, club_name):
-    current_club = Club.objects.get(club_name=club_name)
-    moderators = current_club.get_moderators()
-    return render(request, 'moderator_list.html', {'moderators': moderators, 'current_club': current_club})
+        return redirect('member_list', club_name)
 
 
 @login_required
@@ -595,12 +599,14 @@ def moderator_list(request, club_name):
 def transfer_ownership(request, club_name, user_id):
     current_club = Club.objects.get(club_name=club_name)
     try:
-        moderator = User.objects.get(id=user_id, club__club_name=current_club.club_name, role__club_role='MOD')
+        moderator = User.objects.get(id=user_id, club__club_name=current_club.club_name)
         current_club.transfer_ownership(request.user, moderator)
+        messages.success(request, f'You have transfered owner to {moderator.username}!')
     except (ObjectDoesNotExist):
-        return redirect('feed')
+        messages.add_message(request, messages.WARNING, "User doesn't exist")
+        return redirect('member_list', club_name)
     else:
-        return moderator_list(request, current_club.club_name)
+        return redirect('member_list', club_name)
 
 
 @login_required
@@ -609,41 +615,49 @@ def transfer_ownership(request, club_name, user_id):
 def demote_moderator(request, club_name, user_id):
     current_club = Club.objects.get(club_name=club_name)
     try:
-        moderator = User.objects.get(id=user_id, club__club_name=current_club.club_name, role__club_role='MOD')
+        moderator = User.objects.get(id=user_id, club__club_name=current_club.club_name)
         current_club.toggle_member(moderator)
+        messages.success(request, f'You have demoted {moderator.username} to member !')
     except (ObjectDoesNotExist):
-        return redirect('feed')
+        messages.add_message(request, messages.WARNING, "User doesn't exist")
+        return redirect('member_list', club_name)
     else:
-        return moderator_list(request, current_club.club_name)
+        return redirect('member_list', club_name)
 
 
 @login_required
 @club_exists
-@management_required
+@owner_required
 def promote_member(request, club_name, user_id):
     current_club = Club.objects.get(club_name=club_name)
     try:
-        member = User.objects.get(id=user_id, club__club_name=current_club.club_name, role__club_role='MEM')
-        current_club.toggle_moderator(member)
+        changing_user = User.objects.get(id=user_id)
+        current_club.toggle_moderator(changing_user)
+        messages.success(request, f'You have promted {changing_user.username} to moderator!')
     except (ObjectDoesNotExist):
-        return redirect('feed')
+        messages.add_message(request, messages.WARNING, "User doesn't exist")
+        return redirect('member_list', club_name)
     else:
-        return members_management_list(request, current_club.club_name)
-
+        return redirect('member_list', club_name)
 
 @login_required
 @club_exists
 @membership_required
 def member_list(request, club_name):
-    is_owner = False
-    club = Club.objects.get(club_name=club_name)
-    cur_user = request.user
-    roles = Role.objects.filter(club=club).exclude(club_role='BAN')
-    club_role = club.get_club_role(cur_user)
-    if club_role == 'OWN':
-        is_owner = True
-    context = {'club': club, 'roles': roles, 'is_owner': is_owner}
-    return render(request, "member_list.html", context)
+    current_club = Club.objects.get(club_name=club_name)
+    current_user = request.user
+    current_user_role = Role.objects.get(club=current_club, user=current_user).club_role
+    club_owner = Role.objects.get(club=current_club, club_role='OWN').user
+    moderator_ids = Role.objects.filter(club=current_club, club_role='MOD').values_list('user', flat=True)
+    club_moderators = User.objects.filter(id__in=moderator_ids)
+    member_ids = Role.objects.filter(club=current_club, club_role='MEM').values_list('user', flat=True)
+    club_members = User.objects.filter(id__in=member_ids)
+    banned_ids = Role.objects.filter(club=current_club, club_role='BAN').values_list('user', flat=True)
+    club_banned = User.objects.filter(id__in=banned_ids)
+    context = {'club': current_club, 'current_user': current_user, 'current_user_role': current_user_role,
+               'club_owner': club_owner, 'club_moderators': club_moderators, 'club_members': club_members,
+               'club_banned': club_banned}
+    return render(request, 'member_list.html', context)
 
 @login_required
 def post_upvote(request, post_id):
@@ -661,8 +675,6 @@ def post_downvote(request, post_id):
     post.toggle_downvote(user_downvoting)
     # The #post_id redirects to the part of the page with the post
     return redirect(f'/post_comment/#{post_id}')
-
-
 
 
 class PostCommentView(LoginRequiredMixin, ListView):
@@ -740,15 +752,16 @@ def create_meeting(request, club_name, book_isbn):
     form = MeetingForm(request.POST)
     if request.method == 'POST':
         if form.is_valid():
-            join_link=None
-            start_link=None
+            join_link = None
+            start_link = None
             # create_meeting()
-            if current_club.get_meeting_status()=="Online":
-                create_zoom_meeting(request.POST.get("date"),request.POST.get("time_start"),request.POST.get("duration"))
-                join_link=get_join_link()
-                start_link=get_start_link()
+            if current_club.get_meeting_status() == "Online":
+                create_zoom_meeting(request.POST.get("date"), request.POST.get("time_start"),
+                                    request.POST.get("duration"))
+                join_link = get_join_link()
+                start_link = get_start_link()
 
-            form.original_save(request.user, current_club, chosen_book,join_link,start_link)
+            form.original_save(request.user, current_club, chosen_book, join_link, start_link)
             messages.add_message(request, messages.SUCCESS, "Meeting set up!")
 
             return redirect('meeting_list', club_name)
