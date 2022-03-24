@@ -639,15 +639,32 @@ def demote_moderator(request, club_name, user_id):
 @login_required
 @club_exists
 @management_required
-def promote_member(request, club_name, user_id):
+def promote_member(request, club_name, user_name):
     current_club = Club.objects.get(club_name=club_name)
+    print(user_id)
+    changing_user = User.objects.get(username=user_name)
+    print(changing_user.username)
     try:
-        member = User.objects.get(id=user_id, club__club_name=current_club.club_name, role__club_role='MEM')
-        current_club.toggle_moderator(member)
+        changing_user = User.objects.get(id=user_id)
+        # current_club.toggle_moderator(member)
+        role = Role.objects.get(user=changing_user, club=current_club)
+        print(role.club_role)
+        if role.club_role == 'OWN':
+            messages.add_message(request, messages.ERROR, "ERROR: you cannot change the owner's information!")
+        elif role.club_role == 'MOD':
+            messages.add_message(request, messages.ERROR, "The user you selected is already a club Moderator!")
+        else:
+            print(3)
+            role.club_role = 'MOD'
+            print(1)
+            messages.success(request, "Saved changes.")
+            print(2)
+            role.save()
+        return redirect('member_list', club_name = current_club.club_name)
+
     except (ObjectDoesNotExist):
         return redirect('feed')
-    else:
-        return members_management_list(request, current_club.club_name)
+
 
 
 @login_required
