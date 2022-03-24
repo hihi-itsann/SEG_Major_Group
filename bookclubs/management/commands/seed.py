@@ -43,15 +43,15 @@ class Command(BaseCommand):
 
         self.create_ratings()
 
-        self.create_posts()
-        self.posts = Post.objects.all()
-
-        self.create_comments()
-
         self.create_clubs()
         self.clubs = Club.objects.all()
 
         self.create_roles()
+
+        self.create_posts()
+        self.posts = Post.objects.all()
+
+        self.create_comments()
 
         # self.create_meetings()
 
@@ -315,6 +315,7 @@ class Command(BaseCommand):
         post = Post()
         post.title = self.faker.text(max_nb_chars=255)
         post.author = self.get_random_user()
+        post.club = self.get_random_club()
         post.body = self.faker.text(max_nb_chars=280)
         post.save()
         datetime = self.faker.past_datetime(start_date='-365d', tzinfo=pytz.UTC)

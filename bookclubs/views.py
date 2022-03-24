@@ -749,6 +749,9 @@ class DeleteCommentView(LoginRequiredMixin, DeleteView):
         return reverse('club_feed', kwargs={'club_name': club.club_name})
 
 
+
+#--------------------meeting functions-----------------------------------------
+
 @login_required
 @club_exists
 @membership_required
