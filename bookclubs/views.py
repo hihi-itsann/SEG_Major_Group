@@ -734,7 +734,7 @@ class CreateCommentView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         post = Post.objects.get(id=self.kwargs['pk'])
         club = Club.objects.get(id=post.club.id)
-        return reverse('club_feed', kwargs={'club_name': club.club_name})
+        return '{}#education'.format(reverse('club_feed', kwargs={'club_name': club.club_name}))
 
 
 

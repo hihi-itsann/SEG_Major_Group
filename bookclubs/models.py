@@ -389,7 +389,7 @@ class Post(models.Model):
     title = models.CharField(max_length=255)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     club = models.ForeignKey(Club, on_delete=models.CASCADE)
-    body = models.TextField()
+    body = models.CharField(max_length=520, blank=False)
     post_date = models.DateField(auto_now_add=True)
     post_datetime = models.DateTimeField(auto_now_add=True)
 
@@ -449,8 +449,6 @@ class Comment(models.Model):
     related_post = models.ForeignKey(Post, related_name="comments", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    # def get_absolute_url(self):
-    #     return reverse('feed')
 
     class Meta:
         ordering = ['-created_at']
