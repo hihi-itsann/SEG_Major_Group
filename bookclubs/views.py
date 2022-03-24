@@ -670,23 +670,24 @@ def member_list(request, club_name):
 #-----------------------post and comment functions-------------------------------
 
 
-
 @login_required
 def post_upvote(request, post_id):
     user_upvoting = request.user
     post = Post.objects.get(id=post_id)
+    club = Club.objects.get(id=post.club.id)
     post.toggle_upvote(user_upvoting)
     # The #post_id redirects to the part of the page with the post
-    return redirect(f'/post_comment/#{post_id}')
+    return redirect(f'/club/{club.club_name}/feed/#{post_id}')
 
 
 @login_required
 def post_downvote(request, post_id):
     user_downvoting = request.user
     post = Post.objects.get(id=post_id)
+    club = Club.objects.get(id=post.club.id)
     post.toggle_downvote(user_downvoting)
     # The #post_id redirects to the part of the page with the post
-    return redirect(f'/post_comment/#{post_id}')
+    return redirect(f'/club/{club.club_name}/feed/#{post_id}')
 
 
 class PostCommentView(LoginRequiredMixin, ListView):
