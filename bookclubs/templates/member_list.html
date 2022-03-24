@@ -1,4 +1,4 @@
-{# {% extends 'base_content.html' %}
+{% extends 'base_content.html' %}
 {% block content %}
     <div class="container">
         <div class="col-xs-12 col-lg-6 col-xl-8">
@@ -21,15 +21,15 @@
                                   <th scope="col">Full name</th>
                                   <th scope="col">Username</th>
                               </tr>
-                              {% for relationship in roles %}
+                              {% for role in roles %}
                                   <tr>
-                                      <td>{{ relationship.club_role }}</td>
-                                      <td>{{ relationship.user.full_name }}</td>
-                                      <td>{{ relationship.user.username}}</td>
+                                      <td>{{ role.club_role }}</td>
+                                      <td>{{ role.user.full_name }}</td>
+                                      <td>{{ role.user.username}}</td>
                                       {% if is_moderator or is_owner %}
                                           <td><a>remove</a></td>
                                           <td><a>banned</a></td>
-                                          <td><a>promote</a></td>
+                                          <td><a href="{% url 'promote_member' club_name=club.club_name  user_name=role.user.username%}">promote</a></td>
                                           <td><a>demote</a></td>
                                           <td><a>transfer ownership</a></td>
                                       {% endif %}
@@ -43,4 +43,4 @@
             </div>
         </div>
     </div>
-{% endblock %} #}
+{% endblock %}
