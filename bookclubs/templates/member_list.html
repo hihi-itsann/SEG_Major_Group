@@ -25,10 +25,10 @@
               {% for role in roles %}
                   <tr class="btn-normal">
                     <td>{{ role.club_role }}</td>
-                    <td>{{ role.user.full_name }}</td>
+                    <td id="a">{{ role.user.full_name }}</td>
                     <td>
-                      <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">
-                          user username
+                      <button type="button"  onclick="openDetails()" class="btn btn-info btn-lg" >
+                          {{role.user.email}}
                       </button>
                       <div class="modal fade" id="myModal" role="dialog">
                           <div class="modal-dialog">
