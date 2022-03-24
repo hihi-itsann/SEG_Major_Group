@@ -4,10 +4,8 @@ from .models import User, Club, Application, Role, Post, Comment, BookRatingRevi
 from django.contrib.auth import authenticate
 # from django.forms.widgets import DateInput
 from django.db import IntegrityError
-import datetime
-
+from django.utils import timezone
 from .models import Post
-
 
 # from django.forms.widgets import DateInput
 
@@ -35,17 +33,26 @@ class NewPasswordMixin(forms.Form):
         if new_password != password_confirmation:
             self.add_error('password_confirmation', 'Confirmation does not match password.')
 
+def validate_date_not_in_future(value):
+        if value <= timezone.now().date():
+            raise forms.ValidationError('date needs to be in the future')
+def validate_date_not_in_past(value):
+        if value >= timezone.now().date():
+            raise forms.ValidationError('Date needs to be in the past')
+
 
 class SignUpForm(NewPasswordMixin, forms.ModelForm):
     """Form enabling unregistered users to sign up."""
+
+    dob=forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}),validators=[validate_date_not_in_past])
 
     class Meta:
         """Form options."""
 
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'bio', 'dob', 'gender', 'location',
+        fields = ['first_name', 'last_name', 'username', 'email', 'bio', 'dob', 'gender', 'location', 'city', 'country',
                   'meeting_preference']
-        widgets = {'dob': forms.DateInput(format='%d/%m/%Y'), 'bio': forms.Textarea()}
+        widgets = { 'bio': forms.Textarea()}
 
     def save(self):
         """Create a new user."""
@@ -83,14 +90,17 @@ class LogInForm(forms.Form):
 
 class UserForm(forms.ModelForm):
     """Form to update user profiles."""
+    dob=forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}),validators=[validate_date_not_in_past])
+
 
     class Meta:
         """Form options."""
 
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'bio', 'dob', 'gender', 'location',
+        fields = ['first_name', 'last_name', 'username', 'email', 'bio', 'dob', 'gender', 'location', 'city', 'country',
                   'meeting_preference']
         widgets = {'bio': forms.Textarea()}
+
 
 class PasswordForm(NewPasswordMixin):
     """Form enabling users to change their password."""
@@ -128,16 +138,18 @@ class PasswordForm(NewPasswordMixin):
 class RateReviewForm(forms.ModelForm):
     class Meta:
         model = BookRatingReview
-        fields = ['rate','review']
+        fields = ['rate', 'review']
         widgets = {
             'review': forms.Textarea(),
         }
 
 
-class NewClubForm(forms.ModelForm):
+class ClubForm(forms.ModelForm):
+    """Create and update club form"""
+
     class Meta:
         model = Club
-        fields = ['club_name', 'meeting_status', 'location', 'public_status', 'genre', 'description']
+        fields = ['club_name', 'meeting_status', 'location', 'city', 'country', 'public_status', 'genre', 'description']
         widgets = {'description': forms.Textarea()}
 
     MEETING_CHOICES = (
@@ -149,78 +161,29 @@ class NewClubForm(forms.ModelForm):
         ('PRI', 'Private')
     )
 
+    GENRE_CHOICES = [('Fiction', 'Fiction'), ('Non-Fiction', 'Non-Fiction')]
+    #GENRE_CHOICES = Book.get_genres()
+
+
     meeting_status = forms.ChoiceField(widget=forms.Select(), label='Meetings Held', choices=MEETING_CHOICES)
     public_status = forms.ChoiceField(widget=forms.Select(), label='Status', choices=PRIVACY_CHOICES)
+    genre = forms.ChoiceField(widget=forms.Select(), choices=GENRE_CHOICES)
 
     def clean(self):
         """Clean the data and generate messages for any errors."""
         super().clean()
 
-    def save(self):
-        """Create a new club."""
-        super().save(commit=False)
-        club = Club.objects.create(
-            club_name=self.cleaned_data.get('club_name'),
-            meeting_status=self.cleaned_data.get('meeting_status'),
-            location=self.cleaned_data.get('location'),
-            public_status=self.cleaned_data.get('public_status'),
-            genre=self.cleaned_data.get('genre'),
-            description=self.cleaned_data.get('description')
-        )
-        return club
 
-
-class UpdateClubForm(forms.ModelForm):
-    """Form to update club details."""
-
-    class Meta:
-        """Form options."""
-
-        model = Club
-        fields = ['club_name', 'meeting_status', 'location', 'public_status', 'genre', 'description']
-        widgets = {'description': forms.Textarea()}
-
-        MEETING_CHOICES = (
-            ('ONL', 'Online'),
-            ('OFF', 'In-person')
-        )
-        PRIVACY_CHOICES = (
-            ('PUB', 'Public'),
-            ('PRI', 'Private')
-        )
-
-        meeting_status = forms.ChoiceField(widget=forms.Select(), label='Meetings Held', choices=MEETING_CHOICES)
-        public_status = forms.ChoiceField(widget=forms.Select(), label='Status', choices=PRIVACY_CHOICES)
-
-
-class NewApplicationForm(forms.ModelForm):
+class ApplicationForm(forms.ModelForm):
     class Meta:
         model = Application
         fields = ['statement']
+        widgets = {'statement': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Why do you want to '
+                                                                                              'join this club?'}), }
 
-    def save(self, user=None, club=None):
+    def original_save(self, user=None, club=None):
         super().save(commit=False)
         application = Application.objects.create(
-            user=user,
-            club=club,
-            statement=self.cleaned_data.get('statement'),
-            status='P'
-        )
-        return application
-
-
-class UpdateApplicationForm(forms.ModelForm):
-    class Meta:
-        model = Application
-        fields = ['statement']
-
-    def save(self, user=None, club=None):
-        super().save(commit=False)
-        delete_application = Application.objects.get(user=user, club=club)
-        past_id = delete_application.id
-        delete_application.delete()
-        application = Application.objects.create(
-            id=past_id,
             user=user,
             club=club,
             statement=self.cleaned_data.get('statement'),
@@ -253,41 +216,41 @@ class CommentForm(forms.ModelForm):
         }
 
 
-class NewMeetingForm(forms.ModelForm):
+class MeetingForm(forms.ModelForm):
+
+    date=forms.DateField(
+    widget=forms.SelectDateWidget(),
+    initial=timezone.now().date(),
+    validators=[validate_date_not_in_future]
+    )
 
     class Meta:
         model = Meeting
-        fields = ('topic', 'description', 'meeting_status', 'location', 'date', 'time_start', 'time_end')
+        fields = ('topic', 'description', 'location', 'date', 'time_start', 'duration')
 
         widgets = {
             'topic': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Topic'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Agenda'}),
-            'meeting_status': forms.Select(attrs={'class': 'form-control'}),
             'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Location'}),
-            'date': forms.DateInput(attrs={'class': 'form-control', 'placeholder': 'dd/mm/yyyy'}),
+            #'date': forms.DateInput(attrs={'class': 'form-control', 'format': "%Y-%m-%d", 'placeholder': 'yyyy-mm-dd'}),
             'time_start': forms.TimeInput(attrs={'class': 'form-control', 'placeholder': 'hh:mm'}),
-            'time_end': forms.TimeInput(attrs={'class': 'form-control', 'placeholder': 'hh:mm'})
+            'duration': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Minutes'})
         }
 
-    MEETING_CHOICES = (
-        ('ONL', 'Online'),
-        ('OFF', 'In-person')
-    )
-
-    meeting_status = forms.ChoiceField(widget=forms.Select(), label='Meetings Held', choices=MEETING_CHOICES)
-
-    def save(self, user=None, club=None, book=None):
+    def original_save(self, user=None, club=None, book=None, join_link=None, start_link=None):
         super().save(commit=False)
         meeting = Meeting.objects.create(
             club=club,
             book=book,
             topic=self.cleaned_data.get('topic'),
             description=self.cleaned_data.get('description'),
-            meeting_status=self.cleaned_data.get('meeting_status'),
+            meeting_status=club.meeting_status,
             location=self.cleaned_data.get('location'),
             date=self.cleaned_data.get('date'),
             time_start=self.cleaned_data.get('time_start'),
-            time_end=self.cleaned_data.get('time_end')
+            duration=self.cleaned_data.get('duration'),
+            join_link=join_link,
+            start_link=start_link
         )
         host = MeetingAttendance.objects.create(
             user=user,
@@ -295,4 +258,3 @@ class NewMeetingForm(forms.ModelForm):
             meeting_role='H'
         )
         return meeting
-

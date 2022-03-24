@@ -1,0 +1,49 @@
+{% extends 'base_content.html' %}
+{% block title %}
+| Meeting List
+{% endblock %}
+
+{% block content %}
+<div class="container">
+      <div>
+          <br>
+          <h1>{{ club.club_name }} Meetings</h1>
+      <div style="text-align: right">
+      <button type="button" class="btn btn-outline-dark"><a
+                            href="{% url 'show_book_recommendations' club_name=club_name %}">Create Meeting</a></button>
+          </div>
+          <div>
+          {% if current_meetings.count > 0 %}
+              <hr class="row-divider">
+                  <div>
+                      <table class="table table-striped">
+                          <tr>
+                              <th scope="col">Book</th>
+                              <th scope="col"></th>
+                              <th scope="col">Topic</th>
+                              <th scope="col">Host</th>
+                              <th scope="col">Date</th>
+                              <th scope="col">Held</th>
+                              <th scope="col"></th>
+                          </tr>
+                            {% for meeting in current_meetings %}
+                                <tr>
+                                    <td><img src="{{ meeting.book.image_url_m }}" alt="Book Cover"></td>
+                                    <td><a href="{% url 'show_book' meeting.book.ISBN %}">{{ meeting.book.title }}</a></td>
+                                    <td>{{ meeting.topic }}</td>
+                                    <td><a href="{% url 'show_user' meeting.get_host.username %}"> {{ meeting.get_host.full_name }} </a></td>
+                                    <td>{{ meeting.date }}</td>
+                                    <td>{{ meeting.get_meeting_status }}</td>
+                                    <td><a href="{% url 'show_meeting' club_name=club_name meeting_id=meeting.id %}"> See More </a></td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                  </div>
+              {% else %}
+                <h5>There aren't any meetings currently set up for this club!</h5>
+
+          {% endif %}
+          </div>
+      </div>
+  </div>
+{% endblock %}

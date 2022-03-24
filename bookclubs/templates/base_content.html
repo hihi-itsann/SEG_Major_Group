@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
 {% block body %}
   {% include 'partials/navbar.html' %}
-  {% include 'partials/sidebar.html' %}
+  {% if user.is_authenticated %}
+    {% include 'partials/sidebar.html' %}
+  {% endif %}
   {% include 'partials/messages.html' %}
   {% block content %}
   {% endblock %}

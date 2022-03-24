@@ -1,3 +1,6 @@
+import datetime
+import traceback
+
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator, MinLengthValidator, MinValueValidator, MaxValueValidator
 from django.db import models
@@ -9,7 +12,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 class User(AbstractUser):
-    #userID=models.IntegerField(unique=True, null=True)
+    userID = models.IntegerField(unique=True, null=True)
     username = models.CharField(
         max_length=30,
         unique=True,
@@ -31,6 +34,11 @@ class User(AbstractUser):
     )
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True)
     location = models.CharField(max_length=50, blank=True)
+    city = models.CharField(max_length=50, blank=True)
+    country = models.CharField(max_length=50, blank=True)
+    # country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True)
+    # city = models.ForeignKey(City, on_delete=models.CASCADE, null=True)
+
     MEETING_CHOICES = (
         ('O', 'Online'),
         ('P', 'In-person')
@@ -58,6 +66,23 @@ class User(AbstractUser):
         """Return a URL to a miniature version of the user's gravatar."""
         return self.gravatar(size=60)
 
+    def get_pronouns(self):
+        if self.gender == 'M':
+            return f'he/ him'
+        elif self.gender == 'F':
+            return f'she/ her'
+        else:
+            return f'they/ them (consult for other pronouns)'
+
+    def get_clubs(self):
+        users_clubs = Role.objects.filter(user=self).exclude(club_role='BAN').values_list('club', flat=True)
+        return Club.objects.filter(id__in=users_clubs)
+
+    def get_applied_clubs(self):
+        applicant_clubs = Application.objects.filter(user=self, status='P').values_list('club', flat=True)
+        return Club.objects.filter(id__in=applicant_clubs)
+
+
 
 class Book(models.Model):
     ISBN = models.CharField(
@@ -74,7 +99,7 @@ class Book(models.Model):
     image_url_s = models.URLField(blank=False)
     image_url_m = models.URLField(blank=False)
     image_url_l = models.URLField(blank=False)
-    genra=models.CharField(max_length=100, blank=True)
+    genre = models.CharField(max_length=100, blank=True)
 
     def getAverageRate(self):
         return self.bookratingreview_set.all().aggregate(Avg('rate'))['rate__avg']
@@ -84,6 +109,20 @@ class Book(models.Model):
 
     def get_ISBN(self):
         return self.ISBN
+
+    @staticmethod
+    def get_genres():
+        genres = [('Fiction', 'Fiction'), ('Non-Fiction', 'Non-Fiction')]
+        try:
+            books = Book.objects.all()
+            if books.count() > 0:
+                for book in books:
+                    genres.append((book.genre.title(), book.genre.title()))
+                genres = list(set(genres))
+        except:
+            print(traceback.format_exc())
+        finally:
+            return genres
 
     # def getReadingStatus(self,user):
     #     return BookStatus.objects.get(user=user, book=self).status
@@ -101,7 +140,6 @@ class BookRatingReview(models.Model):
 
     class Meta:
         ordering = ['-created_at']
-
 
 
 class BookStatus(models.Model):
@@ -186,6 +224,16 @@ class Club(models.Model):
         max_length=100,
         blank=False
     )
+    city = models.CharField(
+        max_length=100,
+        blank=True
+    )
+    country = models.CharField(
+        max_length=100,
+        blank=True
+    )
+    # country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True)
+    # city = models.ForeignKey(City, on_delete=models.CASCADE, null=True)
 
     public_status = models.CharField(
         choices=PRIVACY_CHOICES,
@@ -194,8 +242,8 @@ class Club(models.Model):
     )
 
     genre = models.CharField(
-        max_length=520,
-        default='',
+        max_length=100,
+        default='Fiction',
         blank=False
     )
 
@@ -282,12 +330,12 @@ class Club(models.Model):
         role = Role.objects.get(club=self, user=user)
         role.delete()
 
-    def change_club_status(self, choice):
-        if choice == True:
-            self.public_status = True
+    def get_meeting_status(self):
+        if self.meeting_status == 'ONL':
+            return 'Online'
         else:
-            self.status = False
-        self.save()
+            return 'In-Person'
+
 
 class Role(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -297,7 +345,7 @@ class Role(models.Model):
         MEMBER = 'MEM', _('Member')
         MODERATOR = 'MOD', _('Moderator')
         OWNER = 'OWN', _('Owner')
-        BANNED = 'BAN', _('BannedMember')
+        BANNED = 'BAN', _('Banned')
 
     club_role = models.CharField(
         max_length=3,
@@ -308,11 +356,9 @@ class Role(models.Model):
     def get_club_role(self):
         return self.RoleOptions(self.club_role).name.title()
 
-    def full_name(self):
-        return f'{self.first_name} {self.last_name}'
-
 
 class Post(models.Model):
+
     title = models.CharField(max_length=255)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     body = models.TextField()
@@ -324,6 +370,46 @@ class Post(models.Model):
 
     def get_absolute_url(self):
         return reverse('feed')
+
+    def toggle_upvote(self, user):
+        if Vote.objects.filter(post=self, user=user).count() == 1:
+            vote = Vote.objects.get(post=self, user=user)
+            if vote.vote_type == True:
+                vote.delete()
+            else:
+                vote.delete()
+                Vote.objects.create(post=self, user=user, vote_type=True)
+        else:
+            Vote.objects.create(post=self, user=user, vote_type=True)
+
+    def toggle_downvote(self, user):
+        if Vote.objects.filter(post=self, user=user).count() == 1:
+            vote = Vote.objects.get(post=self, user=user)
+            if vote.vote_type == False:
+                vote.delete()
+            else:
+                vote.delete()
+                Vote.objects.create(post=self, user=user, vote_type=False)
+
+        else:
+            Vote.objects.create(post=self, user=user, vote_type=False)
+
+    def get_upvotes(self):
+        return Vote.objects.filter(post=self, vote_type=True).count()
+
+    def get_downvotes(self):
+        return Vote.objects.filter(post=self, vote_type=False).count()
+
+
+
+
+class Vote(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='post_vote')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_vote')
+    vote_type = models.BooleanField()
+
+    class Meta:
+        unique_together = ('user', 'post')
 
 
 class Comment(models.Model):
@@ -350,10 +436,50 @@ class Meeting(models.Model):
     topic = models.CharField(max_length=120, default='', blank=False)
     description = models.TextField(max_length=520, blank=True)
     meeting_status = models.CharField(choices=MEETING_CHOICES, default='OFF', max_length=3)
-    location = models.CharField(max_length=120, blank=False)
-    date = models.DateTimeField(blank=False)
+    location = models.CharField(max_length=120, blank=True)
+    date = models.DateField(blank=False)
     time_start = models.TimeField(blank=False)
-    time_end = models.TimeField(blank=False)
+    duration = models.IntegerField(blank=False, default=30)
+    join_link = models.URLField(blank=True, null=True)
+    start_link = models.URLField(blank=True,null=True)
+    def get_time_end(self):
+        time1 = self.time_start
+        timedelta = datetime.timedelta(minutes=self.duration)
+        tmp_datetime = datetime.datetime.combine(self.date, time1)
+        time2 = (tmp_datetime + timedelta).time()
+        return time2
+
+    def is_attending(self, user):
+        return (MeetingAttendance.objects.filter(meeting=self, user=user)).count() == 1
+
+    def is_host(self, user):
+        return (MeetingAttendance.objects.filter(meeting=self, user=user, meeting_role='H')).count() == 1
+
+    def is_attendee_only(self, user):
+        return (MeetingAttendance.objects.filter(meeting=self, user=user, meeting_role='A')).count() == 1
+
+    def get_host(self):
+        return MeetingAttendance.objects.get(meeting=self, meeting_role='H').user
+
+    def get_meeting_status(self):
+        if self.meeting_status == 'ONL':
+            return 'Online'
+        else:
+            return 'In-Person'
+
+    def get_is_time(self):
+        return datetime.datetime.now().date()==self.date and datetime.datetime.now().time() > self.time_start and datetime.datetime.now().time() < self.get_time_end()
+
+    def get_location(self):
+        if self.meeting_status == 'ONL':
+            if not self.get_is_time():
+                return f"Meeting Link will be available when it's time"
+            else:
+                return f"It's time to join the meeting!"
+
+
+        else:
+            return f'Meeting Held: {self.location} {self.club.city} {self.club.country}'
 
     class Meta:
         ordering = ['-date']
@@ -368,15 +494,18 @@ class MeetingAttendance(models.Model):
     meeting = models.ForeignKey(Meeting, on_delete=models.CASCADE)
     meeting_role = models.CharField(max_length=1, choices=MEETING_ROLE_CHOICES)
 
+    class Meta:
+        unique_together = ('user', 'meeting')
+
 
 class ClubBookAverageRating(models.Model):
     club = models.ForeignKey(Club, on_delete=models.CASCADE)
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     rate = models.FloatField(default=0, validators=[MinValueValidator(0.0), MaxValueValidator(10.0)])
-    number_of_ratings=models.IntegerField()
+    number_of_ratings = models.IntegerField()
 
     def add_rating(self, rate):
-        self.rate+=rate
+        self.rate += rate
 
     def increment_number_of_ratings(self):
-        self.number_of_ratings+=1
+        self.number_of_ratings += 1

@@ -1,23 +1,25 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclubs.models import User, Book, BookStatus
+from bookclubs.views import reading_book_list
 from bookclubs.tests.helpers import reverse_with_next
+from django.test import RequestFactory
 
-class BookListViewTest(TestCase):
+class ReadingBookListViewTest(TestCase):
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
     ]
 
     def setUp(self):
-        self.url = reverse('reading_book_list', kwargs={'book_genra': 'All'})
+        self.url = reverse('reading_book_list', kwargs={'book_genre': 'All'})
         self.user = User.objects.get(username='@johndoe')
+        self._create_reading_books(3)
 
     def test_reading_book_list_url(self):
         self.assertEqual(self.url,f'/reading_book_list/All/')
 
-    def test_get_reading_book_list(self):
+    def test_get_reading_book_list_with_all_genres(self):
         self.client.login(username=self.user.username, password='Password123')
-        self._create_reading_books(3)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'reading_book_list.html')
@@ -37,6 +39,29 @@ class BookListViewTest(TestCase):
             book_url = reverse('show_book', kwargs={'ISBN': book.ISBN})
             self.assertContains(response, book_url)
 
+    def test_get_reading_book_list_with_Social_Science_genre(self):
+        self.client.login(username=self.user.username, password='Password123')
+        url = reverse('reading_book_list', kwargs={'book_genre': 'Social Science'})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'reading_book_list.html')
+        self.assertEqual(len(response.context['unreadBooks']), 3)
+        self.assertEqual(len(response.context['readingBooks']), 0)
+        self.assertEqual(len(response.context['finishedBooks']), 0)
+        self.assertQuerysetEqual(response.context['unreadBooks'], Book.objects.filter(genre='Social Science'))
+        for book_id in range(3):
+            book = Book.objects.get(ISBN=f'XXXXXXXXX{book_id}')
+            book_url = reverse('show_book', kwargs={'ISBN': book.ISBN})
+            self.assertContains(response, book_url)
+        for book_id in range(3):
+            book = Book.objects.get(ISBN=f'YYYYYYYYY{book_id}')
+            book_url = reverse('show_book', kwargs={'ISBN': book.ISBN})
+            self.assertNotContains(response, book_url)
+        for book_id in range(3):
+            book = Book.objects.get(ISBN=f'ZZZZZZZZZ{book_id}')
+            book_url = reverse('show_book', kwargs={'ISBN': book.ISBN})
+            self.assertNotContains(response, book_url)
+
     def test_get_book_list_redirects_when_not_logged_in(self):
         redirect_url = reverse_with_next('log_in', self.url)
         response = self.client.get(self.url)
@@ -53,7 +78,7 @@ class BookListViewTest(TestCase):
                 image_url_s=f'url-s{book_id}',
                 image_url_m=f'url-m{book_id}',
                 image_url_l=f'url-l{book_id}',
-                genra="Social Science"
+                genre="Social Science"
             )
             BookStatus.objects.create(
                 book=unreadBook,
@@ -69,7 +94,7 @@ class BookListViewTest(TestCase):
                 image_url_s=f'url-s{book_id}',
                 image_url_m=f'url-m{book_id}',
                 image_url_l=f'url-l{book_id}',
-                genra="Fiction"
+                genre="Fiction"
             )
             BookStatus.objects.create(
                 book=readingBook,
@@ -86,7 +111,7 @@ class BookListViewTest(TestCase):
                 image_url_s=f'url-s{book_id}',
                 image_url_m=f'url-m{book_id}',
                 image_url_l=f'url-l{book_id}',
-                genra="Medical"
+                genre="Medical"
             )
             BookStatus.objects.create(
                 book=finishedBook,

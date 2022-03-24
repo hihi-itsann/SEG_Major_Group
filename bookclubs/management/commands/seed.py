@@ -15,7 +15,7 @@ import urllib.request
 import json
 import textwrap
 class Command(BaseCommand):
-    USER_COUNT = 1
+    USER_COUNT = 100
     CLUB_COUNT = 10
     POST_COUNT = 100
     COMMENT_COUNT = 100
@@ -33,27 +33,27 @@ class Command(BaseCommand):
         self.faker = Faker('en_GB')
 
     def handle(self, *args, **options):
-        # self.load_data_from_csv()
+        self.load_data_from_csv()
 
-        # self.create_books()
-        # self.books = Book.objects.all()
+        self.create_books()
+        self.books = Book.objects.all()
 
         self.create_users()
         self.users = User.objects.all()
 
-        # self.create_ratings()
+        self.create_ratings()
 
-        # self.create_posts()
-        # self.posts = Post.objects.all()
+        self.create_posts()
+        self.posts = Post.objects.all()
 
-        # self.create_comments()
+        self.create_comments()
 
-        # self.create_clubs()
-        # self.clubs = Club.objects.all()
+        self.create_clubs()
+        self.clubs = Club.objects.all()
 
-        # self.create_roles()
+        self.create_roles()
 
-        # self.create_meetings()
+        self.create_meetings()
 
 
 
@@ -155,7 +155,7 @@ class Command(BaseCommand):
         while user_count < self.USER_COUNT:
             print(f"Seeding user {user_count}/{self.USER_COUNT}", end='\r')
             try:
-                self.create_user()
+                self.create_user(user_count)
             except:
                 continue
             user_count += 1
@@ -197,7 +197,7 @@ class Command(BaseCommand):
     #         meeting_preference=meeting_preference
     #     )
 
-    def create_user(self):
+    def create_user(self,user_count):
         first_name = self.faker.first_name()
         last_name = self.faker.last_name()
         email = create_email(first_name, last_name)
@@ -211,7 +211,8 @@ class Command(BaseCommand):
         country = self.faker.country()
         meeting_preference = self.faker.random_choices(elements=('O', 'P'), length=1)[0]
         User.objects.create_user(
-            username,
+            userID=user_count,
+            username=username,
             first_name=first_name,
             last_name=last_name,
             email=email,
@@ -221,6 +222,8 @@ class Command(BaseCommand):
             dob=dob,
             gender=gender,
             location=location,
+            city=city,
+            country=country,
             meeting_preference=meeting_preference
         )
 
