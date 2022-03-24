@@ -1,6 +1,6 @@
 import datetime
 import traceback
-
+from django.contrib import messages
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator, MinLengthValidator, MinValueValidator, MaxValueValidator
 from django.db import models
@@ -295,9 +295,10 @@ class Club(models.Model):
         """Unban a banned user, they can now re-apply to join the club."""
         role = Role.objects.get(club=self, user=user)
         if role.club_role == 'BAN':
-            if Application.objects.filter(user=user, club=self).count() == 1:
-                Application.objects.get(user=user, club=self).delete()
-            role.delete()
+            role.club_role = 'MEM'
+            role.save()
+            return
+        else:
             return
 
     def transfer_ownership(self, old_owner, new_owner):
@@ -309,6 +310,9 @@ class Club(models.Model):
             new_owner_role.save()
             old_owner_role.club_role = 'MOD'
             old_owner_role.save()
+            return
+
+        else:
             return
 
     def remove_user_from_club(self, user):
@@ -366,6 +370,9 @@ class Role(models.Model):
         choices=RoleOptions.choices,
         default=RoleOptions.MEMBER,
     )
+
+    class Meta:
+        unique_together = ('user', 'club')
 
     def get_club_role(self):
         return self.RoleOptions(self.club_role).name.title()
