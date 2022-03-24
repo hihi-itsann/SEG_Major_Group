@@ -1,46 +1,185 @@
 {% extends 'base_content.html' %}
 {% block content %}
-    <div class="container">
-        <div class="col-xs-12 col-lg-6 col-xl-8">
+    <div class="container" style="padding-bottom: 50px">
             <br>
             <h1>{{ club.club_name }}</h1>
             <div>
-                <p>{{ club.club_location }}</p>
-                <p>{{ club.description }}</p>
-                {% if owner %}
-                  You are owner!
-                {% else %}
-                  <a href="{% url 'leave_club' club.club_name %}" class="btn btn-secondary btn-danger">Leave</a>
+                <div style="text-align: right">
+                    {% if current_user_role == 'MOD' or current_user_role == 'OWN' %}
+                        <a class="btn btn-outline-dark"
+                                href="{% url 'application_list' club_name=club.club_name %}">See Applicants</a>
+                    {% endif %}
+                    {% if current_user_role == 'OWN' %}
+                        <a class="btn btn-outline-dark"
+                                href="{% url 'update_club_info' club_name=club.club_name %}">Update Information</a>
+                    {% else %}
+                        <a class="btn btn-secondary btn-danger" href="{% url 'leave_club' club.club_name %}"
+                           >Leave</a>
+                    {% endif %}
+                </div>
+
+                <div class="container">
+                    <p style="font-size: large"><b>About Club:</b></p>
+                    <p style="font-size: medium">Focus Genre: {{ club.genre }}</p>
+                    <p style="font-size: medium">City: {{ club.city }}</p>
+                    <p style="font-size: medium">Country: {{ club.country }}</p>
+                    <p style="font-size: medium">Meetings Held: {{ club.get_meeting_status }}</p>
+                    <p style="font-size: medium">Description: {{ club.description }}</p>
+                </div>
+                <div id="owner" class="container">
+                    <h4>Owner</h4>
+                    <table class="table table-striped">
+                        <tr>
+                            <th scope="col">Full Name</th>
+                            <th scope="col">Username</th>
+                            <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                        </tr>
+                        <tr>
+                            <td>{{ club_owner.full_name }}</td>
+                            <td>{{ club_owner.username }}</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div id="moderators" class="container">
+                    <h4>Moderators</h4>
+                    {% if club_moderators.count > 0 %}
+                        <table class="table table-striped">
+                            <tr>
+                                <th scope="col">Full Name</th>
+                                <th scope="col">Username</th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                            {% for moderator in club_moderators %}
+                                <tr>
+                                    <td>{{ moderator.full_name }}</td>
+                                    <td>{{ moderator.username }}</td>
+                                    {% if current_user_role == 'OWN' %}
+                                        <td>
+                                            <a class="btn btn-outline-dark" href="{% url 'demote_moderator' club_name=club.club_name  user_id=moderator.id %}">Demote</a>
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-outline-dark" href="{% url 'remove_from_club' club_name=club.club_name  user_id=moderator.id %}">Remove</a>
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-outline-dark" style="background-color: lightcoral" href="{% url 'ban_from_club' club_name=club.club_name  user_id=moderator.id %}">Ban</a>
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-outline-dark" style="background-color: indianred; color: #1e1e1e" href="{% url 'transfer_ownership' club_name=club.club_name  user_id=moderator.id %}">Transfer
+                                                Ownership</a>
+                                        </td>
+                                        {% else %}
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    {% else %}
+                        <h7>There are currently no moderators in this club.</h7>
+                    {% endif %}
+                </div>
+
+                <div id="members" class="container">
+                    <h4>Members</h4>
+                    {% if club_members.count > 0 %}
+                        <table class="table table-striped">
+                            <tr>
+                                <th scope="col">Full Name</th>
+                                <th scope="col">Username</th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                            {% for member in club_members %}
+                                <tr>
+                                    <td>{{ member.full_name }}</td>
+                                    <td>{{ member.username }}</td>
+                                    {% if current_user_role == 'MOD' %}
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>
+                                            <a class="btn btn-outline-dark" href="{% url 'remove_from_club' club_name=club.club_name  user_id=member.id %}">Remove</a>
+                                        </td>
+                                        {% elif current_user_role == 'OWN' %}
+                                        <td>
+                                            <a class="btn btn-outline-dark" href="{% url 'promote_member' club_name=club.club_name  user_id=member.id %}">Promote</a>
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-outline-dark" href="{% url 'remove_from_club' club_name=club.club_name  user_id=member.id %}">Remove</a>
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-outline-dark" style="background-color: lightcoral" href="{% url 'ban_from_club' club_name=club.club_name  user_id=member.id %}">Ban</a>
+                                        </td>
+                                        <td></td>
+                                        {% else %}
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    {% else %}
+                        <h7>There are currently no members in this club.</h7>
+                    {% endif %}
+                </div>
+            {% if current_user_role == 'MOD' or current_user_role == 'OWN' %}
+                <div id="banned" class="container">
+                    <h4>Banned</h4>
+                    {% if club_banned.count > 0 %}
+                        <table class="table table-striped">
+                            <tr>
+                                <th scope="col">Full Name</th>
+                                <th scope="col">Username</th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                            {% for banned in club_banned %}
+                                <tr>
+                                    <td>{{ banned.full_name }}</td>
+                                    <td>{{ banned.username }}</td>
+                                    {% if current_user_role == 'OWN' %}
+                                        <td></td>
+                                        <td></td>
+                                        <td>
+                                            <a class="btn btn-outline-dark" style="background-color: darkseagreen" href="{% url 'unban_from_club' club_name=club.club_name  user_id=banned.id %}">Unban</a>
+                                        </td>
+                                        <td></td>
+                                        {% else %}
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        </table>
+                        <p style="font-size: small; line-height: 3px;">(Unbanning a user will remove them from the
+                            club, but they will now be able to re-apply or re-join.)</p>
+                    {% else %}
+                        <h7>There is currently no one banned from this club.</h7>
+                    {% endif %}
+                </div>
                 {% endif %}
-                <hr class="row-divider">
-                  {% if roles %}
-                      <div>
-                          <table class="table table-dark table-striped">
-                              <tr>
-                                  <th scope="col">Position</th>
-                                  <th scope="col">Full name</th>
-                                  <th scope="col">Username</th>
-                              </tr>
-                              {% for role in roles %}
-                                  <tr>
-                                      <td>{{ role.club_role }}</td>
-                                      <td>{{ role.user.full_name }}</td>
-                                      <td>{{ role.user.username}}</td>
-                                      {% if is_moderator or is_owner %}
-                                          <td><a>remove</a></td>
-                                          <td><a>banned</a></td>
-                                          <td><a href="{% url 'promote_member' club_name=club.club_name  user_name=role.user.username%}">promote</a></td>
-                                          <td><a>demote</a></td>
-                                          <td><a>transfer ownership</a></td>
-                                      {% endif %}
-                                  </tr>
-                              {% endfor %}
-                          </table>
-                      </div>
-                  {% else %}
-                      <p>No applicants have joined yet.</p>
-                  {% endif %}
             </div>
-        </div>
     </div>
+
 {% endblock %}
