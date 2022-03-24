@@ -122,12 +122,8 @@ class TestUrls(SimpleTestCase):
         url = reverse('member_list',args=['some-str'])
         self.assertEquals(resolve(url).func, member_list)
 
-    def test_post_comment_url_is_resolved(self):
-        url = reverse('post_comment')
-        self.assertEquals(resolve(url).func.view_class, PostCommentView)
-
     def test_create_post_url_is_resolved(self):
-        url = reverse('create_post')
+        url = reverse('create_post',args=[random.randint(0,100)])
         self.assertEquals(resolve(url).func.view_class, CreatePostView)
 
     def test_delete_post_url_is_resolved(self):

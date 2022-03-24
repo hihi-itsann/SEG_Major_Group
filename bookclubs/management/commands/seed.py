@@ -26,9 +26,7 @@ class Command(BaseCommand):
     #ratingsPath = 'bookclubs/recommender/dataset/BX-Book-Ratings.csv'
     booksPath   = 'bookclubs/dataset/BX-Books.csv'
     #usersPath   = 'bookclubs/recommender/dataset/BX-Users.csv'
-    # df_ratings=[]
-    # df_users=[]
-    # df_books=[]
+
     def __init__(self):
         self.faker = Faker('en_GB')
 
@@ -43,15 +41,15 @@ class Command(BaseCommand):
 
         self.create_ratings()
 
-        self.create_posts()
-        self.posts = Post.objects.all()
-
-        self.create_comments()
-
         self.create_clubs()
         self.clubs = Club.objects.all()
 
         self.create_roles()
+
+        self.create_posts()
+        self.posts = Post.objects.all()
+
+        self.create_comments()
 
         # self.create_meetings()
 
@@ -78,19 +76,7 @@ class Command(BaseCommand):
     # def __init__(self):
     #     self.faker = Faker('en_GB')
     #
-    # def handle(self, *args, **options):
-    #     self.load_data_from_csv()
-    #     self.create_books()
-    #     self.books = Book.objects.all()
-    #
-    #     self.create_users()
-    #     self.users = User.objects.all()
-    #     self.create_ratings()
-    #
-    #     self.create_clubs()
-    #     self.clubs = Club.objects.all()
-    #     self.create_roles()
-    #     self.roles = Role.objects.all()
+
     # def create_ratings(self):
     #     for index, rating in self.df_ratings.iterrows():
     #         print(f"Seeding rating {index}/{len(self.df_ratings)}", end='\r')
@@ -127,7 +113,8 @@ class Command(BaseCommand):
         )
     def create_books(self):
         for index, book in self.df_books.head(100).iterrows():
-            print(f"Seeding book {index}/{len(self.df_books)}", end='\r')
+            # print(f"Seeding book {index}/{len(self.df_books)}", end='\r')
+            print(f"Seeding book {index}/100", end='\r')
             try:
 
                 self.create_book(book)
@@ -145,7 +132,7 @@ class Command(BaseCommand):
             image_url_s = book['Image-URL-S'],
             image_url_m =book['Image-URL-M'],
             image_url_l = book['Image-URL-L'],
-            genre=(self.getgenre(book['ISBN'])[0]).upper()
+            genre=(self.getgenre(book['ISBN'])[0]).lower().title()
         )
 
 
@@ -315,6 +302,7 @@ class Command(BaseCommand):
         post = Post()
         post.title = self.faker.text(max_nb_chars=255)
         post.author = self.get_random_user()
+        post.club = self.get_random_club()
         post.body = self.faker.text(max_nb_chars=280)
         post.save()
         datetime = self.faker.past_datetime(start_date='-365d', tzinfo=pytz.UTC)

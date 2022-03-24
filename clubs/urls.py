@@ -28,7 +28,6 @@ urlpatterns = [
     path('log_in/', views.LogInView.as_view(), name='log_in'),
     path('log_out/', views.log_out, name='log_out'),
     path('profile/', views.ProfileUpdateView.as_view(), name='profile'),
-    path('user/<str:username>/', views.show_user, name='show_user'),
     path('password/', views.PasswordView.as_view(), name='password'),
 
     # Book Views
@@ -68,9 +67,8 @@ urlpatterns = [
     path('club/<str:club_name>/reject/<int:user_id>/', views.reject_applicant, name='reject_applicant'),
 
     # Post Comment Views
-    path('post_comment/', views.PostCommentView.as_view(), name='post_comment'),
-    path('create_post/', views.CreatePostView.as_view(), name='create_post'),
-    path('article/delete/<int:pk>/', views.DeletePostView.as_view(), name='delete_post'),
+    path('create_post/<int:pk>/', views.CreatePostView.as_view(), name='create_post'),
+    path('delete_post/<int:pk>/', views.DeletePostView.as_view(), name='delete_post'),
     path('upvote/<post_id>/', views.post_upvote, name='post_upvote'),
     path('downvote/<post_id>/', views.post_downvote, name='post_downvote'),
     path('create_comment/<int:pk>/', views.CreateCommentView.as_view(), name='create_comment'),
