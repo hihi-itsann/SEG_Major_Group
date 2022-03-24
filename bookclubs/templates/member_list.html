@@ -1,9 +1,6 @@
 {% extends 'base_content.html' %}
-{% block title %}
-| Member List
-{% endblock %}
-
 {% block content %}
+
 <head>
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
 </head>
@@ -31,13 +28,160 @@
                         <th scope="col" class="border-0 text-uppercase font-medium">Manage</th>
                       {% endif %}
                     </tr>
+<<<<<<< HEAD
                 </thead>
+=======
+                  </thead>
+                  <tbody id="sbsb">
+                    {% for role in roles %}
+                        <tr class="btn-normal">
+                            <td>{{ role.club_role }}</td>
+                            <td>{{ role.user.full_name }}</td>
+                            <td >{{ role.user.username}}</td>
+                            <!-- The Modal -->
+                            <div id="myModal" class="modal">
 
-            </table>
-          </div>
-        </div>
-      </div>
+                              <!-- Modal content -->
+                              <div class="modal-content">
+                                <span class="close">&times;</span>
+                                <p>Email: {{role.user.email}}</p>
+                                <p>Bio: {{role.user.bio}}</p>
+                                <p>Date of Birth: {{role.user.dob}}</p>
+                                <p>Gender: {{role.user.gender}}</p>
+                                <p>Location: {{role.user.location}}</p>
+                                <p>City: {{role.user.city}}</p>
+                                <p>Country: {{role.user.country}}</p>
+                              </div>
+
+                            </div>
+
+                            <script>
+                                // Get the modal
+                                var modal = document.getElementById("myModal");
+
+                                // Get the button that opens the modal
+                                var btn = document.getElementById("${x.index+1}");
+                                // Get the <span> element that closes the modal
+                                var close = document.getElementsByClassName("close")[0];
+
+                                // When the user clicks the button, open the modal
+                                btn.onclick = function(){
+                                  modal.style.display ="block";
+                                }
+                                // When the user clicks on <span> (x), close the modal
+                                close.onclick = function() {
+                                  modal.style.display ="none";
+                                }
+
+                                // When the user clicks anywhere outside of the modal, close it
+                                window.onclick = function(event) {
+                                  if (event.target == modal) {
+                                    modal.style.display = "none";
+                                  }
+                                }
+                            </script>
+
+                            {% if is_owner %}
+                            <td>
+                              <button type="button" class="btn btn-outline-info btn-circle btn-lg btn-circle"><i class="fa fa-key"></i> </button>
+                              <button type="button" class="btn btn-outline-info btn-circle btn-lg btn-circle ml-2"><i class="fa fa-trash"></i> </button>
+                              <button type="button" class="btn btn-outline-info btn-circle btn-lg btn-circle ml-2"><i class="fa fa-edit"></i> </button>
+                              <button type="button" class="btn btn-outline-info btn-circle btn-lg btn-circle ml-2"><i class="fa fa-upload"></i> </button>
+                            </td>
+                            {% endif %}
+                        </tr>
+                      </p>
+                    {% endfor %}
+>>>>>>> main
+
+                <div id="members" class="container">
+                    <h4>Members</h4>
+                    {% if club_members.count > 0 %}
+                        <table class="table table-striped">
+                            <tr>
+                                <th scope="col">Full Name</th>
+                                <th scope="col">Username</th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                            {% for member in club_members %}
+                                <tr>
+                                    <td>{{ member.full_name }}</td>
+                                    <td>{{ member.username }}</td>
+                                    {% if current_user_role == 'MOD' %}
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>
+                                            <a class="btn btn-outline-dark" href="{% url 'remove_from_club' club_name=club.club_name  user_id=member.id %}">Remove</a>
+                                        </td>
+                                        {% elif current_user_role == 'OWN' %}
+                                        <td>
+                                            <a class="btn btn-outline-dark" href="{% url 'promote_member' club_name=club.club_name  user_id=member.id %}">Promote</a>
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-outline-dark" href="{% url 'remove_from_club' club_name=club.club_name  user_id=member.id %}">Remove</a>
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-outline-dark" style="background-color: lightcoral" href="{% url 'ban_from_club' club_name=club.club_name  user_id=member.id %}">Ban</a>
+                                        </td>
+                                        <td></td>
+                                        {% else %}
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    {% else %}
+                        <h7>There are currently no members in this club.</h7>
+                    {% endif %}
+                </div>
+            {% if current_user_role == 'MOD' or current_user_role == 'OWN' %}
+                <div id="banned" class="container">
+                    <h4>Banned</h4>
+                    {% if club_banned.count > 0 %}
+                        <table class="table table-striped">
+                            <tr>
+                                <th scope="col">Full Name</th>
+                                <th scope="col">Username</th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                            {% for banned in club_banned %}
+                                <tr>
+                                    <td>{{ banned.full_name }}</td>
+                                    <td>{{ banned.username }}</td>
+                                    {% if current_user_role == 'OWN' %}
+                                        <td></td>
+                                        <td></td>
+                                        <td>
+                                            <a class="btn btn-outline-dark" style="background-color: darkseagreen" href="{% url 'unban_from_club' club_name=club.club_name  user_id=banned.id %}">Unban</a>
+                                        </td>
+                                        <td></td>
+                                        {% else %}
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        </table>
+                        <p style="font-size: small; line-height: 3px;">(Unbanning a user will remove them from the
+                            club, but they will now be able to re-apply or re-join.)</p>
+                    {% else %}
+                        <h7>There is currently no one banned from this club.</h7>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
     </div>
-  </div>
-</body>
+
 {% endblock %}

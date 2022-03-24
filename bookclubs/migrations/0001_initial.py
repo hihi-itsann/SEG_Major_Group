@@ -1,4 +1,3 @@
-
 from django.conf import settings
 import django.contrib.auth.models
 import django.core.validators
@@ -118,6 +117,9 @@ class Migration(migrations.Migration):
                 ('club', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='bookclubs.club')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
+            options={
+                'unique_together': {('user', 'club')},
+            },
         ),
         migrations.CreateModel(
             name='Comment',
