@@ -68,7 +68,6 @@ urlpatterns = [
     path('club/<str:club_name>/reject/<int:user_id>/', views.reject_applicant, name='reject_applicant'),
 
     # Post Comment Views
-    #path('post_comment/', views.PostCommentView.as_view(), name='post_comment'),
     path('create_post/<int:pk>/', views.CreatePostView.as_view(), name='create_post'),
     path('delete_post/<int:pk>/', views.DeletePostView.as_view(), name='delete_post'),
     path('upvote/<post_id>/', views.post_upvote, name='post_upvote'),
