@@ -376,6 +376,7 @@ class Role(models.Model):
         max_length=3,
         choices=RoleOptions.choices,
         default=RoleOptions.MEMBER,
+        unique=True,
     )
 
     class Meta:

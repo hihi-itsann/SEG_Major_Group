@@ -118,14 +118,14 @@ def log_out(request):
     return redirect('home')
 
 
-@login_required
-def show_user(request, username):
-    if User.objects.filter(username=username).count() == 1:
-        user = User.objects.get(username=username)
-        return render(request, 'show_user.html', {'user': user})
-    else:
-        messages.add_message(request, messages.WARNING, "User not found.")
-        return redirect('feed')
+# @login_required
+# def show_user(request, username):
+#     if User.objects.filter(username=username).count() == 1:
+#         user = User.objects.get(username=username)
+#         return render(request, 'show_user.html', {'user': user})
+#     else:
+#         messages.add_message(request, messages.WARNING, "User not found.")
+#         return redirect('feed')
 
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
