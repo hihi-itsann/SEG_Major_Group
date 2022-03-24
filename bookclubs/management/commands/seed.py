@@ -55,7 +55,30 @@ class Command(BaseCommand):
 
         self.create_meetings()
 
+        self.get_club_books_average_rating()
 
+
+    def get_club_books_average_rating():
+        """ Saves the average rating of books read by users of each club (banned member are not included) """
+        ClubBookAverageRating.objects.all().delete()
+
+        clubs=Club.objects.all()
+        for club in clubs:
+            members=club.get_moderators()|club.get_members()|club.get_management()
+            for user in members:
+                ratings=BookRatingReview.objects.all().filter(user=user)
+                for rating in ratings:
+                    clubBookRating=ClubBookAverageRating.objects.all().filter(club=club,book=rating.book)
+                    if clubBookRating:
+                        clubBookRating.get().add_rating(clubBookRating.get().rate)
+                        clubBookRating.get().increment_number_of_ratings()
+                    else:
+                        ClubBookAverageRating.objects.create(
+                            club=club,
+                            book=rating.book,
+                            rate=rating.rate,
+                            number_of_ratings=1
+                        )
 
     def load_data_from_csv(self):
         #self.df_users= pd.read_csv(self.usersPath, sep = ';',names = ['User-ID', 'Location', 'Age'], quotechar = '"', encoding = 'latin-1',header = 0)
@@ -211,7 +234,7 @@ class Command(BaseCommand):
         country = self.faker.country()
         meeting_preference = self.faker.random_choices(elements=('O', 'P'), length=1)[0]
         User.objects.create_user(
-            userID=user_count,
+            userID=user_count+1,
             username=username,
             first_name=first_name,
             last_name=last_name,

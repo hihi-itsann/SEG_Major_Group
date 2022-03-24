@@ -11,30 +11,32 @@ from tensorflow.keras.applications import ResNet50
 #from dkeras import dKeras
 import numpy as np
 #import ray
-from bookclubs.models import Book, ClubBookAverageRating, Club
+from bookclubs.models import Book, ClubBookAverageRating, Club,BookRatingReview
 
 def get_club_books_average_rating():
-    """ Saves the average rating of books read by users of each club (banned member are not included) """
-    clubs=Club.objects.all()
-    for club in clubs:
-        members=club.get_moderators()|club.get_members()|club.get_management()
-        for user in members:
-            for rating in user.get_rated_books():
-                clubBookRating=ClubBookAverageRating.objects.all().filter(club=club,book=rating.book)
-                if clubBookRating:
-                    clubBookRating.get().add_rating(clubBookRating.get().rate)
-                    clubBookRating.get().increment_number_of_ratings()
-                else:
-                    ClubBookAverageRating.objects.create(
-                        club=club,
-                        book=rating.book,
-                        rate=rating.rate,
-                        number_of_ratings=1
-                    )
-def get_data_for_recommendations():
-    ClubBookAverageRating.objects.all().delete()
+        """ Saves the average rating of books read by users of each club (banned member are not included) """
+        ClubBookAverageRating.objects.all().delete()
 
-    get_club_books_average_rating()
+        clubs=Club.objects.all()
+        for club in clubs:
+            members=club.get_moderators()|club.get_members()|club.get_management()
+            for user in members:
+                ratings=BookRatingReview.objects.all().filter(user=user)
+                for rating in ratings:
+                    clubBookRating=ClubBookAverageRating.objects.all().filter(club=club,book=rating.book)
+                    if clubBookRating:
+                        clubBookRating.get().add_rating(clubBookRating.get().rate)
+                        clubBookRating.get().increment_number_of_ratings()
+                    else:
+                        ClubBookAverageRating.objects.create(
+                            club=club,
+                            book=rating.book,
+                            rate=rating.rate,
+                            number_of_ratings=1
+                        )
+
+def get_data_for_recommendations():
+
     ratings = pd.DataFrame(list(ClubBookAverageRating.objects.all().values()))
     books = pd.DataFrame(list(Book.objects.all().values()))
     ratings['Book-Rating']=ratings['rate']/ratings['number_of_ratings']
@@ -137,69 +139,52 @@ def get_model(ratings):
     )
     return (model,user2user_encoded,book2book_encoded,book_encoded2book)
 
-def getTenISBN(userID):
+def get_recommendations(userID):
 
     train()
     (ratings, books)=get_data_for_recommendations()
     (model,user2user_encoded,book2book_encoded,book_encoded2book)=get_model(ratings)
-    print("user2user_encoded")
-    print(user2user_encoded)
-    print("book2book_encoded")
-    print(book2book_encoded)
-    print("book_encoded2book")
-    print(book_encoded2book)
-
+   
 
     user_id = np.int64(userID)
 
     books_watched_by_user = ratings[ratings['User-ID'] == user_id]
-    print(books_watched_by_user)
     # print(len(books_watched_by_user))
     # if (len(books_watched_by_user) == 0) :
     #     return []
-    print("something")
 
     books_not_watched = books[
         ~books["ISBN"].isin(books_watched_by_user.ISBN.values)
     ]["ISBN"]
-    print("book not watched first")
-    print(books_not_watched)
+
+    #this means that club has read all books so there is no book to recommend
+    if len(books_not_watched) == 0:
+        return []
     books_not_watched = list(
         set(books_not_watched).intersection(set(book2book_encoded.keys()))
     )
-    print("book not watched second")
-    print(books_not_watched)
+   
     books_not_watched = [[book2book_encoded.get(x)] for x in books_not_watched]
-    print("book not watched")
-    print(books_not_watched)
+   
     user_encoder = user2user_encoded.get(user_id)
-    print("user_encoded")
-    print(user_encoder)
+   
     user_book_array = np.hstack(
         ([[user_encoder]] * len(books_not_watched), books_not_watched)
     )
-    print(user_book_array)
     ratings = model.predict(user_book_array).flatten()
     top_ratings_indices = ratings.argsort()[-10:][::-1]
 
     recommended_book_ids = [
         book_encoded2book.get(books_not_watched[x][0]) for x in top_ratings_indices
     ]
-    top_books_user = (
-    books_watched_by_user.sort_values(by="rating", ascending=False)
-    .head(5)
-    .ISBN.values
-)
-    books_rows = books[books["ISBN"].isin(top_books_user)]
-    for row in books_rows.itertuples():
-        print(row[2], ":", row[4])
+    
+
 
     # print("----" * 8)
     # print("Top 10 book recommendations")
     # print("----" * 8)
     recommended_books = books[books["ISBN"].isin(recommended_book_ids)]
-    for row in recommended_books.itertuples():
-        print(row[2], ":", row[4])
-    return recommended_book_ids
+    
+    print(recommended_books['ISBN'])
+    return recommended_books['ISBN']
 
-getTenISBN(17)

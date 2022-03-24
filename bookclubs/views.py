@@ -27,7 +27,7 @@ from django.core.paginator import Paginator
 from random import choice
 from bookclubs.meeting_link import create_zoom_meeting, get_join_link, get_start_link
 from datetime import datetime
-
+from bookclubs.recommender.keras import get_recommendations
 
 
 @login_prohibited
@@ -704,26 +704,27 @@ class DeleteCommentView(LoginRequiredMixin, DeleteView):
 
 @login_required
 @club_exists
-@membership_required
-@not_last_host
+#@membership_required
+#@not_last_host
 def show_book_recommendations(request, club_name):
     """Choose a book for the meeting"""
     # get_club_books_average_rating()
-    # recommendations = get_recommendations(current_club.id)
-    # print(recommendations)
-    # recommended_books = Book.objects.all().filter(ISBN__in=recommendations)
+    current_club=Club.objects.get(club_name=club_name)
+    recommendations = get_recommendations(current_club.id)
+    print(recommendations)
+    recommended_books = Book.objects.all().filter(ISBN__in=recommendations)
 
-    all_books = Book.objects.all()
-    all_books_list = list(all_books)
-    randomly_selected_ISBNs = []
-    if len(all_books_list) < 10:
-        recommended_books = all_books
-    else:
-        for i in range(10):
-            random_book = choice(all_books_list)
-            randomly_selected_ISBNs.append(random_book.ISBN)
-            all_books_list.remove(random_book)
-        recommended_books = Book.objects.all().filter(ISBN__in=randomly_selected_ISBNs)
+    # all_books = Book.objects.all()
+    # all_books_list = list(all_books)
+    # randomly_selected_ISBNs = []
+    # if len(all_books_list) < 10:
+    #     recommended_books = all_books
+    # else:
+    #     for i in range(10):
+    #         random_book = choice(all_books_list)
+    #         randomly_selected_ISBNs.append(random_book.ISBN)
+    #         all_books_list.remove(random_book)
+    #     recommended_books = Book.objects.all().filter(ISBN__in=randomly_selected_ISBNs)
 
     return render(request, 'show_book_recommendations.html',
                   {'recommended_books': recommended_books, 'club_name': club_name})
