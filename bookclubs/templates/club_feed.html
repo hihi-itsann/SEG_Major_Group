@@ -22,6 +22,10 @@
   <h4 style="color:#354F52"><em>Country: {{ club.country }}</em></h4><br>
   <h4 style="color:#354F52"><em>Description: {{ club.description }}</em></h4><br>
 
+  {% if user.is_authenticated %}
+    <a href="{% url 'create_post' club.pk%}">Create Post</a>
+  {% endif %}
+
 
 </div>
 

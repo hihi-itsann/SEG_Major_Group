@@ -67,7 +67,7 @@ urlpatterns = [
 
     # Post Comment Views
     #path('post_comment/', views.PostCommentView.as_view(), name='post_comment'),
-    path('create_post/', views.CreatePostView.as_view(), name='create_post'),
+    path('create_post/<int:pk>/', views.CreatePostView.as_view(), name='create_post'),
     path('delete_post/<int:pk>/', views.DeletePostView.as_view(), name='delete_post'),
     path('upvote/<post_id>/', views.post_upvote, name='post_upvote'),
     path('downvote/<post_id>/', views.post_downvote, name='post_downvote'),

@@ -63,7 +63,7 @@ class CommentAdmin(admin.ModelAdmin):
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
     list_display = [
-        'title', 'author', 'body', 'post_date', 'post_datetime'
+        'title', 'author','club', 'body', 'post_date', 'post_datetime'
     ]
 
 @admin.register(Meeting)

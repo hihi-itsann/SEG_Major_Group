@@ -324,7 +324,7 @@ def club_feed(request, club_name):
     club_role = current_club.get_club_role(request.user)
     members = current_club.get_members()
     management = current_club.get_management()
-    posts = Post.objects.all()
+    posts = Post.objects.all().filter(club=current_club)
     if club_role == 'OWN':
         is_owner = True
     elif club_role == 'MOD':
@@ -678,7 +678,7 @@ class CreatePostView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('my_clubs')
 
     def form_valid(self, form):
-        #form.instance.club_id = self.kwargs['pk']
+        form.instance.club_id = self.kwargs['pk']
         form.instance.author = self.request.user
         return super().form_valid(form)
 
@@ -694,6 +694,7 @@ class CreateCommentView(LoginRequiredMixin, CreateView):
     model = Comment
     form_class = CommentForm
     template_name = 'create_comment.html'
+    success_url = reverse_lazy('my_clubs')
     #success_url = reverse_lazy('club_feed')
 
     def form_valid(self, form):
@@ -706,6 +707,7 @@ class CreateCommentView(LoginRequiredMixin, CreateView):
 class DeleteCommentView(LoginRequiredMixin, DeleteView):
     model = Comment
     template_name = 'delete_comment.html'
+    success_url = reverse_lazy('my_clubs')
     #success_url = reverse_lazy('my_clubs')
 
 
