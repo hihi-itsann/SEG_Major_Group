@@ -645,11 +645,17 @@ def promote_member(request, club_name, user_id):
 @membership_required
 def member_list(request, club_name):
     is_owner=False
+    is_ban = False
+    is_moderator = False
     current_club = Club.objects.get(club_name=club_name)
     current_user = request.user
     current_user_role = Role.objects.get(club=current_club, user=current_user).club_role
-    if current_user_role == 'own':
+    if current_user_role == 'OWN':
         is_owner = True
+    if current_user_role == 'BAN':
+        is_ban = True
+    if current_user_role == 'MOD':
+        is_moderator = True
     roles = Role.objects.filter(club=current_club).exclude(club_role='BAN')
     roles_num= roles.count()
     club_owner = Role.objects.get(club=current_club, club_role='OWN').user
