@@ -21,10 +21,10 @@ class CreateCommentTest(TestCase):
         self.url = reverse('create_comment', kwargs={'pk': self.post.id})
         self.data = { 'body': 'The quick brown fox jumps over the lazy dog.' }
 
-    def test_create_user_url(self):
-        self.assertEqual(self.url, f'/create_comment/{self.post.id}')
+    def test_create_comment_url(self):
+        self.assertEqual(self.url, f'/create_comment/{self.post.id}/')
 
-    def test_create_user_redirects_when_not_logged_in(self):
+    def test_create_comment_redirects_when_not_logged_in(self):
         redirect_url = reverse_with_next('log_in', self.url)
         response = self.client.get(self.url)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)

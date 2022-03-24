@@ -9,14 +9,8 @@ from pyspark.ml.feature import StringIndexer, IndexToString
 from pyspark.ml.evaluation import RegressionEvaluator
 from pyspark.ml.recommendation import ALS
 from pyspark.sql.functions import explode
-# from bookclubs.views import get_club_books_average_rating
 
-
-from django.conf import settings
-
-# from bookclubs.models import ClubBookAverageRating
-from bookclubs import models
-from bookclubs.models import User, Club, Role, Book, Rating, ClubBookAverageRating
+from bookclubs.models import ClubBookAverageRating, Club
 from bookclubs.recommender.BookLens import BookLens
 
 import pandas as pd
@@ -52,7 +46,7 @@ def get_recommendations(club_id): #club_subject
         .getOrCreate()
 
     spark.sparkContext.setCheckpointDir("/tmp/checkpoints")
-    
+
     ClubBookAverageRating.objects.all().delete()
 
     df = pd.read_csv('bookclubs/dataset/BX-Book-Ratings.csv', sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0 )
@@ -110,12 +104,16 @@ def get_recommendations(club_id): #club_subject
 
     ml = BookLens()
     ml.loadBookLensLatestSmall()
-  
+
     # print(len(user85Recs))
-    
-    
+
+    isbn_list = []
+
+    for row in user85Recs:
+        print(row['book_id'])
+        isbn_list.append(row['book_id'])
 
     # for row in user85Recs:
     #     print(ml.getBookName(row.book_id))
 
-    return(user85Recs)
+    return(isbn_list)

@@ -10,7 +10,8 @@
        "publisher": "Oxford University Press",
        "image_url_s": "http://images.amazon.com/images/P/0195153448.01.THUMBZZZ.jpg",
        "image_url_m": "http://images.amazon.com/images/P/0195153448.01.MZZZZZZZ.jpg",
-       "image_url_l": "http://images.amazon.com/images/P/0195153448.01.LZZZZZZZ.jpg"
+       "image_url_l": "http://images.amazon.com/images/P/0195153448.01.LZZZZZZZ.jpg",
+       "genre": "Social Science"
      }
    }
 ]

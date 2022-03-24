@@ -1,4 +1,8 @@
 {% extends 'base_content.html' %}
+{% block title %}
+| Moderator List
+{% endblock %}
+
 {% block content %}
 <div class="container">
   <div class="row justify-content-between">
@@ -20,7 +24,7 @@
             <th scope="col">Experience Level</th>
           </tr>
         </thead>
-        {% for user in modtorsers %}
+        {% for user in moderators %}
         <tr>
           <td>
             <img src="{{ user.mini_gravatar }}" alt="Gravatar of {{ user.username }}" class="rounded-circle" >
