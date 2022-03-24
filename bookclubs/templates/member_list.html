@@ -6,7 +6,6 @@
 {% block content %}
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <style>
 body {font-family: Arial, Helvetica, sans-serif;}
 
@@ -51,13 +50,10 @@ body {font-family: Arial, Helvetica, sans-serif;}
 </style>
 </head>
 <body>
-<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <div class="container">
-
-
-
-      <div class="row">
+<div class="row">
     <div class="col-md-12">
         <div class="card text-center" style="border:none">
             <div class="card-body" style="background-color:#EFF6E0; border:none;">
@@ -79,54 +75,54 @@ body {font-family: Arial, Helvetica, sans-serif;}
                       {% endif %}
                     </tr>
                   </thead>
-                  <!-- Button trigger modal -->
-
-                  <tbody>
+                  <tbody id="sbsb">
                     {% for role in roles %}
-                        <tr>
+                        <tr class="btn-normal">
                             <td>{{ role.club_role }}</td>
                             <td>{{ role.user.full_name }}</td>
-                            <td>
-                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
-                                    {{role.user.username}}
-                                  </button>
-                                   <!-- Modal -->
-                                            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                                                <div class="modal-dialog modal-dialog-centered" role="document">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                    <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
-                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                    <!-- Modal content -->
-                                                      <div class="modal-content" id="myModal" class="modal">
-                                                          <span class="close">&times;</span>
-                                                          <p>Email: {{role.user.email}}</p>
-                                                          <p>Bio: {{role.user.bio}}</p>
-                                                          <p>Date of Birth: {{role.user.dob}}</p>
-                                                          <p>Gender: {{role.user.gender}}</p>
-                                                          <p>Location: {{role.user.location}}</p>
-                                                          <p>City: {{role.user.city}}</p>
-                                                          <p>Country: {{role.user.country}}</p>
-                                                      </div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                    <button type="button" class="btn btn-primary">Save changes</button>
-                                                    </div>
-                                                </div>
-                                                </div>
-                                            </div>
-                            <!-- Modal content -->
-                            </td>
-                            <!-- Button trigger modal -->
+                            <td >{{ role.user.username}}</td>
+                            <!-- The Modal -->
+                            <div id="myModal" class="modal">
 
+                              <!-- Modal content -->
+                              <div class="modal-content">
+                                <span class="close">&times;</span>
+                                <p>Email: {{role.user.email}}</p>
+                                <p>Bio: {{role.user.bio}}</p>
+                                <p>Date of Birth: {{role.user.dob}}</p>
+                                <p>Gender: {{role.user.gender}}</p>
+                                <p>Location: {{role.user.location}}</p>
+                                <p>City: {{role.user.city}}</p>
+                                <p>Country: {{role.user.country}}</p>
+                              </div>
 
+                            </div>
 
+                            <script>
+                                // Get the modal
+                                var modal = document.getElementById("myModal");
 
+                                // Get the button that opens the modal
+                                var btn = document.getElementById("${x.index+1}");
+                                // Get the <span> element that closes the modal
+                                var close = document.getElementsByClassName("close")[0];
+
+                                // When the user clicks the button, open the modal
+                                btn.onclick = function(){
+                                  modal.style.display ="block";
+                                }
+                                // When the user clicks on <span> (x), close the modal
+                                close.onclick = function() {
+                                  modal.style.display ="none";
+                                }
+
+                                // When the user clicks anywhere outside of the modal, close it
+                                window.onclick = function(event) {
+                                  if (event.target == modal) {
+                                    modal.style.display = "none";
+                                  }
+                                }
+                            </script>
 
                             {% if is_owner %}
                             <td>
@@ -137,15 +133,15 @@ body {font-family: Arial, Helvetica, sans-serif;}
                             </td>
                             {% endif %}
                         </tr>
+                      </p>
                     {% endfor %}
 
                   </tbody>
                 </table>
             </div>
-          </div>
         </div>
-      </div>
     </div>
+</div>
+</div>
 </body>
-
 {% endblock %}

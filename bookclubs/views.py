@@ -640,9 +640,10 @@ def member_list(request, club_name):
     cur_user = request.user
     roles = Role.objects.filter(club=club).exclude(club_role='BAN')
     club_role = club.get_club_role(cur_user)
+    roles_num = roles.count();
     if club_role == 'OWN':
         is_owner = True
-    context = {'club': club, 'roles': roles, 'is_owner': is_owner}
+    context = {'club': club, 'roles': roles, 'is_owner': is_owner, 'roles_num':roles_num,}
     return render(request, "member_list.html", context)
 
 @login_required
