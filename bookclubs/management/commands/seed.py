@@ -10,12 +10,12 @@ from faker.providers import BaseProvider, address, date_time, misc
 import pandas as pd
 import datetime
 import numpy
-#from bookclubs.recommender.BooksRecommender import getGenra
+#from bookclubs.recommender.BooksRecommender import getgenre
 import urllib.request
 import json
 import textwrap
 class Command(BaseCommand):
-    USER_COUNT = 100
+    USER_COUNT = 1
     CLUB_COUNT = 10
     POST_COUNT = 100
     COMMENT_COUNT = 100
@@ -33,25 +33,25 @@ class Command(BaseCommand):
         self.faker = Faker('en_GB')
 
     def handle(self, *args, **options):
-        self.load_data_from_csv()
+        # self.load_data_from_csv()
 
-        self.create_books()
-        self.books = Book.objects.all()
+        # self.create_books()
+        # self.books = Book.objects.all()
 
         self.create_users()
         self.users = User.objects.all()
 
-        self.create_ratings()
+        # self.create_ratings()
 
-        self.create_posts()
-        self.posts = Post.objects.all()
+        # self.create_posts()
+        # self.posts = Post.objects.all()
 
-        self.create_comments()
+        # self.create_comments()
 
-        self.create_clubs()
-        self.clubs = Club.objects.all()
+        # self.create_clubs()
+        # self.clubs = Club.objects.all()
 
-        self.create_roles()
+        # self.create_roles()
 
         # self.create_meetings()
 
@@ -63,7 +63,7 @@ class Command(BaseCommand):
         #self.df_ratings= pd.read_csv(self.ratingsPath, sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0)
 
 
-    def getGenra(self, isbn):
+    def getgenre(self, isbn):
         base_api_link = "https://www.googleapis.com/books/v1/volumes?q=isbn:"
 
         with urllib.request.urlopen(base_api_link + isbn) as f:
@@ -145,7 +145,7 @@ class Command(BaseCommand):
             image_url_s = book['Image-URL-S'],
             image_url_m =book['Image-URL-M'],
             image_url_l = book['Image-URL-L'],
-            genra=self.getGenra(book['ISBN'])[0]
+            genre=(self.getgenre(book['ISBN'])[0]).upper()
         )
 
 
@@ -155,7 +155,7 @@ class Command(BaseCommand):
         while user_count < self.USER_COUNT:
             print(f"Seeding user {user_count}/{self.USER_COUNT}", end='\r')
             try:
-                self.create_user(user_count)
+                self.create_user()
             except:
                 continue
             user_count += 1
@@ -197,7 +197,7 @@ class Command(BaseCommand):
     #         meeting_preference=meeting_preference
     #     )
 
-    def create_user(self, userID):
+    def create_user(self):
         first_name = self.faker.first_name()
         last_name = self.faker.last_name()
         email = create_email(first_name, last_name)
@@ -206,15 +206,17 @@ class Command(BaseCommand):
         dob = self.faker.date_of_birth(minimum_age = 8, maximum_age = 100)
         #dob=self.get_dob_from_age(user['Age'])
         gender = self.faker.random_choices(elements=('M', 'F', 'O'), length=1)[0]
-        location = self.faker.city()
+        location = self.faker.street_name()
+        city = self.faker.city()
+        country = self.faker.country()
         meeting_preference = self.faker.random_choices(elements=('O', 'P'), length=1)[0]
         User.objects.create_user(
-            userID=userID+1,
-            username=username,
-            email=email,
-            password=Command.DEFAULT_PASSWORD,
+            username,
             first_name=first_name,
             last_name=last_name,
+            email=email,
+            password=Command.DEFAULT_PASSWORD,
+            
             bio=bio,
             dob=dob,
             gender=gender,
@@ -247,16 +249,20 @@ class Command(BaseCommand):
 
     def create_club(self):
         description = self.faker.text(max_nb_chars=520)
-        meeting_status = self.faker.boolean()
+        meeting_status = self.faker.random_choices(elements=('ONL', 'OFF'), length=3)[0]
         location = self.faker.street_name()
+        city = self.faker.city()
+        country = self.faker.country()
         club_name = create_club_name(location)
-        public_status = self.faker.boolean()
+        public_status = self.faker.random_choices(elements=('PUB', 'PRI'), length=3)[0]
         genre = self.faker.text(max_nb_chars=520)
         club = Club.objects.create(
             club_name=club_name,
             description=description,
             meeting_status=meeting_status,
             location=location,
+            city=city,
+            country=country,
             public_status=public_status,
             genre=genre
         )

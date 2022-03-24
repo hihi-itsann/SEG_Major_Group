@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 class User(AbstractUser):
-    userID=models.IntegerField(unique=True, null=True)
+    #userID=models.IntegerField(unique=True, null=True)
     username = models.CharField(
         max_length=30,
         unique=True,
