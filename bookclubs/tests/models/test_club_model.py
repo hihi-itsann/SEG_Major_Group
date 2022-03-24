@@ -101,5 +101,3 @@ class ClubModelTestCase(TestCase):
         self.assertEqual(moderating.club_role, 'OWN')
         self.assertEqual(ownership.club_role, 'MOD')
 
-    # moderator_ids = Role.objects.filter(club=current_club, club_role='MOD').values_list('user', flat=True)
-    # moderator_list = User.objects.filter(id__in=moderator_ids)

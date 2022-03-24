@@ -32,15 +32,15 @@
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
 
     <div class="event-schedule-area-two bg-color pad100">
-        <div class="container">
+        <div class="container" style="padding-bottom: 50px">
             <div class="row">
                 <div class="col-lg-12">
                     <div class="section-title text-center">
                         <div class="title-text">
                             <h2><b>My Applications </b></h2>
                      <div style="text-align: right">
-                                <button type="button" class="btn btn-outline-dark"><a
-                                        href="{% url 'club_list' %}">Explore Clubs</a></button>
+                                <a class="btn btn-outline-dark"
+                                        href="{% url 'club_list' %}">Explore Clubs</a>
                             </div>
                         </div>
                     </div>
@@ -75,7 +75,12 @@
                                                    class="btn btn-outline-dark">
                                                     Edit
                                                 </a>
-
+                                            {% endif %}
+                                        {% if application.status == 'A' %}
+                                                <a href="{% url 'club_feed' application.club.club_name %}"
+                                                   class="btn btn-outline-dark">
+                                                    Go
+                                                </a>
                                             {% endif %}
                                         </td>
                                         <td>
@@ -102,5 +107,6 @@
             </div>
             <!-- /row end-->
         </div>
+    </div>
     </div>
 {% endblock %}

@@ -367,6 +367,9 @@ class Role(models.Model):
         default=RoleOptions.MEMBER,
     )
 
+    class Meta:
+        unique_together = ('user', 'club')
+
     def get_club_role(self):
         return self.RoleOptions(self.club_role).name.title()
 
