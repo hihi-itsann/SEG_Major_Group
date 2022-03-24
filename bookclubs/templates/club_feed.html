@@ -23,7 +23,7 @@
   <h4 style="color:#354F52"><em>Description: {{ club.description }}</em></h4><br>
 
   {% if user.is_authenticated %}
-    <a href="{% url 'create_post' club.pk%}">Create Post</a>
+    <a href="{% url 'create_post' club.pk%}" class="btn btn-outline-dark">Create Post</a>
   {% endif %}
 
 
@@ -64,9 +64,9 @@
 
           <small>
               {% if user.is_authenticated %}
-                <a href="{% url 'create_comment' post.pk%}">(Comment)</a>
-                {% if user.id == post.author.id%}
-                  <a href="{% url 'delete_post' post.pk %}">(Delete)</a>
+                <a href="{% url 'create_comment' post.pk%}">(Comment on this post)</a>
+                {% if user.id == post.author.id or is_owner%}
+                  <a href="{% url 'delete_post' post.pk %}">(Delete this post)</a>
                 {% endif %}
               {% endif %}
           </small>
@@ -81,8 +81,8 @@
                     <b><i>{{ comment.author.username }}</i> - <i>{{ post.post_datetime }}</i></b>
                     <small>
                         {% if user.is_authenticated %}
-                          {% if user.id == post.author.id or user.id == comment.author.id%}
-                            <a href="{% url 'delete_comment' comment.pk %}">(Delete)</a>
+                          {% if user.id == post.author.id or user.id == comment.author.id or is_owner%}
+                            <a href="{% url 'delete_comment' comment.pk %}">(Delete this comment)</a>
                           {% endif %}
                         {% endif %}
                     </small>
