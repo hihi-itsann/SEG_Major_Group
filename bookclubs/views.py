@@ -467,10 +467,9 @@ def delete_club(request, club_name):
     current_club.delete()
     return feed(request)
 
-
-@membership_required
-@club_exists
 @login_required
+@club_exists
+@membership_required
 def leave_club(request, club_req):
     club = Club.objects.get(club_name=club_req)
     user = request.user
