@@ -46,20 +46,16 @@ class Command(BaseCommand):
 
         self.create_roles()
 
-<<<<<<< HEAD
-       # self.create_meetings()
-=======
         self.create_posts()
         self.posts = Post.objects.all()
 
         self.create_comments()
 
         # self.create_meetings()
->>>>>>> main
 
-  
 
-    
+
+
 
     def load_data_from_csv(self):
         #self.df_users= pd.read_csv(self.usersPath, sep = ';',names = ['User-ID', 'Location', 'Age'], quotechar = '"', encoding = 'latin-1',header = 0)
@@ -79,29 +75,6 @@ class Command(BaseCommand):
 
         return  volume_info["volumeInfo"]["categories"]
 
-<<<<<<< HEAD
-=======
-    # def __init__(self):
-    #     self.faker = Faker('en_GB')
-    #
-
-    # def create_ratings(self):
-    #     for index, rating in self.df_ratings.iterrows():
-    #         print(f"Seeding rating {index}/{len(self.df_ratings)}", end='\r')
-    #
-    #         try:
-    #
-    #             self.create_rating(rating)
-    #         except:
-    #             continue
-    #     print("Rating seeding complete.      ")
-    #
-    # def create_rating(self,rating):
-    #     Rating.objects.create(
-    #         rate = rating['Book-Rating'],
-    #         book = self.books.get(ISBN=rating['ISBN']),
-    #         user = self.users.get(userID=rating['User-ID']  ))
->>>>>>> main
     def create_ratings (self):
         for book in self.books:
             print(f"Seeding user ratings ......", end='\r')
@@ -123,12 +96,8 @@ class Command(BaseCommand):
 
     def create_books(self):
         for index, book in self.df_books.head(100).iterrows():
-<<<<<<< HEAD
-            print(f"Seeding book {index}/{100}", end='\r')
-=======
             # print(f"Seeding book {index}/{len(self.df_books)}", end='\r')
             print(f"Seeding book {index}/100", end='\r')
->>>>>>> main
             try:
 
                 self.create_book(book)
@@ -182,7 +151,7 @@ class Command(BaseCommand):
             last_name=last_name,
             email=email,
             password=Command.DEFAULT_PASSWORD,
-            
+
             bio=bio,
             dob=dob,
             gender=gender,
@@ -251,7 +220,7 @@ class Command(BaseCommand):
             user=self.users[i],
             club=self.clubs[i],
             club_role='OWN'
-        ) 
+        )
         print("Owner role seeding complete.      ")
 
 
