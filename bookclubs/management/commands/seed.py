@@ -152,7 +152,7 @@ class Command(BaseCommand):
             last_name=last_name,
             email=email,
             password=Command.DEFAULT_PASSWORD,
-            
+
             bio=bio,
             dob=dob,
             gender=gender,
@@ -220,7 +220,7 @@ class Command(BaseCommand):
             user=self.users[i],
             club=self.clubs[i],
             club_role='OWN'
-        ) 
+        )
         print("Owner role seeding complete.      ")
 
 
