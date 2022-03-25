@@ -25,7 +25,7 @@
                   <img src="{{ book.image_url_m }}">
                 </div>
                 <div class="col-6">
-                  <h2><a href="{% url 'show_book' book.ISBN %}" style="color:#2F3E46; text-decoration:none;">{{ book.title }}</a></h2>
+                  <h2><a href="{% url 'show_book' book.ISBN %}" style="color:#2F3E46;">{{ book.title }}</a></h2>
                   {% if book.getAverageRate == None %}
                     <h5 style="color:#354F52">No Yet Rated</h5>
                   {% else %}

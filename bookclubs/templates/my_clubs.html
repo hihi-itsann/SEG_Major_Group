@@ -17,7 +17,7 @@
             {% if clubs %}
                 <h1><b>My Clubs</b></h1>
                 <div style="text-align: right">
-                                <a class="btn btn-outline-dark"
+                                <a class="btn btn-submit"
                                         href="{% url 'club_list' %}">Explore More</a>
 
                 </div>
@@ -42,9 +42,9 @@
                   </div>
                 </div>
             {% else %}
-                <h1>You haven't joined any club yet!</h1>
-                <p>Click <a href='{% url 'club_list'  %}'>here</a> to apply to one of our clubs
-                    or <a href="{% url 'create_club' %}">here</a> to create a new club.</p>
+                <h1 style="color:#344E41">You haven't joined any club yet!</h1>
+                <p style="color:#344E41">Click <a href='{% url 'club_list'  %}' style="color:#ffb703">here</a> to apply to one of our clubs
+                    or <a href="{% url 'create_club' %}" style="color:#ffb703">here</a> to create a new club.</p>
             {% endif %}
         </div>
 {% endblock %}
