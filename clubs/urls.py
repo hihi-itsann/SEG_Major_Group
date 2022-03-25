@@ -29,6 +29,7 @@ urlpatterns = [
     path('log_out/', views.log_out, name='log_out'),
     path('profile/', views.ProfileUpdateView.as_view(), name='profile'),
     path('password/', views.PasswordView.as_view(), name='password'),
+    path('user/<str:username>/', views.show_user, name='show_user'),
 
     # Book Views
     path('book_list/<str:book_genre>/', views.BookListView.as_view(), name='book_list'),
