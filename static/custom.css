@@ -240,7 +240,7 @@ h3.profile-title {
  * important buttons and href link
  */
  .btn-apply{
-   background-color:#ffdd00;
+   background-color:#ff9f1c;
    color:#2f3e46;
  }
 
@@ -269,12 +269,12 @@ h3.profile-title {
  .btn-book{
    text-decoration: none;
    background-color:#CAD2C5;
-   color:#2F3E46;
+   color:#ffbf69;
  }
 
  .btn-book:hover{
    background-color:#AEC3B0;
-   color:#52796F;
+   color:#ffbf69;
  }
 
  .btn-read{
@@ -291,4 +291,15 @@ h3.profile-title {
  .btn-change:hover{
    background-color:#344e41;
    color:#ffa200;
+ }
+
+ .btn-submit{
+   border: 2px;
+   border-color:#ff9f1c;
+   color:#ff9f1c;
+ }
+
+ .btn-submit:hover{
+   background-color:#588157;
+   color:#ff9f1c;
  }
