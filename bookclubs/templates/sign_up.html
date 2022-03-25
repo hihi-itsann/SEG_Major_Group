@@ -32,9 +32,10 @@
                       <form action-"{% url 'sign_up' %}" method="post">
                         {% csrf_token %}
                         {% include 'partials/bootstrap_form.html' with form=form %}
-                        <input type="submit" value="Sign up" class="btn-lg btn-outline-dark">
+                        <input type="submit" value="Sign up" class="btn btn-submit btn-lg">
                       </form>
-                      <a href='{%url 'log_in' %}' class="btn-sm btn-outline-dark">
+                      <br>
+                      <a href='{%url 'log_in' %}' class="btn btn-submit btn-sm">
                           Already have an account? Log in here!
                       </a>
                     </div>
