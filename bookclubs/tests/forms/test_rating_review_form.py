@@ -22,7 +22,7 @@ class RateFormTestCase(TestCase):
         self.assertIn('rate', form.fields)
         self.assertIn('review', form.fields)
 
-    def test_form_application_lists_valid_input(self):
+    def test_form_lists_valid_input(self):
         form = RateReviewForm(data=self.form_input)
         self.assertTrue(form.is_valid())
 
