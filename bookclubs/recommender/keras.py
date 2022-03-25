@@ -13,28 +13,6 @@ import numpy as np
 #import ray
 from bookclubs.models import Book, ClubBookAverageRating, Club,BookRatingReview
 
-# def get_club_books_average_rating():
-#         """ Saves the average rating of books read by users of each club (banned member are not included) """
-#         ClubBookAverageRating.objects.all().delete()
-
-#         clubs=Club.objects.all()
-#         for club in clubs:
-#             members=club.get_moderators()|club.get_members()|club.get_management()
-#             for user in members:
-#                 ratings=BookRatingReview.objects.all().filter(user=user)
-#                 for rating in ratings:
-#                     clubBookRating=ClubBookAverageRating.objects.all().filter(club=club,book=rating.book)
-#                     if clubBookRating:
-#                         clubBookRating.get().add_rating(clubBookRating.get().rate)
-#                         clubBookRating.get().increment_number_of_ratings()
-#                     else:
-#                         ClubBookAverageRating.objects.create(
-#                             club=club,
-#                             book=rating.book,
-#                             rate=rating.rate,
-#                             number_of_ratings=1
-#                         )
-
 def get_selected_club_books_average_ratings(club_id):
     ClubBookAverageRating.objects.all().delete()
 
@@ -43,26 +21,31 @@ def get_selected_club_books_average_ratings(club_id):
     for user in members:
         ratings = BookRatingReview.objects.all().filter(user=user)
         for rating in ratings:
-            clubBookRating=ClubBookAverageRating.objects.all().filter(club=club,book=rating.book)
+            clubBookRating=ClubBookAverageRating.objects.all().filter(user=user,book=rating.book)
             if clubBookRating:
                 clubBookRating.get().add_rating(clubBookRating.get().rate)
                 clubBookRating.get().increment_number_of_ratings()
             else:
                 ClubBookAverageRating.objects.create(
-                    club=club,
-                    book=rating.book,
-                    rate=rating.rate,
-                    number_of_ratings=1
+                user=user,
+                book=rating.book,
+                rate=rating.rate,
+                number_of_ratings=1 #calculating the number of ratings giving in the club
                 )
-    return ratings
-    
 
 def get_data_for_recommendations():
 
-    ratings = pd.DataFrame(list(get_selected_club_books_average_ratings))
+    ratings = pd.DataFrame(list(ClubBookAverageRating.objects.all().values()))
     books = pd.DataFrame(list(Book.objects.all().values()))
     ratings['Book-Rating']=ratings['rate']/ratings['number_of_ratings']
     ratings['ISBN']=ratings['book_id']
+    ratings['User-ID']=ratings['club_id']
+
+    allratings = pd.read_csv('bookclubs/dataset/BX-Book-Ratings.csv', sep = ';', quotechar = '"', encoding = 'latin-1',header = 0)
+    allbooks = pd.read_csv('bookclubs/dataset/BX-Books.csv', sep = ';', quotechar = '"', encoding = 'latin-1',header = 0 )
+    ratings = pd.concat([ratings,allratings])
+    books = pd.concat([books,allbooks])
+
     return (ratings, books)
 
 def train():
