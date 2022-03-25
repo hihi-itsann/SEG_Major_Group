@@ -38,7 +38,7 @@
                 </i>&emsp;<a href="{% url 'delete_book_status' book.ISBN %}" style="color:#52796F">Delete from your reading list</a></button>
                 <br><br>
                 <div class="dropdown">
-                  <a class="btn btn-outline-primary dropdown-toggle btn-lg" role="button" data-bs-toggle="dropdown">
+                  <a class="btn btn-change dropdown-toggle btn-lg" role="button" data-bs-toggle="dropdown">
                     Change Reading Status
                   </a>
                   <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
@@ -49,7 +49,7 @@
                 </div>
                 {% endif %}
                 {% if readingStatus == 'F'%}
-                    <br><button type="button" class="btn btn-outline-primary btn-lg" data-bs-toggle="modal" data-bs-target="#Modal" data-bs-whatever="Create Review">Create your feedback here</button>
+                    <br><button type="button" class="btn btn-change btn-lg" data-bs-toggle="modal" data-bs-target="#Modal" data-bs-whatever="Create Review">Create your feedback here</button>
                     {% include 'create_book_rating_review.html' %}
                 {% endif %}
             {% endif %}
@@ -59,14 +59,14 @@
             {% if not book.getReview.all %}
                 <h2 style="color:#2F3E46">No Reviews Yet.</h2>
             {% else %}
-                <h2>Reviews:</h2>
+                <h2 style="color:#2F3E46">Reviews:</h2>
                 {% for review in book.getReview%}
                 <hr><br><br>
                 <div class="row">
                   <div class="col-lg-1 offset-0">
                         <img src="{{ review.user.gravatar }}" alt="Gravatar of author {{ review.user.username }}" class="rounded-circle">
                   </div>
-                  <div class="col-lg-6 offset-1">
+                  <div class="col-lg-6 offset-1" style="color:#2F3E46">
                     <p class="review.user">
                       <span class="review.user-fullname">
                         {{ post.author.full_name }}

@@ -1,8 +1,8 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from bookclubs.models import User, Post, Comment, Club
+from bookclubs.models import User, Post, Club
 
-class CommentModelTestCase(TestCase):
+class PostModelTestCase(TestCase):
 
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
@@ -19,35 +19,29 @@ class CommentModelTestCase(TestCase):
             club=self.club,
             body="The quick brown fox jumps over the lazy dog."
         )
-        self.comment = Comment.objects.create(
-            author=self.user,
-            related_post=self.post,
-            body="this is a comment."
-        )
-
 
     def test_valid_comment(self):
         try:
-            self.comment.full_clean()
+            self.post.full_clean()
         except ValidationError:
-            self.fail("Test comment should be valid")
+            self.fail("Test post should be valid")
 
     def test_author_must_not_be_blank(self):
-        self.comment.author = None
+        self.post.author = None
         with self.assertRaises(ValidationError):
-            self.comment.full_clean()
+            self.post.full_clean()
 
-    def test_post_must_not_be_blank(self):
-        self.comment.related_post = None
+    def test_club_must_not_be_blank(self):
+        self.post.club = None
         with self.assertRaises(ValidationError):
-            self.comment.full_clean()
+            self.post.full_clean()
 
     def test_body_must_not_be_blank(self):
-        self.comment.body = ''
+        self.post.body = ''
         with self.assertRaises(ValidationError):
-            self.comment.full_clean()
+            self.post.full_clean()
 
     def test_body_must_not_be_overlong(self):
-        self.comment.body = 'x' * 521
+        self.post.body = 'x' * 521
         with self.assertRaises(ValidationError):
-            self.comment.full_clean()
+            self.post.full_clean()

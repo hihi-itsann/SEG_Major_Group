@@ -26,9 +26,7 @@ class Command(BaseCommand):
     #ratingsPath = 'bookclubs/recommender/dataset/BX-Book-Ratings.csv'
     booksPath   = 'bookclubs/dataset/BX-Books.csv'
     #usersPath   = 'bookclubs/recommender/dataset/BX-Users.csv'
-    # df_ratings=[]
-    # df_users=[]
-    # df_books=[]
+
     def __init__(self):
         self.faker = Faker('en_GB')
 
@@ -43,17 +41,21 @@ class Command(BaseCommand):
 
         self.create_ratings()
 
-        self.create_posts()
-        self.posts = Post.objects.all()
-
-        self.create_comments()
-
         self.create_clubs()
         self.clubs = Club.objects.all()
 
         self.create_roles()
 
+<<<<<<< HEAD
        # self.create_meetings()
+=======
+        self.create_posts()
+        self.posts = Post.objects.all()
+
+        self.create_comments()
+
+        # self.create_meetings()
+>>>>>>> main
 
   
 
@@ -77,6 +79,29 @@ class Command(BaseCommand):
 
         return  volume_info["volumeInfo"]["categories"]
 
+<<<<<<< HEAD
+=======
+    # def __init__(self):
+    #     self.faker = Faker('en_GB')
+    #
+
+    # def create_ratings(self):
+    #     for index, rating in self.df_ratings.iterrows():
+    #         print(f"Seeding rating {index}/{len(self.df_ratings)}", end='\r')
+    #
+    #         try:
+    #
+    #             self.create_rating(rating)
+    #         except:
+    #             continue
+    #     print("Rating seeding complete.      ")
+    #
+    # def create_rating(self,rating):
+    #     Rating.objects.create(
+    #         rate = rating['Book-Rating'],
+    #         book = self.books.get(ISBN=rating['ISBN']),
+    #         user = self.users.get(userID=rating['User-ID']  ))
+>>>>>>> main
     def create_ratings (self):
         for book in self.books:
             print(f"Seeding user ratings ......", end='\r')
@@ -95,9 +120,15 @@ class Command(BaseCommand):
             book=book,
             user=user
         )
+
     def create_books(self):
         for index, book in self.df_books.head(100).iterrows():
+<<<<<<< HEAD
             print(f"Seeding book {index}/{100}", end='\r')
+=======
+            # print(f"Seeding book {index}/{len(self.df_books)}", end='\r')
+            print(f"Seeding book {index}/100", end='\r')
+>>>>>>> main
             try:
 
                 self.create_book(book)
@@ -115,7 +146,7 @@ class Command(BaseCommand):
             image_url_s = book['Image-URL-S'],
             image_url_m =book['Image-URL-M'],
             image_url_l = book['Image-URL-L'],
-            genre=(self.getgenre(book['ISBN'])[0]).upper()
+            genre=(self.getgenre(book['ISBN'])[0]).lower().title()
         )
 
 
@@ -237,7 +268,8 @@ class Command(BaseCommand):
     def create_post(self):
         post = Post()
         post.title = self.faker.text(max_nb_chars=255)
-        post.author = self.get_random_user()
+        post.club = self.get_random_club()
+        post.author = self.get_random_member(post.club)
         post.body = self.faker.text(max_nb_chars=280)
         post.save()
         datetime = self.faker.past_datetime(start_date='-365d', tzinfo=pytz.UTC)
@@ -250,17 +282,20 @@ class Command(BaseCommand):
         print("Comment seeding complete.      ")
 
     def create_comment(self):
+        club = self.get_random_club()
         comment = Comment()
-        comment.author = self.get_random_user()
+        comment.author = self.get_random_member(club)
         comment.body = self.faker.text(max_nb_chars=280)
-        comment.related_post = self.get_random_post()
+        comment.related_post = self.get_random_post(club)
         comment.save()
         datetime = self.faker.past_datetime(start_date='-365d', tzinfo=pytz.UTC)
         Comment.objects.filter(id=comment.id).update(created_at = datetime)
 
-    def get_random_post(self):
-        index = randint(0,self.posts.count()-1)
-        return self.posts[index]
+    # get random post from a specific club
+    def get_random_post(self,club):
+        club_post = Post.objects.all().filter(club=club)
+        index = randint(0,club_post.count()-1)
+        return club_post[index]
 
     def create_meetings(self):
         meeting_count = 0
@@ -296,6 +331,11 @@ class Command(BaseCommand):
     def get_random_club(self):
         index = randint(0,self.clubs.count()-1)
         return self.clubs[index]
+
+    def get_random_member(self, club):
+        member_roles = Role.objects.all().filter(club=club).exclude(club_role='BAN')
+        index = randint(0,member_roles.count()-1)
+        return member_roles[index].user
 
 def create_username(first_name, last_name):
     return '@' + first_name.lower() + last_name.lower()
