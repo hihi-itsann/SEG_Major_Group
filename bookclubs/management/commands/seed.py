@@ -279,14 +279,16 @@ class Command(BaseCommand):
 
     def create_meeting(self):
         club = self.get_random_club()
+
         book = self.get_random_book()
         topic = self.faker.text(max_nb_chars=60)
         description = self.faker.text(max_nb_chars=520)
-        meeting_status = club.meeting_status()
+        meeting_status = club.meeting_status
         if meeting_status == 'ONL':
             location = 'Meeting link to be created...'
         else:
             location = self.faker.street_name()
+        #date = self.faker.past_datetime(start_date='-365d', tzinfo=pytz.UTC)
         date = self.faker.past_datetime(start_date='-365d', tzinfo=pytz.UTC)
         time_start = self.faker.time()
         duration = randint(15, 45)
