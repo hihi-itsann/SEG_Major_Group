@@ -53,7 +53,7 @@ class Command(BaseCommand):
 
         self.create_roles()
 
-        self.create_meetings()
+       # self.create_meetings()
 
   
 
@@ -206,13 +206,12 @@ class Command(BaseCommand):
         print("Role seeding complete.      ")
 
     def create_role(self, user, club):
-        if random() < self.USER_IN_CLUB_PROBABILITY:
-            club_role = self.faker.random_choices(elements=('MEM', 'MOD', 'BAN'), length=1)[0]
-            Role.objects.create(
-                user=user,
-                club=club,
-                club_role=club_role
-            )
+        club_role = self.faker.random_choices(elements=('MEM', 'MOD', 'BAN'), length=1)[0]
+        Role.objects.create(
+            user=user,
+            club=club,
+            club_role=club_role
+        )
 
     def create_owner_role(self):
         for i in range(self.CLUB_COUNT):
