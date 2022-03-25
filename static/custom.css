@@ -257,6 +257,15 @@ h3.profile-title {
    color:#52796F;
  }
 
+ .btn-show-user{
+   background-color:#AEC3B0;
+   color:#2F3E46;
+ }
+
+ .btn-show-user:hover{
+   color:#52796F;
+ }
+
  .btn-book{
    text-decoration: none;
    background-color:#CAD2C5;
@@ -274,15 +283,12 @@ h3.profile-title {
    color:#124559;
  }
 
- .btn-read:hover{
-   background-color:#CAD2C5;
-   color:#52796F;
+ .btn-change{
+   background-color:#ffa200;
+   color:#344e41;
  }
 
- .parent .popup {
-  display: none;
-}
-
-.parent:hover .popup {
-  display: block;
-}
+ .btn-change:hover{
+   background-color:#344e41;
+   color:#ffa200;
+ }

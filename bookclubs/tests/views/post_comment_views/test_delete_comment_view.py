@@ -1,27 +1,35 @@
 from django.test import TestCase
 from django.urls import reverse
-from bookclubs.models import Post, User, Comment
+from bookclubs.models import Post, User, Comment, Club, Role
 from bookclubs.tests.helpers import reverse_with_next
 
 
 class DeleteCommentTest(TestCase):
 
     fixtures = [
-        'bookclubs/tests/fixtures/default_user.json'
+        'bookclubs/tests/fixtures/default_user.json',
+        'bookclubs/tests/fixtures/default_clubs.json'
     ]
 
     def setUp(self):
         super(TestCase, self).setUp()
         self.user = User.objects.get(username='@johndoe')
+        self.club = Club.objects.get(club_name='private_online')
         self.post = Post.objects.create(
             title="this is a title.",
             author=self.user,
+            club=self.club,
             body="The quick brown fox jumps over the lazy dog."
         )
         self.comment = Comment.objects.create(
             author=self.user,
             related_post=self.post,
             body="this is a comment."
+        )
+        self.role = Role.objects.create(
+             user=self.user,
+             club=self.club,
+             club_role='MEM'
         )
         self.url = reverse('delete_comment', kwargs={'pk': self.comment.id})
 
@@ -39,7 +47,7 @@ class DeleteCommentTest(TestCase):
         response = self.client.delete(self.url)
         comment_count_after = Comment.objects.count()
         self.assertEqual(comment_count_after, comment_count_before-1)
-        response_url = reverse('post_comment')
+        response_url = reverse('club_feed',kwargs={'club_name': self.club.club_name})
         self.assertRedirects(
             response, response_url,
             status_code=302, target_status_code=200,
