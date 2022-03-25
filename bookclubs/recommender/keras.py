@@ -35,6 +35,27 @@ def get_club_books_average_rating():
                             number_of_ratings=1
                         )
 
+# def get_selected_club_books_average_ratings(club_id):
+#     ClubBookAverageRating.objects.all().delete()
+
+#     club = Club.objects.filter(id = club_id).first()
+#     members = club.get_moderators()|club.get_members()|club.get_management()
+#     for user in members:
+#         ratings = BookRatingReview.objects.all().filter(user=user)
+#         for rating in ratings:
+#             clubBookRating=ClubBookAverageRating.objects.all().filter(user=user,book=rating.book)
+#             if clubBookRating:
+#                 clubBookRating.get().add_rating(clubBookRating.get().rate)
+#                 clubBookRating.get().increment_number_of_ratings()
+#             else:
+#                 ClubBookAverageRating.objects.create(
+#                 user=user,
+#                 book=rating.book,
+#                 rate=rating.rate,
+#                 number_of_ratings=1
+#                 )
+    
+
 def get_data_for_recommendations():
 
     ratings = pd.DataFrame(list(ClubBookAverageRating.objects.all().values()))

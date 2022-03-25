@@ -497,7 +497,8 @@ class MeetingAttendance(models.Model):
 
 
 class ClubBookAverageRating(models.Model):
-    club = models.ForeignKey(Club, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+#    club = models.ForeignKey(Club, on_delete=models.CASCADE)
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     rate = models.FloatField(default=0)
     number_of_ratings = models.IntegerField()
