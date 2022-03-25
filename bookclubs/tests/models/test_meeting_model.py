@@ -1,3 +1,5 @@
+from datetime import timedelta, date
+
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from bookclubs.models import User, Club, Meeting, Book, MeetingAttendance
@@ -22,7 +24,7 @@ class MeetingModelTestCase(TestCase):
             description='[Description]',
             meeting_status='ONL',
             location='Bush House',
-            date='2022-04-01',
+            date=date.today() + timedelta(days=5),
             time_start='11:00',
             duration=60
         )

@@ -283,7 +283,7 @@ class Command(BaseCommand):
         book = self.get_random_book()
         topic = self.faker.text(max_nb_chars=60)
         description = self.faker.text(max_nb_chars=520)
-        meeting_status = club.meeting_status()
+        meeting_status = club.meeting_status
         if meeting_status == 'ONL':
             location = 'Meeting link to be created...'
         else:

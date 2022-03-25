@@ -24,8 +24,6 @@ class CreateClubViewTestCase(TestCase):
             'country': 'country1',
             'public_status': 'PUB',
             'genre': 'Non-Fiction',
-            # 'genre': 'Social Science',
-
             'description': 'description',
         }
 
@@ -58,7 +56,6 @@ class CreateClubViewTestCase(TestCase):
             'city': 'city1',
             'country': 'country1',
             'public_status': 'PUB',
-            # 'genre': 'Social Science',
             'genre': 'Non-Fiction',
             'description': 'description',
         }

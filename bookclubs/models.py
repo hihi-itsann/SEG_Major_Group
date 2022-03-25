@@ -5,6 +5,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator, MinLengthValidator, MinValueValidator, MaxValueValidator
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db.utils import OperationalError
 from libgravatar import Gravatar
 from django.db.models import Avg
 from django.urls import reverse
@@ -119,7 +120,7 @@ class Book(models.Model):
                 for book in books:
                     genres.append((book.genre.title(), book.genre.title()))
                 genres = list(set(genres))
-        except:
+        except OperationalError:
             # print(traceback.format_exc())
             print("Genres are being set to the default of Fiction and Non-Fiction until books are added to the system.")
         finally:
@@ -293,7 +294,7 @@ class Club(models.Model):
             return
 
     def unban_member(self, user):
-        """Unban a banned user, they can now re-apply to join the club."""
+        """Unban a banned user, they now re-join the club."""
         role = Role.objects.get(club=self, user=user)
         if role.club_role == 'BAN':
             role.club_role = 'MEM'
