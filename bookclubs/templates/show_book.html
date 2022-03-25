@@ -78,7 +78,7 @@
                       </span>
 
                       {% if user.id == review.user.id%}
-                        <a href="{% url 'delete_book_rating_review' book.ISBN review.id%}">(Delete)</a>
+                        <a href="{% url 'delete_book_rating_review' book.ISBN review.id%}" style="color:#fb8500">(Delete)</a>
                       {% endif %}
 
                       <b><p class="review-rate">Rate: {{ review.rate  }}</p></b>
@@ -88,10 +88,17 @@
                 {%endfor%}
             {%endif%}
 
-          <div>
-            <form class="row justify-content-center">
-              <input type="button" class="btn-close btn-lg" aria-label="Close" onclick="history.back()">
-            </form>
+          <div class="text-center">
+              <ul>
+              <a href="{%  url 'reading_book_list' 'All' %}"
+                     class="btn btn-submit">
+                  My reading List
+              </a>
+              <a href="{% url 'book_list' 'All' %}"
+                     class="btn btn-submit">
+                  Book List
+              </a>
+            </ul>
         </div>
 
         </div>
