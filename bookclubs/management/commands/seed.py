@@ -49,6 +49,8 @@ class Command(BaseCommand):
 
         self.create_roles()
 
+        self.create_applications()
+
         self.create_posts()
         self.posts = Post.objects.all()
 
@@ -59,7 +61,6 @@ class Command(BaseCommand):
 
         self.create_meeting_attendance()
 
-        self.create_applications()
 
     def load_data_from_csv(self):
         #self.df_users= pd.read_csv(self.usersPath, sep = ';',names = ['User-ID', 'Location', 'Age'], quotechar = '"', encoding = 'latin-1',header = 0)
@@ -412,7 +413,6 @@ class Command(BaseCommand):
         member_roles = Role.objects.all().filter(club=club).exclude(club_role='BAN')
         index = randint(0,member_roles.count()-1)
         return member_roles[index].user
-
 
     def create_applications(self):
         application_count = 0
