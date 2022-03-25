@@ -6,10 +6,10 @@ from bookclubs.tests.helpers import reverse_with_next
 from bookclubs.models import User, Club, Meeting, Role, Book, MeetingAttendance
 
 
-class LeaveClubViewTestCase(TestCase):
+class TransferOwnershipViewTestCase(TestCase):
     """Tests for the leaving of a meeting"""
 
-    VIEW = 'leave_club'
+    VIEW = 'transfer_ownership'
 
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
@@ -24,38 +24,52 @@ class LeaveClubViewTestCase(TestCase):
         self.member = User.objects.get(username='@janedoe')
         self.club = Club.objects.get(club_name='private_online')
         self.book = Book.objects.get(ISBN='0195153448')
-        Role.objects.create(user=self.owner, club=self.club, club_role='OWN')
-        self.url = reverse(self.VIEW, kwargs={'club_name': self.club.club_name})
+        self.url = reverse(self.VIEW, kwargs={'club_name': self.club.club_name, 'user_id': self.member.id})
 
-    def test_leave_club_url(self):
-        self.assertEqual(self.url, f'/club/{self.club.club_name}/leave_club/')
+    def test_transfer_ownership_url(self):
+        self.assertEqual(self.url, f'/club/{self.club.club_name}/transfer_ownership/{self.member.id}/')
 
-    def test_get_leave_club_redirects_when_not_logged_in(self):
+    def test_get_transfer_ownership_redirects_when_not_logged_in(self):
         redirect_url = reverse_with_next('log_in', self.url)
         response = self.client.get(self.url)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
-    def test_member_successfully_leave(self):
-        Role.objects.create(user=self.member, club=self.club, club_role='MEM')
-        self.client.login(username=self.member.username, password="Password123")
-        club_member_count_before = Role.objects.count()
+    def test_owner_successfully_transfer_ownership_to_mod(self):
+        Role.objects.create(user=self.owner, club=self.club, club_role='OWN')
+        Role.objects.create(user=self.member, club=self.club, club_role='MOD')
+        self.client.login(username=self.owner.username, password="Password123")
         response = self.client.post(self.url, follow=True)
-        club_member_count_after = Role.objects.count()
-        self.assertEqual(club_member_count_after, club_member_count_before - 1)
-        response_url = reverse('my_clubs')
+        response_url = reverse('member_list', kwargs={'club_name': self.club.club_name})
         self.assertRedirects(
             response, response_url,
             status_code=302, target_status_code=200,
             fetch_redirect_response=True
         )
+        self.assertEqual(self.club.get_club_role(self.member), 'OWN')
+        self.assertEqual(self.club.get_club_role(self.owner), 'MOD')
 
-    def test_owner_unsuccessfully_leave(self):
+    def test_owner_unsuccessfully_transfer_ownership_to_member(self):
+        Role.objects.create(user=self.owner, club=self.club, club_role='OWN')
+        Role.objects.create(user=self.member, club=self.club, club_role='MEM')
         self.client.login(username=self.owner.username, password="Password123")
-        club_member_count_before = Role.objects.count()
         response = self.client.post(self.url, follow=True)
-        club_member_count_after = Role.objects.count()
-        self.assertEqual(club_member_count_after, club_member_count_before)
         response_url = reverse('member_list', kwargs={'club_name': self.club.club_name})
+        self.assertRedirects(
+            response, response_url,
+            status_code=302, target_status_code=200,
+            fetch_redirect_response=True
+        )
+        self.assertEqual(self.club.get_club_role(self.member), 'MEM')
+        self.assertEqual(self.club.get_club_role(self.owner), 'OWN')
+
+    def test_member_unsuccessfully_transfer_ownership(self):
+        Role.objects.create(user=self.owner, club=self.club, club_role='OWN')
+        Role.objects.create(user=self.member, club=self.club, club_role='MEM')
+        self.client.login(username=self.member.username, password="Password123")
+        response = self.client.post(self.url, follow=True)
+        self.assertEqual(self.club.get_club_role(self.member), 'MEM')
+        self.assertEqual(self.club.get_club_role(self.owner), 'OWN')
+        response_url = reverse('club_feed', kwargs={'club_name': self.club.club_name})
         self.assertRedirects(
             response, response_url,
             status_code=302, target_status_code=200,
@@ -81,12 +95,23 @@ class LeaveClubViewTestCase(TestCase):
         self.assertEqual(len(messages_list), 1)
         self.assertEqual(messages_list[0].level, messages.WARNING)
 
-    def test_get_redirect_when_club_do_not_exist(self):
-        Role.objects.create(user=self.member, club=self.club, club_role='MEM')
-        url = reverse(self.VIEW, kwargs={'club_name': 'WrongClubName'})
+    def test_get_redirect_when_club_does_not_exist(self):
+        Role.objects.create(user=self.member, club=self.club, club_role='OWN')
+        url = reverse(self.VIEW, kwargs={'club_name': 'WrongClubName', 'user_id': self.member.id})
         self.client.login(username=self.member.username, password="Password123")
         response = self.client.post(url, follow=True)
         redirect_url = reverse('feed')
+        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
+        messages_list = list(response.context['messages'])
+        self.assertEqual(len(messages_list), 1)
+        self.assertEqual(messages_list[0].level, messages.WARNING)
+
+    def test_get_redirect_when_user_id_does_not_exist(self):
+        Role.objects.create(user=self.member, club=self.club, club_role='OWN')
+        url = reverse(self.VIEW, kwargs={'club_name': self.club.club_name, 'user_id': 999})
+        self.client.login(username=self.member.username, password="Password123")
+        response = self.client.post(url, follow=True)
+        redirect_url = reverse('member_list', kwargs={'club_name': self.club.club_name})
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
         messages_list = list(response.context['messages'])
         self.assertEqual(len(messages_list), 1)
