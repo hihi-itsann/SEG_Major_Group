@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from bookclubs.models import User, Club, Role, Book, ClubBookAverageRating
+from bookclubs.models import User, Club, Role, Book, ClubBookAverageRating, Application
 from bookclubs.models import User, Post, Comment, Club, Role, Book, BookRatingReview, Meeting, MeetingAttendance
 
 import pytz
@@ -22,6 +22,7 @@ class Command(BaseCommand):
     POST_COUNT = 100
     COMMENT_COUNT = 100
     MEETING_COUNT = 20
+    APPLICATION_PER_CLUB_COUNT = 10
     DEFAULT_PASSWORD = 'Password123'
     USER_IN_CLUB_PROBABILITY = 0.2
     USER_RATE_BOOK_PROBABILITY= 0.3
@@ -56,7 +57,9 @@ class Command(BaseCommand):
         self.create_meetings()
         self.meetings = Meeting.objects.all()
 
-        # self.create_meeting_attendance()
+        self.create_meeting_attendance()
+
+        self.create_applications()
 
     def load_data_from_csv(self):
         #self.df_users= pd.read_csv(self.usersPath, sep = ';',names = ['User-ID', 'Location', 'Age'], quotechar = '"', encoding = 'latin-1',header = 0)
@@ -377,7 +380,7 @@ class Command(BaseCommand):
     def create_meeting_attendance(self):
         meeting_attendance_count = 0
         for meeting in self.meetings:
-            print(f"Seeding role {meeting_attendance_count}/{self.MEETING_COUNT * 10}", end='\r')
+            print(f"Seeding attendance {meeting_attendance_count}/{self.MEETING_COUNT * 10}", end='\r')
             meeting_attendance_count += 1
             host = self.create_meeting_host(meeting)
             for i in range(9):
@@ -409,6 +412,36 @@ class Command(BaseCommand):
         member_roles = Role.objects.all().filter(club=club).exclude(club_role='BAN')
         index = randint(0,member_roles.count()-1)
         return member_roles[index].user
+
+
+    def create_applications(self):
+        application_count = 0
+        for club in self.clubs:
+            # print(f"Seeding role {role_count}/{self.CLUB_COUNT*len(self.df_users)}", end='\r')
+            print(f"Seeding application {application_count}/{self.APPLICATION_PER_CLUB_COUNT*self.CLUB_COUNT}", end='\r')
+            for i in range(0,self.APPLICATION_PER_CLUB_COUNT):
+                try:
+                    self.create_application(club)
+                except:
+                    continue
+                application_count += 1
+        print("Application seeding complete.      ")
+
+    def create_application(self, club):
+        user = self.get_random_non_member(club)
+        statement = self.faker.text(max_nb_chars=200)
+        Application.objects.create(
+            user=user,
+            club=club,
+            statement=statement
+        )
+
+
+    def get_random_non_member(self, club):
+        all_in_club = Role.objects.filter(club=club).values_list('user', flat=True)
+        all_out_of_club = User.objects.all().exclude(id__in=all_in_club)
+        index = randint(0, all_out_of_club.count()-1)
+        return all_out_of_club[index]
 
 def create_username(first_name, last_name):
     return '@' + first_name.lower() + last_name.lower()
