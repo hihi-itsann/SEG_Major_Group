@@ -1,3 +1,5 @@
+from datetime import date, timedelta
+
 from django import forms
 from django.test import TestCase
 
@@ -25,7 +27,7 @@ class MeetingFormTestCase(TestCase):
             'description': 'delta foxtrot golf hotel india',
             'meeting_status': 'OFF',
             'location': 'Bush House',
-            'date': '2022-04-01',
+            'date': date.today() + timedelta(days=5),
             'time_start': '10:00',
             'duration': 11
         }
