@@ -22,14 +22,14 @@
         </form>
     </center>
     <div class="container">
-        <div class="col-xs-12 col-lg-6 col-xl-8">
-            <h1>Clubs </h1>
+        <div class="col-xs-12 col-lg-6 col-xl-8" style="color:#1b4332">
+            <h1 style="color:#1b4332">Clubs </h1>
             {% if meeting_status == None %}
-                <p> Filter applied:None </p>
+                <p style="color:#1b4332"> Filter applied:None </p>
             {% elif meeting_status == 'Online' %}
-                <p> Filter applied: {{ meeting_status }} meeting </p>
+                <p style="color:#1b4332"> Filter applied: {{ meeting_status }} meeting </p>
             {% else %}
-                <p> Filter applied: {{ meeting_status }} meeting in {{ distance }}</p>
+                <p style="color:#1b4332"> Filter applied: {{ meeting_status }} meeting in {{ distance }}</p>
             {% endif %}
             {% if club_count > 0 %}
                 {% if is_suitable_clubs %}
@@ -42,7 +42,7 @@
                                     <p>Genre: {{ club.genre }}</p>
                                     <p>Total members: {{ club.club_members.count }}</p>
                                     <td><a id="apply-button" href='{% url 'create_application' club.club_name %}'
-                                           class="btn btn-outline-dark">
+                                           class="btn btn-apply">
                                         APPLY
                                     </a></td>
                                     {% for club_applied in user.get_applied_clubs %}
