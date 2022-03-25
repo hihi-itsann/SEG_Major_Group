@@ -200,7 +200,7 @@ class Command(BaseCommand):
         for i in range(self.USER_COUNT-self.CLUB_COUNT):
             print(f"Seeding other role {i}/{self.USER_COUNT-self.CLUB_COUNT}", end='\r')
             try:
-                self.create_role(self.users.get(i+self.CLUB_COUNT+1), self.get_random_club())
+                self.create_role(self.users[i+self.CLUB_COUNT+1], self.get_random_club())
             except:
                 continue
         print("Role seeding complete.      ")
@@ -218,10 +218,12 @@ class Command(BaseCommand):
         for i in range(self.CLUB_COUNT):
             print(f"Seeding owner role {i+1}/{self.CLUB_COUNT}", end='\r')
             Role.objects.create(
-            user=self.user.get(i),
-            club=self.club.get(i),
+            user=self.users[i],
+            club=self.clubs[i],
             club_role='OWN'
         ) 
+        print("Owner role seeding complete.      ")
+
 
     def get_random_user(self):
         index = randint(0,self.users.count()-1)
