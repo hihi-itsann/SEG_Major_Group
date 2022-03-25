@@ -2,7 +2,7 @@ from django.test import SimpleTestCase
 from django.urls import reverse, resolve
 import random
 from bookclubs.views import home, feed, SignUpView, LogInView, log_out, ProfileUpdateView,\
-                             PasswordView ,BookListView, ShowBookView, CreateBookRateReviewView,\
+                             show_user, PasswordView ,BookListView, ShowBookView, CreateBookRateReviewView,\
                             create_book_status, delete_book_status, change_book_status, reading_book_list,\
                             club_feed, create_club, delete_club, create_application,\
                             withdraw_application, my_applications, application_list, accept_applicant, \
@@ -38,9 +38,9 @@ class TestUrls(SimpleTestCase):
         url = reverse('profile')
         self.assertEquals(resolve(url).func.view_class, ProfileUpdateView)
 
-    # def test_show_user_url_is_resolved(self):
-    #     url = reverse('show_user',args=['some-str'])
-    #     self.assertEquals(resolve(url).func,show_user)
+    def test_show_user_url_is_resolved(self):
+        url = reverse('show_user',args=['some-str'])
+        self.assertEquals(resolve(url).func,show_user)
 
     def test_password_url_is_resolved(self):
         url = reverse('password')
