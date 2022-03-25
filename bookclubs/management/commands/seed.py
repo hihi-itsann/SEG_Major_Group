@@ -79,27 +79,7 @@ class Command(BaseCommand):
 
         return volume_info["volumeInfo"]["categories"]
 
-    # def __init__(self):
-    #     self.faker = Faker('en_GB')
-    #
-
-    # def create_ratings(self):
-    #     for index, rating in self.df_ratings.iterrows():
-    #         print(f"Seeding rating {index}/{len(self.df_ratings)}", end='\r')
-    #
-    #         try:
-    #
-    #             self.create_rating(rating)
-    #         except:
-    #             continue
-    #     print("Rating seeding complete.      ")
-    #
-    # def create_rating(self,rating):
-    #     Rating.objects.create(
-    #         rate = rating['Book-Rating'],
-    #         book = self.books.get(ISBN=rating['ISBN']),
-    #         user = self.users.get(userID=rating['User-ID']  ))
-    def create_ratings(self):
+    def create_ratings (self):
         for book in self.books:
             print(f"Seeding user ratings ......", end='\r')
             for user in self.users:
@@ -153,43 +133,7 @@ class Command(BaseCommand):
             user_count += 1
         print("User seeding complete.      ")
 
-    # def create_users(self):
-    #     for index, user in self.df_users.iterrows():
-    #         print(f"Seeding user {index}/{len(self.df_users)}", end='\r')
-    #         try:
-    #
-    #             self.create_user(user)
-    #         except:
-    #             continue
-    #     print("User seeding complete.      ")
-
-    # the csv file has only user id, location and age so Other information are created with Faker
-    # def create_user(self,user):
-    #     first_name = self.faker.first_name()
-    #     last_name = self.faker.last_name()
-    #     email = create_email(first_name, last_name)
-    #     username = create_username(first_name, last_name)
-    #     bio = self.faker.text(max_nb_chars=520)
-    #     #dob = self.faker.date_of_birth(minimum_age = 8, maximum_age = 100)
-    #     dob=self.get_dob_from_age(user['Age'])
-    #     gender = self.faker.random_choices(elements=('M', 'F', 'O'), length=1)[0]
-    #     #location = self.faker.city()
-    #     meeting_preference = self.faker.random_choices(elements=('O', 'P'), length=1)[0]
-    #     User.objects.create_user(
-    #         userID=user['User-ID'],
-    #         username=username,
-    #         email=email,
-    #         password=Command.DEFAULT_PASSWORD,
-    #         first_name=first_name,
-    #         last_name=last_name,
-    #         bio=bio,
-    #         dob=dob,
-    #         gender=gender,
-    #         location=user['Location'],
-    #         meeting_preference=meeting_preference
-    #     )
-
-    def create_user(self, userID):
+    def create_user(self, user_count):
         first_name = self.faker.first_name()
         last_name = self.faker.last_name()
         email = create_email(first_name, last_name)
@@ -203,12 +147,13 @@ class Command(BaseCommand):
         country = self.faker.country()
         meeting_preference = self.faker.random_choices(elements=('O', 'P'), length=1)[0]
         User.objects.create_user(
-            userID=userID+1,
+            userID=user_count+1,
             username=username,
-            email=email,
-            password=Command.DEFAULT_PASSWORD,
             first_name=first_name,
             last_name=last_name,
+            email=email,
+            password=Command.DEFAULT_PASSWORD,
+
             bio=bio,
             dob=dob,
             gender=gender,
@@ -218,16 +163,6 @@ class Command(BaseCommand):
             meeting_preference=meeting_preference
         )
 
-    # def get_dob_from_age(self, age):
-    #     if numpy.isnan(age) :
-    #         return None
-    #     else:
-    #         now = datetime.datetime.now()
-    #         current_year = now.year
-    #         year_of_birth=int(current_year-age)
-    #         start_date = datetime.date(year=year_of_birth, month=1, day=1)
-    #         end_date = datetime.date(year=year_of_birth, month=12, day=31)
-    #         return self.faker.date_between(start_date=start_date, end_date=end_date)
 
     def create_clubs(self):
         club_count = 0
@@ -261,36 +196,34 @@ class Command(BaseCommand):
         )
 
     def create_roles(self):
-        role_count = 0
-        for club in self.clubs:
-            # print(f"Seeding role {role_count}/{self.CLUB_COUNT*len(self.df_users)}", end='\r')
-            print(f"Seeding role {role_count}/{self.CLUB_COUNT*10}", end='\r')
-            self.create_owner_role(club)
-            role_count += 1
-            for user in self.users:
-                try:
-                    self.create_role(user, club)
-                except:
-                    continue
-                role_count += 1
+
+        self.create_owner_role()
+        for i in range(self.USER_COUNT-self.CLUB_COUNT):
+            print(f"Seeding other role {i}/{self.USER_COUNT-self.CLUB_COUNT}", end='\r')
+            try:
+                self.create_role(self.users[i+self.CLUB_COUNT+1], self.get_random_club())
+            except:
+                continue
         print("Role seeding complete.      ")
 
     def create_role(self, user, club):
-        if random() < self.USER_IN_CLUB_PROBABILITY:
-            club_role = self.faker.random_choices(elements=('MEM', 'MOD', 'BAN'), length=1)[0]
-            Role.objects.create(
-                user=user,
-                club=club,
-                club_role=club_role
-            )
-
-    def create_owner_role(self, club):
-        user = self.get_random_user()
+        club_role = self.faker.random_choices(elements=('MEM', 'MOD', 'BAN'), length=1)[0]
         Role.objects.create(
             user=user,
             club=club,
+            club_role=club_role
+        )
+
+    def create_owner_role(self):
+        for i in range(self.CLUB_COUNT):
+            print(f"Seeding owner role {i+1}/{self.CLUB_COUNT}", end='\r')
+            Role.objects.create(
+            user=self.users[i],
+            club=self.clubs[i],
             club_role='OWN'
         )
+        print("Owner role seeding complete.      ")
+
 
     def get_random_user(self):
         index = randint(0, self.users.count() - 1)
