@@ -26,6 +26,21 @@ class BookStatusModelTestCase(TestCase):
     def _assert_book_status_is_invalid(self):
         with self.assertRaises(ValidationError):
             self.book_status.full_clean()
+            
+    def test_change_status_unread(self):
+        self.book_status.change_status('U')
+        self.book_status.refresh_from_db()
+        self.assertEqual(self.book_status.status, 'U')
+
+    def test_change_status_reading(self):
+        self.book_status.change_status('R')
+        self.book_status.refresh_from_db()
+        self.assertEqual(self.book_status.status, 'R')
+
+    def test_change_status_finished(self):
+        self.book_status.change_status('F')
+        self.book_status.refresh_from_db()
+        self.assertEqual(self.book_status.status, 'F')
 
     def test_valid_book_status(self):
         self._assert_book_status_is_valid()

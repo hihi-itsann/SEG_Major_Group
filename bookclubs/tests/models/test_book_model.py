@@ -21,6 +21,9 @@ class BookModelTestCase(TestCase):
         with self.assertRaises(ValidationError):
             self.book.full_clean()
 
+    def test_get_isbn(self):
+        (self.book.get_ISBN(), '0195153448')
+
     def test_valid_book(self):
         self._assert_book_is_valid()
 
