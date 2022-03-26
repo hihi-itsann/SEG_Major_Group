@@ -589,11 +589,9 @@ def unban_member(request, club_name, user_id):
 def remove_member(request, club_name, user_id):
     current_club = Club.objects.get(club_name=club_name)
     current_user_role = Role.objects.get(club=current_club, user = request.user).club_role
-    print(current_user_role)
     try:
         member = User.objects.get(id=user_id, club__club_name=current_club.club_name)
         member_role = Role.objects.get(club=current_club, user = member).club_role
-        print(member_role)
         if current_user_role=='MOD' and member_role=='MOD':
             messages.add_message(request, messages.WARNING, "Moderator can't remove each other!")
             return redirect('member_list', club_name)
