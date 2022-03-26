@@ -772,7 +772,6 @@ def show_book_recommendations(request, club_name):
     # get_club_books_average_rating()
     current_club=Club.objects.get(club_name=club_name)
     recommendations = get_recommendations(current_club.id)
-    print(recommendations)
     recommended_books = Book.objects.all().filter(ISBN__in=recommendations)
 
     # all_books = Book.objects.all()
