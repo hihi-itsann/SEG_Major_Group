@@ -42,15 +42,15 @@
                                              alt="Gravatar of {{ application.user.username }}" class="rounded-circle">
                                     </td>
                                     <td>{{ application.user.full_name }}</td>
-                                    <td><a href="{% url 'show_user' application.user.username %}">{{ application.user.username }}</a>
+                                    <td><a href="{% url 'show_user' application.user.username %}" style="color:#344E41">{{ application.user.username }}</a>
                                     </td>
                                     <td> {{ application.statement }}</td>
                                     <td> {{ application.created_at.date }}</td>
                                     <td>
-                                        <a href="{% url 'accept_applicant' current_club.club_name application.user.id %}">Accept</a>
+                                        <a href="{% url 'accept_applicant' current_club.club_name application.user.id %}" class="btn btn-normal">Accept</a>
                                     </td>
                                     <td>
-                                        <a href="{% url 'reject_applicant' current_club.club_name application.user.id %}">Reject</a>
+                                        <a href="{% url 'reject_applicant' current_club.club_name application.user.id %}" class="btn btn-submit">Reject</a>
                                     </td>
                                 </tr>
                             {% endfor %}
