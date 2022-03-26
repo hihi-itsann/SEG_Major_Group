@@ -1,72 +1,133 @@
+
 {% extends 'base_content.html' %}
+{% load static %}
+
 {% block title %}
 | Show Recommendations
 {% endblock %}
 
 {% block content %}
-    <style>
-        h1 {
-            padding: 5px;
-            text-align: left;
+<style>
+    h1 {
+        padding: 5px;
+        text-align: left;
 
-        }
+    }
 
-        h5 {
-            padding: 5px;
-            text-align: left;
+    h5 {
+        padding: 5px;
+        text-align: left;
 
-        }
+    }
 
-        table {
-            border-collapse: separate;
-            border-spacing: 0 15px;
-        }
+    table {
+        border-collapse: separate;
+        border-spacing: 0 15px;
+    }
 
-        td {
-            width: 150px;
-            text-align: left;
-            padding: 5px;
-        }
-    </style>
-    <div class="container">
-        <div class="row justify-content-between">
-            <h1> Recommended Books </h1>
-        </div>
-    </div>
+    td {
+        width: 150px;
+        text-align: left;
+        padding: 5px;
+    }
+    
+    
+</style>
+<div id="loading" name="loading">
+    <h1 class="text-center " name="loading-text">Loading book recommendations </h1> 
 
-    <div class="container">
-        <div class="row">
-            <div>
-
-                    <table>
-                        <thead>
-                        <tr>
-                            <th></th>
-                            <th>Title</th>
-                            <th>Author</th>
-                            <th>ISBN</th>
-                            <th></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for book in recommended_books %}
-                            <tr class="row_hover">
-                                <td>
-                                    <img src="{{ book.image_url_m }}">
-                                </td>
-                                <td>{{ book.title }}</td>
-                                <td>{{ book.author }}</td>
-                                <td> {{ book.ISBN }} </td>
-                                <td>
-                                        <a href="{% url 'create_meeting' club_name=club_name book_isbn=book.ISBN %}" class="btn btn-outline-dark">
-                                            Choose
-                                        </a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
+        <div class="text-center">
+            <div class="spinner-border" role="status">
             </div>
-        </div>
+          </div>
+          <div class="world" data-world>
+            <div class="score" data-score>0</div>
+            <div class="start-screen" data-start-screen>Press Any Key To Start</div>
+            <img src="{% static 'imgs/ground.png' %}" class="ground" data-ground>
+            <img src="{% static 'imgs/ground.png' %}" class="ground" data-ground>
+            <img src="{% static 'imgs/dino-stationary.png' %}" class="dino" data-dino>
+          </div>
     </div>
+   
+    
+    <div id="success" name="success">
+        
+    </div>
+    <script>
+        const spinner=document.getElementById("loading")
+        var list=document.getElementById("success")  
+        
+        $.ajax({
+            url: "{% url 'show_book_recommendations_show' club_name %}",
+            type: "GET",
+            dataType: 'json',
+            success: function (data){
+                document.getElementsByName("loading")[0].style.display="none";
+                var text=   `  
+                                <div class="container">
+                                            <div class="row justify-content-between">
+                                                <h1> Recommended Books </h1>
+                                            </div>
+                                        </div>`;
+                if(data.recommended_books.length != 0)
+                {
+                    
+                    text+=   `<div class="container">
+                                            <div class="row">
+                                                <div>   
+                                                    <table>
+                                                        <thead>
+                                                        <tr>
+                                                            <th></th>
+                                                            <th>Title</th>
+                                                            <th>Author</th>
+                                                            <th>ISBN</th>
+                                                            <th></th>
+                                                        </tr>
+                                                        </thead>`;
+                                 
+
+
+                    for (let i = 0; i < data.recommended_books.length; i++) 
+
+                    {
+                        bookISBN=data.recommended_books[i].ISBN ;
+                        text+=   ` <tr class="row_hover">
+                                                <td>
+                                                    <img src="`+data.recommended_books[i].image_url_m+`">
+                                                </td>
+                                                <td>`+data.recommended_books[i].title+`</td>
+                                                <td>`+data.recommended_books[i].author+`</td>
+                                                <td>`+bookISBN+`</td>
+                                                <td>
+                                                        <a href="{% url 'create_meeting' club_name=club_name book_isbn="`+bookISBN+`" %}" class="btn btn-outline-dark">
+                                                            Choose
+                                                        </a>
+                                                </td>
+                                            </tr>  `;
+
+                            } 
+
+                    text+=   `  </table>`;
+             
+                }  
+                else{
+                    text+=   `
+                         <p> The club has read all books</p>`;
+                }  
+                text+=   `
+
+                            </div>
+                        </div>
+                    </div>`  ;
+ 
+                list.innerHTML=text;
+
+            },
+            error: function(e){
+                console.log(e);
+            }
+        });
+       
+    </script>
 {% endblock %}

@@ -10,7 +10,7 @@ from libgravatar import Gravatar
 from django.db.models import Avg
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-
+import json
 
 class User(AbstractUser):
     userID = models.IntegerField(unique=True, null=True)
@@ -46,9 +46,7 @@ class User(AbstractUser):
     )
     meeting_preference = models.CharField(max_length=1, choices=MEETING_CHOICES, blank=True)
 
-    def get_rated_books(self):
-        return BookRatingReview.objects.all().filter(user=self)
-
+    
     class Meta:
         """Model options."""
 
@@ -110,7 +108,8 @@ class Book(models.Model):
 
     def get_ISBN(self):
         return self.ISBN
-
+    def toJson(self):
+        return json.dumps(self, default=lambda o: o.__dict__)
     @staticmethod
     def get_genres():
         genres = [('Fiction', 'Fiction'), ('Non-Fiction', 'Non-Fiction')]
@@ -529,11 +528,13 @@ class MeetingAttendance(models.Model):
 class ClubBookAverageRating(models.Model):
     club = models.ForeignKey(Club, on_delete=models.CASCADE)
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
-    rate = models.FloatField(default=0, validators=[MinValueValidator(0.0), MaxValueValidator(10.0)])
+    rate = models.FloatField(default=0)
     number_of_ratings = models.IntegerField()
 
     def add_rating(self, rate):
         self.rate += rate
+        self.save()
 
     def increment_number_of_ratings(self):
         self.number_of_ratings += 1
+        self.save()

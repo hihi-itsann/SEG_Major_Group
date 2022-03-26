@@ -8,7 +8,10 @@
     <link href="{% static 'custom.css' %}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
 
-    
+   <!--hidden game-->
+   <link href="{% static 'styles.css' %}" rel="stylesheet">
+   <script src="{% static 'scripts.js' %}" type="module"></script>
+   
     <script>
       function chooseStatus()
       {
@@ -23,14 +26,10 @@
 
         }
       }
-    </script> <script>
-      function openDetails()
-      {
-        var a = document.getElementById('a').value;
-        alert(a)
-      }
-    </script>
 
+    </script> 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  
     <title>
       Book Clubs
       {% block title %}

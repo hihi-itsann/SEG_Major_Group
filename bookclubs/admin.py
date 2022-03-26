@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import User, Application, Club, Role, Book, BookRatingReview, BookStatus, Vote, Comment, Post, Meeting, \
-    MeetingAttendance
+    MeetingAttendance,ClubBookAverageRating
 
 
 @admin.register(User)
@@ -76,4 +76,9 @@ class MeetingAdmin(admin.ModelAdmin):
 class MeetingAttendanceAdmin(admin.ModelAdmin):
     list_display = [
         'id', 'user', 'meeting', 'meeting_role'
+    ]
+@admin.register(ClubBookAverageRating)
+class ClubBookAverageRatingAdmin(admin.ModelAdmin):
+    list_display = [
+        'club', 'book', 'rate', 'number_of_ratings'
     ]

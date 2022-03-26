@@ -1,4 +1,6 @@
+from ntpath import join
 from django.core.management.base import BaseCommand, CommandError
+from bookclubs.meeting_link import create_zoom_meeting, get_join_link, get_start_link
 
 from bookclubs.models import User, Post, Comment, Club, Role, Book, BookRatingReview, Meeting, MeetingAttendance, \
     Application, ClubBookAverageRating
@@ -37,6 +39,7 @@ class Command(BaseCommand):
         self.faker = Faker('en_GB')
 
     def handle(self, *args, **options):
+        
         self.load_data_from_csv()
 
         self.create_books()
@@ -282,6 +285,10 @@ class Command(BaseCommand):
         print("Meeting seeding complete.      ")
 
     def create_meeting(self):
+
+        date = self.faker.future_date()
+        time_start = self.faker.time(pattern= '%H:%M')
+        duration = randint(15, 45)
         club = self.get_random_club()
         book = self.get_random_book()
         topic = self.faker.text(max_nb_chars=60)
@@ -289,11 +296,12 @@ class Command(BaseCommand):
         meeting_status = club.meeting_status
         if meeting_status == 'ONL':
             location = 'Meeting link to be created...'
+            create_zoom_meeting(date, time_start,duration)
+            join_link = get_join_link()
+            start_link = get_start_link()
+
         else:
             location = self.faker.street_name()
-        date = self.faker.past_datetime(start_date='-365d', tzinfo=pytz.UTC)
-        time_start = self.faker.time()
-        duration = randint(15, 45)
         meeting = Meeting.objects.create(
             club=club,
             book=book,
@@ -303,7 +311,9 @@ class Command(BaseCommand):
             location=location,
             date=date,
             time_start=time_start,
-            duration=duration
+            duration=duration,
+            join_link=join_link,
+            start_link=start_link
         )
 
     def get_random_club(self):

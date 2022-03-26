@@ -28,7 +28,7 @@ from django.core.paginator import Paginator
 from random import choice
 from bookclubs.meeting_link import create_zoom_meeting, get_join_link, get_start_link
 from datetime import datetime
-
+from bookclubs.recommender.keras import get_recommendations
 
 @login_prohibited
 def home(request):
@@ -467,10 +467,9 @@ def delete_club(request, club_name):
     current_club.delete()
     return feed(request)
 
-
-@membership_required
-@club_exists
 @login_required
+@club_exists
+@membership_required
 def leave_club(request, club_req):
     club = Club.objects.get(club_name=club_req)
     user = request.user
@@ -499,8 +498,7 @@ def update_club_info(request, club_name):
         if form.is_valid():
             club = form.save()
             return redirect('club_feed', club.club_name)
-    context = {'form': form, 'club_name': club_name}
-    return render(request, 'update_club_info.html', context)
+    return render(request, 'update_club_info.html', {'form': form, 'club_name': club_name})
 
 
 @login_required
@@ -590,9 +588,15 @@ def unban_member(request, club_name, user_id):
 @management_required
 def remove_member(request, club_name, user_id):
     current_club = Club.objects.get(club_name=club_name)
+    current_user_role = Role.objects.get(club=current_club, user = request.user).club_role
     try:
         member = User.objects.get(id=user_id, club__club_name=current_club.club_name)
-        current_club.remove_user_from_club(member)
+        member_role = Role.objects.get(club=current_club, user = member).club_role
+        if current_user_role=='MOD' and member_role=='MOD':
+            messages.add_message(request, messages.WARNING, "Moderator can't remove each other!")
+            return redirect('member_list', club_name)
+        else:
+            current_club.remove_user_from_club(member)
     except ObjectDoesNotExist:
         messages.add_message(request, messages.WARNING, "User doesn't exist")
         return redirect('member_list', club_name)
@@ -762,6 +766,8 @@ class DeleteCommentView(LoginRequiredMixin, DeleteView):
 
 
 #--------------------meeting functions-----------------------------------------
+import json
+from django.core.serializers.json import DjangoJSONEncoder
 
 @login_required
 @club_exists
@@ -769,25 +775,28 @@ class DeleteCommentView(LoginRequiredMixin, DeleteView):
 @not_last_host
 def show_book_recommendations(request, club_name):
     """Choose a book for the meeting"""
-    # get_club_books_average_rating()
-    # recommendations = get_recommendations(current_club.id)
-    # print(recommendations)
-    # recommended_books = Book.objects.all().filter(ISBN__in=recommendations)
+    return render(request, "show_book_recommendations.html",{'club_name':club_name})
 
-    all_books = Book.objects.all()
-    all_books_list = list(all_books)
-    randomly_selected_ISBNs = []
-    if len(all_books_list) < 10:
-        recommended_books = all_books
-    else:
-        for i in range(10):
-            random_book = choice(all_books_list)
-            randomly_selected_ISBNs.append(random_book.ISBN)
-            all_books_list.remove(random_book)
-        recommended_books = Book.objects.all().filter(ISBN__in=randomly_selected_ISBNs)
+@login_required
+@club_exists
+@membership_required
+@not_last_host 
+def show_book_recommendations_show(request, club_name):
+    """Choose a book for the meeting"""
+    current_club=Club.objects.get(club_name=club_name)
+    recommendations = get_recommendations(current_club.id)
 
-    return render(request, 'show_book_recommendations.html',
-                  {'recommended_books': recommended_books, 'club_name': club_name})
+    if len(recommendations)==0:
+        recommended_books=[]
+
+    else :
+        recommended_books = Book.objects.all().filter(ISBN__in=recommendations)
+   
+    data=dict()
+    data['recommended_books']=list(recommended_books.values())
+    data['club_name']=club_name
+    
+    return JsonResponse(data)
 
 
 @login_required
@@ -803,7 +812,6 @@ def create_meeting(request, club_name, book_isbn):
         if form.is_valid():
             join_link = None
             start_link = None
-            # create_meeting()
             if current_club.get_meeting_status() == "Online":
                 create_zoom_meeting(request.POST.get("date"), request.POST.get("time_start"),
                                     request.POST.get("duration"))
@@ -904,3 +912,4 @@ def edit_meeting(request, club_name, meeting_id):
             return redirect('show_meeting', club_name, meeting_id)
     return render(request, 'edit_meeting.html', {'form': form, 'club_name': club_name, 'club': current_club,
                                                  'meeting': meeting, 'meeting_id': meeting_id})
+
