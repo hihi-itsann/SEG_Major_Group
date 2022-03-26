@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.contrib.auth.hashers import check_password
 from bookclubs.forms import ClubForm
 from django.urls import reverse
-from bookclubs.models import Club, User, Book, Role
+from bookclubs.models import Club, User, Role
 from bookclubs.tests.helpers import reverse_with_next
 
 class UpdateClubViewTestCase(TestCase):
