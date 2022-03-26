@@ -6,7 +6,7 @@ from bookclubs.models import Club, User, Role
 from bookclubs.tests.helpers import reverse_with_next
 
 
-class BanFromClubViewTestCase(TestCase):
+class UnbanFromClubViewTestCase(TestCase):
 
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
@@ -23,21 +23,21 @@ class BanFromClubViewTestCase(TestCase):
         self.club3 =  Club.objects.get(club_name='private_in-person')
         self.club4 =  Club.objects.get(club_name='public_in-person')
         self._create_test_rols()
-        self.url = reverse('ban_from_club',kwargs={'club_name':self.club1.club_name, 'user_id': self.user2.id})
+        self.url = reverse('unban_from_club',kwargs={'club_name':self.club1.club_name, 'user_id': self.user3.id})
 
 
     def test_ban_from_club_url(self):
-        self.assertEqual(self.url, f'/club/{self.club1.club_name}/ban/{self.user2.id}/')
+        self.assertEqual(self.url, f'/club/{self.club1.club_name}/unban/{self.user3.id}/')
 
     def test_get_ban_from_club_redirects_when_not_logged_in(self):
         redirect_url = reverse_with_next('log_in', self.url)
         response = self.client.get(self.url)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
-    def test_successfully_ban_moderator_by_owner(self):
+    def test_successfully_unban_banner_by_owner(self):
         self.client.login(username=self.user.username, password='Password123')
         before_count = Role.objects.filter(club=self.club1).count()
-        self.assertEqual(self.club1.get_club_role(self.user2), 'MOD')
+        self.assertEqual(self.club1.get_club_role(self.user3), 'BAN')
         response = self.client.post(self.url, follow=True)
         response_url = reverse('member_list', kwargs={'club_name': self.club1.club_name})
         after_count = Role.objects.filter(club=self.club1).count()
@@ -47,20 +47,21 @@ class BanFromClubViewTestCase(TestCase):
             status_code=302, target_status_code=200,
             fetch_redirect_response=True
         )
-        self.assertEqual(self.club1.get_club_role(self.user2), 'BAN')
+        self.assertEqual(self.club1.get_club_role(self.user3), 'MEM')
         roles = Role.objects.filter(club=self.club1)
         member_list = []
         for i in roles:
             member_list.append(i.user)
-        self.assertIn(self.user2, member_list)
+        self.assertIn(self.user3, member_list)
         self.assertEqual(len(member_list),3)
 
 
-    def test_successfully_ban_member_by_owner(self):
+
+    def test_unsuccessfully_unban_member_by_owner(self):
         self.client.login(username=self.user.username, password='Password123')
         before_count = Role.objects.filter(club=self.club2).count()
         self.assertEqual(self.club2.get_club_role(self.user2), 'MEM')
-        self.url= reverse('ban_from_club',kwargs={'club_name':self.club2.club_name, 'user_id': self.user2.id})
+        self.url= reverse('unban_from_club',kwargs={'club_name':self.club2.club_name, 'user_id': self.user2.id})
         response = self.client.post(self.url, follow=True)
         response_url = reverse('member_list', kwargs={'club_name': self.club2.club_name})
         after_count = Role.objects.filter(club=self.club2).count()
@@ -70,7 +71,7 @@ class BanFromClubViewTestCase(TestCase):
             status_code=302, target_status_code=200,
             fetch_redirect_response=True
         )
-        self.assertEqual(self.club2.get_club_role(self.user2), 'BAN')
+        self.assertEqual(self.club2.get_club_role(self.user2), 'MEM')
         roles = Role.objects.filter(club=self.club2)
         member_list = []
         for i in roles:
@@ -79,11 +80,11 @@ class BanFromClubViewTestCase(TestCase):
         self.assertEqual(len(member_list),3)
 
 
-    def test_unsuccessfully_ban_owner_by_owner(self):
+    def test_unsuccessfully_unban_owner_by_owner(self):
         self.client.login(username=self.user.username, password='Password123')
         before_count = Role.objects.filter(club=self.club2).count()
         self.assertEqual(self.club2.get_club_role(self.user), 'OWN')
-        self.url= reverse('ban_from_club',kwargs={'club_name':self.club2.club_name, 'user_id': self.user.id})
+        self.url= reverse('unban_from_club',kwargs={'club_name':self.club2.club_name, 'user_id': self.user.id})
         response = self.client.post(self.url, follow=True)
         response_url = reverse('member_list', kwargs={'club_name': self.club2.club_name})
         after_count = Role.objects.filter(club=self.club2).count()
@@ -102,22 +103,22 @@ class BanFromClubViewTestCase(TestCase):
         self.assertEqual(len(member_list),3)
 
 
-    def test_unsuccessfully_ban_banner_by_owner(self):
+    def test_unsuccessfully_unban_moderator_by_owner(self):
         self.client.login(username=self.user.username, password='Password123')
-        before_count = Role.objects.filter(club=self.club3).count()
-        self.assertEqual(self.club3.get_club_role(self.user2), 'BAN')
-        self.url= reverse('ban_from_club',kwargs={'club_name':self.club3.club_name, 'user_id': self.user2.id})
+        before_count = Role.objects.filter(club=self.club1).count()
+        self.assertEqual(self.club1.get_club_role(self.user2), 'MOD')
+        self.url= reverse('unban_from_club',kwargs={'club_name':self.club1.club_name, 'user_id': self.user2.id})
         response = self.client.post(self.url, follow=True)
-        response_url = reverse('member_list', kwargs={'club_name': self.club3.club_name})
-        after_count = Role.objects.filter(club=self.club3).count()
+        response_url = reverse('member_list', kwargs={'club_name': self.club1.club_name})
+        after_count = Role.objects.filter(club=self.club1).count()
         self.assertEqual(before_count,after_count)
         self.assertRedirects(
             response, response_url,
             status_code=302, target_status_code=200,
             fetch_redirect_response=True
         )
-        self.assertEqual(self.club3.get_club_role(self.user2), 'BAN')
-        roles = Role.objects.filter(club=self.club3)
+        self.assertEqual(self.club1.get_club_role(self.user2), 'MOD')
+        roles = Role.objects.filter(club=self.club1)
         member_list = []
         for i in roles:
             member_list.append(i.user)
@@ -125,11 +126,11 @@ class BanFromClubViewTestCase(TestCase):
         self.assertEqual(len(member_list),3)
 
 
-    def test_unsuccessfully_ban_moderator_by_moderator(self):
+    def test_unsuccessfully_unban_banner_by_moderator(self):
         self.client.login(username=self.user2.username, password='Password123')
         before_count = Role.objects.filter(club=self.club1).count()
-        self.assertEqual(self.club1.get_club_role(self.user3), 'MOD')
-        self.url= reverse('ban_from_club',kwargs={'club_name':self.club1.club_name, 'user_id': self.user3.id})
+        self.assertEqual(self.club1.get_club_role(self.user3), 'BAN')
+        self.url= reverse('unban_from_club',kwargs={'club_name':self.club1.club_name, 'user_id': self.user3.id})
         response = self.client.post(self.url, follow=True)
         response_url = reverse('club_feed', kwargs={'club_name': self.club1.club_name})
         after_count = Role.objects.filter(club=self.club1).count()
@@ -139,7 +140,7 @@ class BanFromClubViewTestCase(TestCase):
             status_code=302, target_status_code=200,
             fetch_redirect_response=True
         )
-        self.assertEqual(self.club1.get_club_role(self.user3), 'MOD')
+        self.assertEqual(self.club1.get_club_role(self.user3), 'BAN')
         roles = Role.objects.filter(club=self.club1)
         member_list = []
         for i in roles:
@@ -148,11 +149,11 @@ class BanFromClubViewTestCase(TestCase):
         self.assertEqual(len(member_list),3)
 
 
-    def test_unsuccessfully_ban_member_by_member(self):
+    def test_unsuccessfully_unban_banner_by_member(self):
         self.client.login(username=self.user2.username, password='Password123')
         before_count = Role.objects.filter(club=self.club2).count()
-        self.assertEqual(self.club2.get_club_role(self.user3), 'MEM')
-        self.url= reverse('ban_from_club',kwargs={'club_name':self.club2.club_name, 'user_id': self.user3.id})
+        self.assertEqual(self.club2.get_club_role(self.user3), 'BAN')
+        self.url= reverse('unban_from_club',kwargs={'club_name':self.club2.club_name, 'user_id': self.user3.id})
         response = self.client.post(self.url, follow=True)
         response_url = reverse('club_feed', kwargs={'club_name': self.club2.club_name})
         after_count = Role.objects.filter(club=self.club2).count()
@@ -162,7 +163,7 @@ class BanFromClubViewTestCase(TestCase):
             status_code=302, target_status_code=200,
             fetch_redirect_response=True
         )
-        self.assertEqual(self.club2.get_club_role(self.user3), 'MEM')
+        self.assertEqual(self.club2.get_club_role(self.user3), 'BAN')
         roles = Role.objects.filter(club=self.club2)
         member_list = []
         for i in roles:
@@ -171,14 +172,14 @@ class BanFromClubViewTestCase(TestCase):
         self.assertEqual(len(member_list),3)
 
 
-    def test_unsuccessfully_ban_baner_by_banner(self):
+    def test_unsuccessfully_unban_banner_by_banner(self):
         self.client.login(username=self.user2.username, password='Password123')
         before_count = Role.objects.filter(club=self.club3).count()
-        self.assertEqual(self.club3.get_club_role(self.user3), 'BAN')
-        self.url= reverse('ban_from_club',kwargs={'club_name':self.club3.club_name, 'user_id': self.user3.id})
+        self.assertEqual(self.club1.get_club_role(self.user3), 'BAN')
+        self.url= reverse('unban_from_club',kwargs={'club_name':self.club3.club_name, 'user_id': self.user3.id})
         response = self.client.post(self.url, follow=True)
         response_url = reverse('feed')
-        after_count = Role.objects.filter(club=self.club3).count()
+        after_count = Role.objects.filter(club=self.club1).count()
         self.assertEqual(before_count,after_count)
         self.assertRedirects(
             response, response_url,
@@ -194,10 +195,10 @@ class BanFromClubViewTestCase(TestCase):
         self.assertEqual(len(member_list),3)
 
 
-    def test_unsuccessfully_ban_member_by_user_not_in_club(self):
+    def test_unsuccessfully_unban_banner_by_user_not_in_club(self):
         self.client.login(username=self.user2.username, password='Password123')
         before_count = Role.objects.filter(club=self.club4).count()
-        self.assertEqual(self.club4.get_club_role(self.user3), 'MEM')
+        self.assertEqual(self.club4.get_club_role(self.user3), 'BAN')
         self.url= reverse('ban_from_club',kwargs={'club_name':self.club4.club_name, 'user_id': self.user3.id})
         response = self.client.post(self.url, follow=True)
         response_url = reverse('feed')
@@ -208,7 +209,7 @@ class BanFromClubViewTestCase(TestCase):
             status_code=302, target_status_code=200,
             fetch_redirect_response=True
         )
-        self.assertEqual(self.club4.get_club_role(self.user3), 'MEM')
+        self.assertEqual(self.club4.get_club_role(self.user3), 'BAN')
         roles = Role.objects.filter(club=self.club4)
         member_list = []
         for i in roles:
@@ -217,10 +218,10 @@ class BanFromClubViewTestCase(TestCase):
         self.assertEqual(len(member_list),2)
 
 
-    def test_unsuccessfully_ban_member_not_in_club(self):
+    def test_unsuccessfully_unban_baner_who_is_not_in_club(self):
         self.client.login(username=self.user.username, password='Password123')
         before_count = Role.objects.filter(club=self.club4).count()
-        self.url= reverse('ban_from_club',kwargs={'club_name':self.club4.club_name, 'user_id': 7})
+        self.url= reverse('unban_from_club',kwargs={'club_name':self.club4.club_name, 'user_id': 7})
         response = self.client.post(self.url, follow=True)
         response_url = reverse('member_list', kwargs={'club_name': self.club4.club_name})
         after_count = Role.objects.filter(club=self.club4).count()
@@ -232,11 +233,10 @@ class BanFromClubViewTestCase(TestCase):
         )
 
 
-
-    def test_unsuccessfully_ban_not_exist_club(self):
+    def test_unsuccessfully_unban_not_exist_club(self):
         self.client.login(username=self.user.username, password='Password123')
         before_count = Role.objects.all().count()
-        self.url= reverse('ban_from_club',kwargs={'club_name':'bab_club', 'user_id': self.user2.id})
+        self.url= reverse('unban_from_club',kwargs={'club_name':'bab_club', 'user_id': self.user2.id})
         response = self.client.post(self.url, follow=True)
         response_url = reverse('feed')
         after_count = Role.objects.all().count()
@@ -298,13 +298,13 @@ class BanFromClubViewTestCase(TestCase):
         Role.objects.create(
             club = self.club1,
             user = self.user3,
-            club_role = 'MOD',
+            club_role = 'BAN',
             )
 
         Role.objects.create(
             club = self.club2,
             user = self.user3,
-            club_role = 'MEM',
+            club_role = 'BAN',
             )
 
         Role.objects.create(
@@ -316,5 +316,5 @@ class BanFromClubViewTestCase(TestCase):
         Role.objects.create(
             club = self.club4,
             user = self.user3,
-            club_role = 'MEM',
+            club_role = 'BAN',
             )
