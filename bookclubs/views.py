@@ -645,6 +645,7 @@ def promote_member(request, club_name, user_id):
     else:
         return redirect('member_list', club_name)
 
+
 @login_required
 @club_exists
 @membership_required

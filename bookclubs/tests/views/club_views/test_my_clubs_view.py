@@ -5,7 +5,7 @@ from django.urls import reverse
 from bookclubs.models import Club, User, Role
 from bookclubs.tests.helpers import reverse_with_next
 
-class UpdateClubViewTestCase(TestCase):
+class MyClubViewTestCase(TestCase):
 
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
