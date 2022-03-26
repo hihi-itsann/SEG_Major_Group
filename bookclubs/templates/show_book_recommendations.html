@@ -1,4 +1,7 @@
+
 {% extends 'base_content.html' %}
+{% load static %}
+
 {% block title %}
 | Show Recommendations
 {% endblock %}
@@ -37,7 +40,15 @@
             <div class="spinner-border" role="status">
             </div>
           </div>
+          <div class="world" data-world>
+            <div class="score" data-score>0</div>
+            <div class="start-screen" data-start-screen>Press Any Key To Start</div>
+            <img src="{% static 'imgs/ground.png' %}" class="ground" data-ground>
+            <img src="{% static 'imgs/ground.png' %}" class="ground" data-ground>
+            <img src="{% static 'imgs/dino-stationary.png' %}" class="dino" data-dino>
+          </div>
     </div>
+   
     
     <div id="success" name="success">
         
@@ -51,7 +62,7 @@
             type: "GET",
             dataType: 'json',
             success: function (data){
-                document.getElementsByName("loading")[0].style.visibility="hidden";
+                document.getElementsByName("loading")[0].style.display="none";
                 var text=   `  
                                 <div class="container">
                                             <div class="row justify-content-between">

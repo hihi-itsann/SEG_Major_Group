@@ -909,3 +909,4 @@ def edit_meeting(request, club_name, meeting_id):
             return redirect('show_meeting', club_name, meeting_id)
     return render(request, 'edit_meeting.html', {'form': form, 'club_name': club_name, 'club': current_club,
                                                  'meeting': meeting, 'meeting_id': meeting_id})
+
