@@ -42,19 +42,19 @@ urlpatterns = [
     path('reading_book_list/<str:book_genre>/', views.reading_book_list, name='reading_book_list'),
 
     # Club Views
-    path('club/<str:club_name>/feed/', views.club_feed, name='club_feed'),
-    path('club_list/', views.club_list, name='club_list'),
     path('my_clubs/', views.my_clubs, name='my_clubs'),
+    path('club_list/', views.club_list, name='club_list'),
     path('create_club/', views.create_club, name='create_club'),
-    path('club/<str:club_name>/delete/', views.delete_club, name='delete_club'),
+    path('club/<str:club_name>/feed/', views.club_feed, name='club_feed'),
     path('club/<str:club_name>/leave_club/', views.leave_club, name='leave_club'),
     path('club/<str:club_name>/update_club_info/', views.update_club_info, name='update_club_info'),
+    path('club/<str:club_name>/transfer_ownership/<int:user_id>/', views.transfer_ownership, name='transfer_ownership'),
+    path('club/<str:club_name>/delete/', views.delete_club, name='delete_club'),
     path('club/<str:club_name>/promote/<int:user_id>/', views.promote_member, name='promote_member'),
     path('club/<str:club_name>/demote/<int:user_id>/', views.demote_moderator, name='demote_moderator'),
     path('club/<str:club_name>/remove/<int:user_id>/', views.remove_member, name='remove_from_club'),
     path('club/<str:club_name>/ban/<int:user_id>/', views.ban_member, name='ban_from_club'),
     path('club/<str:club_name>/unban/<int:user_id>/', views.unban_member, name='unban_from_club'),
-    path('club/<str:club_name>/transfer_ownership/<int:user_id>/', views.transfer_ownership, name='transfer_ownership'),
     path('club/<str:club_name>/member_list/', views.member_list, name='member_list'),
 
 

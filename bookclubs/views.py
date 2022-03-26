@@ -29,7 +29,7 @@ from random import choice
 from bookclubs.meeting_link import create_zoom_meeting, get_join_link, get_start_link
 from datetime import datetime
 from bookclubs.recommender.keras import get_recommendations
-from django.template.loader import render_to_string
+
 @login_prohibited
 def home(request):
     return render(request, 'home.html')
@@ -467,10 +467,9 @@ def delete_club(request, club_name):
     current_club.delete()
     return feed(request)
 
-
-@membership_required
-@club_exists
 @login_required
+@club_exists
+@membership_required
 def leave_club(request, club_req):
     club = Club.objects.get(club_name=club_req)
     user = request.user
@@ -499,8 +498,7 @@ def update_club_info(request, club_name):
         if form.is_valid():
             club = form.save()
             return redirect('club_feed', club.club_name)
-    context = {'form': form, 'club_name': club_name}
-    return render(request, 'update_club_info.html', context)
+    return render(request, 'update_club_info.html', {'form': form, 'club_name': club_name})
 
 
 @login_required
@@ -590,9 +588,15 @@ def unban_member(request, club_name, user_id):
 @management_required
 def remove_member(request, club_name, user_id):
     current_club = Club.objects.get(club_name=club_name)
+    current_user_role = Role.objects.get(club=current_club, user = request.user).club_role
     try:
         member = User.objects.get(id=user_id, club__club_name=current_club.club_name)
-        current_club.remove_user_from_club(member)
+        member_role = Role.objects.get(club=current_club, user = member).club_role
+        if current_user_role=='MOD' and member_role=='MOD':
+            messages.add_message(request, messages.WARNING, "Moderator can't remove each other!")
+            return redirect('member_list', club_name)
+        else:
+            current_club.remove_user_from_club(member)
     except ObjectDoesNotExist:
         messages.add_message(request, messages.WARNING, "User doesn't exist")
         return redirect('member_list', club_name)
@@ -808,7 +812,6 @@ def create_meeting(request, club_name, book_isbn):
         if form.is_valid():
             join_link = None
             start_link = None
-            # create_meeting()
             if current_club.get_meeting_status() == "Online":
                 create_zoom_meeting(request.POST.get("date"), request.POST.get("time_start"),
                                     request.POST.get("duration"))

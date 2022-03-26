@@ -1,6 +1,4 @@
 from datetime import datetime
-from lib2to3.pytree import type_repr
-from os import system
 import pandas as pd
 import numpy as np
 from zipfile import ZipFile
@@ -10,7 +8,6 @@ from tensorflow.keras import layers
 from pathlib import Path
 import matplotlib.pyplot as plt
 from keras import backend as K
-from tensorflow.keras.applications import ResNet50
 import numpy as np
 from bookclubs.models import Book, ClubBookAverageRating, Club,BookRatingReview
 csv_ratings = pd.read_csv('bookclubs/dataset/BX-Book-Ratings.csv', sep = ';', quotechar = '"', encoding = 'latin-1',header = 0 )
