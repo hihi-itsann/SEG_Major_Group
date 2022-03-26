@@ -498,8 +498,7 @@ def update_club_info(request, club_name):
         if form.is_valid():
             club = form.save()
             return redirect('club_feed', club.club_name)
-    context = {'form': form, 'club_name': club_name}
-    return render(request, 'update_club_info.html', context)
+    return render(request, 'update_club_info.html', {'form': form, 'club_name': club_name})
 
 
 @login_required
