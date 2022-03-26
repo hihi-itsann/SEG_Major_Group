@@ -77,6 +77,7 @@ urlpatterns = [
 
     # Meeting Views
     path('club/<str:club_name>/meeting/show_books/', views.show_book_recommendations, name='show_book_recommendations'),
+    path('club/<str:club_name>/meeting/show_books/show', views.show_book_recommendations_show, name='show_book_recommendations_show'),
     path('club/<str:club_name>/meeting/book/<str:book_isbn>/create/', views.create_meeting, name='create_meeting'),
     path('club/<str:club_name>/meeting_list/', views.meeting_list, name='meeting_list'),
     path('club/<str:club_name>/meeting/<int:meeting_id>/', views.show_meeting, name='show_meeting'),

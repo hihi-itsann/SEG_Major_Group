@@ -9,7 +9,7 @@ from libgravatar import Gravatar
 from django.db.models import Avg
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-
+import json
 
 class User(AbstractUser):
     userID = models.IntegerField(unique=True, null=True)
@@ -107,7 +107,8 @@ class Book(models.Model):
 
     def get_ISBN(self):
         return self.ISBN
-
+    def toJson(self):
+        return json.dumps(self, default=lambda o: o.__dict__)
     @staticmethod
     def get_genres():
         genres = [('Fiction', 'Fiction'), ('Non-Fiction', 'Non-Fiction')]
