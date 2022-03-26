@@ -1,3 +1,5 @@
+from datetime import date, timedelta
+
 from django.test import TestCase
 from django.urls import reverse
 
@@ -41,7 +43,7 @@ class MeetingListViewTestCase(TestCase):
             description='delta foxtrot golf hotel india',
             meeting_status='OFF',
             location='Bush House',
-            date='2024-04-01',
+            date=date.today() + timedelta(days=4),
             time_start='10:00',
             duration=60
         )
@@ -52,7 +54,7 @@ class MeetingListViewTestCase(TestCase):
             description='delta foxtrot golf hotel india',
             meeting_status='OFF',
             location='Bush House',
-            date='2024-04-01',
+            date=date.today() + timedelta(days=5),
             time_start='10:00',
             duration=60
         )

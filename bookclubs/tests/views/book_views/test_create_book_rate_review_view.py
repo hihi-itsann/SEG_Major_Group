@@ -57,3 +57,5 @@ class CreateBookRateViewTestCase(TestCase):
         self.assertEqual(after_count, before_count + 1)
         book = Book.objects.get(ISBN='0195153448')
         self.assertTemplateUsed(response, 'show_book.html')
+        response_url = '{}#education'.format(reverse('show_book',kwargs={'ISBN': self.book.ISBN}))
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)

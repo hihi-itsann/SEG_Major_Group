@@ -81,8 +81,7 @@ class ClubModelTestCase(TestCase):
         Application.objects.create(user=self.member, club=self.club, statement="Joined and was banned", status='A')
         Role.objects.create(user=self.member, club=self.club, club_role='BAN')
         self.club.unban_member(self.member)
-        self.assertEqual(Role.objects.filter(club=self.club, user=self.member).count(), 0)
-        self.assertEqual(Application.objects.filter(club=self.club, user=self.member).count(), 0)
+        self.assertEqual(Role.objects.filter(club=self.club, user=self.member).count(), 1)
 
     def test_transfer_ownership_on_member(self):
         ownership = Role.objects.get(club=self.club, user=self.owner)
@@ -101,3 +100,29 @@ class ClubModelTestCase(TestCase):
         self.assertEqual(moderating.club_role, 'OWN')
         self.assertEqual(ownership.club_role, 'MOD')
 
+    def test_remove_user_from_club_on_owner(self):
+        ownership = Role.objects.get(club=self.club, user=self.owner)
+        self.club.remove_user_from_club(self.owner)
+        ownership.refresh_from_db()
+        self.assertEqual(ownership.club_role, 'OWN')
+
+    def test_remove_user_from_club(self):
+        Application.objects.create(user=self.member, club=self.club, statement='Accepted', status='A')
+        self.club.remove_user_from_club(self.member)
+        self.assertEqual(Role.objects.filter(club=self.club, user=self.member).count(), 0)
+        self.assertEqual(Application.objects.filter(club=self.club, user=self.member).count(), 0)
+
+    def test_get_moderators(self):
+        self.assertIn(self.moderator, self.club.get_moderators())
+
+    def test_get_management(self):
+        self.assertIn(self.moderator, self.club.get_management())
+        self.assertIn(self.owner, self.club.get_management())
+
+    def test_get_banned_members(self):
+        self.membership.delete()
+        Role.objects.create(user=self.member, club=self.club, club_role='BAN')
+        self.assertIn(self.member, self.club.get_banned_members())
+
+    def test_get_owner(self):
+        self.assertIn(self.owner, self.club.get_owner())

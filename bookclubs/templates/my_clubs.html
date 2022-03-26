@@ -17,8 +17,9 @@
             {% if clubs %}
                 <h1><b>My Clubs</b></h1>
                 <div style="text-align: right">
-                                <button type="button" class="btn btn-outline-dark"><a
-                                        href="{% url 'club_list' %}">Explore More</a></button>
+                    <a class="btn btn-submit" href="{% url 'club_list' %}">
+                      Explore More
+                    </a>
                 </div>
                 <br>
                 <div class="club">
@@ -29,21 +30,26 @@
                          {{ club.club.club_name }}
                       </h1>
                       <div class="card-body">
-                        <p>What do we do? - {{ club.club.description }}</p>
-                        <p>Number of Members: {{ club.club.club_members.count }}</p>
+                        <p><b>What do we do?</b> - {{ club.club.description }}</p>
+                        <p><b>Number of Members:</b> {{ club.club.club_members.count }}</p>
                         <a href='{% url 'club_feed' club_name=club.club.club_name %}'
-                                 class="btn btn-outline-dark">
+                                 class="btn btn-submit">
                               View club
                           </a>
+                          <a href='{% url 'leave_club' club_name=club.club.club_name %}'
+                                   class="btn btn-submit">
+                                Leave club
+                            </a>
+
                       </div>
                     </div>
                     {% endfor %}
                   </div>
                 </div>
             {% else %}
-                <h1>You haven't joined any club yet!</h1>
-                <p>Click <a href='{% url 'club_list'  %}'>here</a> to apply to one of our clubs
-                    or <a href="{% url 'create_club' %}">here</a> to create a new club.</p>
+                <h1 style="color:#344E41">You haven't joined any club yet!</h1>
+                <p style="color:#344E41">Click <a href='{% url 'club_list'  %}' style="color:#ffb703">here</a> to apply to one of our clubs
+                    or <a href="{% url 'create_club' %}" style="color:#ffb703">here</a> to create a new club.</p>
             {% endif %}
         </div>
 {% endblock %}

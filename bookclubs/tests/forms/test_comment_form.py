@@ -10,12 +10,16 @@ class CommentFormTestCase(TestCase):
         super(TestCase, self).setUp()
         self.user = User.objects.get(username='@johndoe')
 
+    def test_form_contains_required_fields(self):
+        form = CommentForm()
+        self.assertIn('body', form.fields)
+
     def test_valid_comment_form(self):
         input = {'body': 'x'*520 }
         form = CommentForm(data=input)
         self.assertTrue(form.is_valid())
 
-    def test_invalid_post_form(self):
+    def test_invalid_comment_form(self):
         input = {'body': 'x'*521 }
         form = CommentForm(data=input)
         self.assertFalse(form.is_valid())

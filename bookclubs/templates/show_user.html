@@ -6,16 +6,7 @@
 {% block content %}
 <div class="container">
   <div class="row content">
-    <div class="col-xs-12 col-lg-6 col-xl-4">
       {% include 'partials/user_profile.html' %}
-        <table>
-        <thead><th scope="col">User belongs to:</th></thead>
-
-        {% for club in user.get_clubs %}
-            <tr><td>{{ club.club_name }}</td></tr>
-        {% endfor %}
-    </table>
-    </div>
-  </div>
 </div>
+
 {% endblock %}
