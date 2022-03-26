@@ -47,50 +47,18 @@
                         </div>
                       </div>
                     </td>
-                    {% for member in club_members %}
-                        <tr>
-                            <td>{{ member.full_name }}</td>
-                            <td>{{ member.username }}</td>
-                            {% if current_user_role == 'MOD' %}
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td>
-                                    <a class="btn btn-outline-dark" href="{% url 'remove_from_club' club_name=club.club_name  user_id=member.id %}">Remove</a>
-                                </td>
-                                {% if is_ban %}
-                                  <td>
-                                      <a class="btn btn-submit" href="{% url 'unban' club_name=club.club_name  user_id=member.id %}">Unban</a>
-                                  </td>
-                                {% endif %}
-                                {% elif current_user_role == 'OWN' %}
-                                <td>
-                                    <a class="btn btn-outline-dark" href="{% url 'promote_member' club_name=club.club_name  user_id=member.id %}">Promote</a>
-                                </td>
-                                <td>
-                                    <a class="btn btn-outline-dark" href="{% url 'remove_from_club' club_name=club.club_name  user_id=member.id %}">Remove</a>
-                                </td>
-                                <td>
-                                    <a class="btn btn-outline-dark" href="{% url 'transfer_ownership' club_name=club.club_name  user_id=member.id %}">Transfer Ownership</a>
-                                </td>
-                                <td>
-                                    <a class="btn btn-outline-dark" style="background-color: lightcoral" href="{% url 'ban_from_club' club_name=club.club_name  user_id=member.id %}">Ban</a>
-                                </td>
-                                {% if is_ban %}
-                                  <td>
-                                      <a class="btn btn-submit" href="{% url 'unban' club_name=club.club_name  user_id=member.id %}">Unban</a>
-                                  </td>
-                                {% endif %}
-                                <td></td>
-                                {% else %}
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            {% endif %}
-                        </tr>
-                    {% endfor %}
-                  {% endfor %}
+                    {% if is_owner %}
+                    <td>
+                      <a class="btn btn-outline-dark" href="{% url 'remove_from_club' club_name=club.club_name  user_id=member.id %}">Remove</a>
+                      <a class="btn btn-submit" href="{% url 'unban' club_name=club.club_name  user_id=member.id %}">Unban</a>
+                      <a class="btn btn-outline-dark" href="{% url 'promote_member' club_name=club.club_name  user_id=member.id %}">Promote</a>
+                      <a class="btn btn-outline-dark" href="{% url 'remove_from_club' club_name=club.club_name  user_id=member.id %}">Remove</a>
+                      <a class="btn btn-outline-dark" href="{% url 'transfer_ownership' club_name=club.club_name  user_id=member.id %}">Transfer Ownership</a>
+                      <a class="btn btn-outline-dark" style="background-color: lightcoral" href="{% url 'ban_from_club' club_name=club.club_name  user_id=member.id %}">Ban</a>
+                    </td>
+                    {% endif %}
+                  </tr>
+                {% endfor %}
               </tbody>
             </table>
         </div>
