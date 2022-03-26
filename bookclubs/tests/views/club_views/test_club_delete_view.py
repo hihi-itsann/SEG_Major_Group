@@ -5,7 +5,7 @@ from bookclubs.models import Club, User, Role
 from bookclubs.tests.helpers import reverse_with_next
 
 
-class ClubFeedViewTestCase(TestCase):
+class ClubDeleteViewTestCase(TestCase):
 
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
