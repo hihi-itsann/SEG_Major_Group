@@ -4,11 +4,15 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container">
+    <div class="container" style="padding-bottom: 50px">
         <div class="row justify-content-between">
             <h1 class="col-5">
                 Applicants:
             </h1>
+            <div style="text-align: right">
+                <a class="btn btn-outline-dark"
+                        href="{% url 'member_list' club_name=current_club.club_name %}">See Members</a>
+            </div>
         </div>
     </div>
     <div class="container">

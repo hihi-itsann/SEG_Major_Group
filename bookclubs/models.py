@@ -1,6 +1,6 @@
 import datetime
 import traceback
-
+from django.contrib import messages
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator, MinLengthValidator, MinValueValidator, MaxValueValidator
 from django.db import models
@@ -45,9 +45,7 @@ class User(AbstractUser):
     )
     meeting_preference = models.CharField(max_length=1, choices=MEETING_CHOICES, blank=True)
 
-    def get_rated_books(self):
-        return BookRatingReview.objects.all().filter(user=self)
-
+    
     class Meta:
         """Model options."""
 
@@ -120,7 +118,8 @@ class Book(models.Model):
                     genres.append((book.genre.title(), book.genre.title()))
                 genres = list(set(genres))
         except:
-            print(traceback.format_exc())
+            # print(traceback.format_exc())
+            print("Genres are being set to the default of Fiction and Non-Fiction until books are added to the system.")
         finally:
             return genres
 
@@ -295,9 +294,10 @@ class Club(models.Model):
         """Unban a banned user, they can now re-apply to join the club."""
         role = Role.objects.get(club=self, user=user)
         if role.club_role == 'BAN':
-            if Application.objects.filter(user=user, club=self).count() == 1:
-                Application.objects.get(user=user, club=self).delete()
-            role.delete()
+            role.club_role = 'MEM'
+            role.save()
+            return
+        else:
             return
 
     def transfer_ownership(self, old_owner, new_owner):
@@ -309,6 +309,9 @@ class Club(models.Model):
             new_owner_role.save()
             old_owner_role.club_role = 'MOD'
             old_owner_role.save()
+            return
+
+        else:
             return
 
     def remove_user_from_club(self, user):
@@ -350,6 +353,12 @@ class Club(models.Model):
         else:
             return 'In-Person'
 
+    def get_public_status(self):
+        if self.public_status == 'PRI':
+            return 'Private'
+        else:
+            return 'Public'
+
 
 class Role(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -365,7 +374,11 @@ class Role(models.Model):
         max_length=3,
         choices=RoleOptions.choices,
         default=RoleOptions.MEMBER,
+        # unique=True,
     )
+
+    class Meta:
+        unique_together = ('user', 'club')
 
     def get_club_role(self):
         return self.RoleOptions(self.club_role).name.title()
@@ -375,15 +388,16 @@ class Post(models.Model):
 
     title = models.CharField(max_length=255)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    body = models.TextField()
+    club = models.ForeignKey(Club, on_delete=models.CASCADE)
+    body = models.CharField(max_length=520, blank=False)
     post_date = models.DateField(auto_now_add=True)
     post_datetime = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        ordering = ['-post_date', '-post_datetime']
+
     def __str__(self):
         return self.title + ' | ' + str(self.author)
-
-    def get_absolute_url(self):
-        return reverse('feed')
 
     def toggle_upvote(self, user):
         if Vote.objects.filter(post=self, user=user).count() == 1:
@@ -431,9 +445,6 @@ class Comment(models.Model):
     body = models.CharField(max_length=520, blank=False)
     related_post = models.ForeignKey(Post, related_name="comments", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-
-    def get_absolute_url(self):
-        return reverse('feed')
 
     class Meta:
         ordering = ['-created_at']
@@ -515,11 +526,13 @@ class MeetingAttendance(models.Model):
 class ClubBookAverageRating(models.Model):
     club = models.ForeignKey(Club, on_delete=models.CASCADE)
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
-    rate = models.FloatField(default=0, validators=[MinValueValidator(0.0), MaxValueValidator(10.0)])
+    rate = models.FloatField(default=0)
     number_of_ratings = models.IntegerField()
 
     def add_rating(self, rate):
         self.rate += rate
+        self.save()
 
     def increment_number_of_ratings(self):
         self.number_of_ratings += 1
+        self.save()
