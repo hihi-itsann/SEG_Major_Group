@@ -1,3 +1,6 @@
+from datetime import datetime
+from lib2to3.pytree import type_repr
+from os import system
 import pandas as pd
 import numpy as np
 from zipfile import ZipFile
@@ -8,52 +11,55 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 from keras import backend as K
 from tensorflow.keras.applications import ResNet50
-#from dkeras import dKeras
 import numpy as np
-#import ray
 from bookclubs.models import Book, ClubBookAverageRating, Club,BookRatingReview
+csv_ratings = pd.read_csv('bookclubs/dataset/BX-Book-Ratings.csv', sep = ';', quotechar = '"', encoding = 'latin-1',header = 0 )
+csv_ratings = csv_ratings.loc[csv_ratings["Book-Rating"] != 0]
 
-def get_club_books_average_rating():
+def get_club_books_average_rating(clubID):
     """ Saves the average rating of books read by users of each club (banned member are not included) """
-    clubs=Club.objects.all()
-    for club in clubs:
-        members=club.get_moderators()|club.get_members()|club.get_management()
-        for user in members:
-            ratings=BookRatingReview.objects.all().filter(user=user)
-            for rating in ratings:
-                clubBookRating=ClubBookAverageRating.objects.all().filter(club=club,book=rating.book)
-                if clubBookRating:
-                    clubBookRating.get().add_rating(clubBookRating.get().rate)
-                    clubBookRating.get().increment_number_of_ratings()
-                else:
-                    ClubBookAverageRating.objects.create(
-                        club=club,
-                        book=rating.book,
-                        rate=rating.rate,
-                        number_of_ratings=1
-                    )
+    club=Club.objects.get(id=clubID)
+    members=club.get_moderators()|club.get_members()|club.get_management()
+    for user in members:
+        ratings=BookRatingReview.objects.all().filter(user=user)
+        for rating in ratings:
+            clubBookRating=ClubBookAverageRating.objects.all().filter(club=club,book=rating.book)
+            if clubBookRating:
+                clubBookRating.get().add_rating(clubBookRating.get().rate)
+                clubBookRating.get().increment_number_of_ratings()
+            else:
+                ClubBookAverageRating.objects.create(
+                    club=club,
+                    book=rating.book,
+                    rate=rating.rate,
+                    number_of_ratings=1
+                )
 
-def get_data_for_recommendations():
+def get_data_for_recommendations(clubID):
     ClubBookAverageRating.objects.all().delete()
 
-    get_club_books_average_rating()
-    ratings = pd.DataFrame(list(ClubBookAverageRating.objects.all().values()))
+    get_club_books_average_rating(clubID)
+    club_ratings = pd.DataFrame(list(ClubBookAverageRating.objects.all().values()))
     books = pd.DataFrame(list(Book.objects.all().values()))
-    ratings['Book-Rating']=ratings['rate']/ratings['number_of_ratings']
+    club_ratings['Book-Rating']=club_ratings['rate']/club_ratings['number_of_ratings']
+    club_ratings['ISBN']=club_ratings['book_id']
+    club_ratings['User-ID']=club_ratings['club_id']
+    club_ratings=club_ratings.drop(columns=['id', 'club_id','book_id','rate','number_of_ratings'])
+    ratings = pd.DataFrame(list(BookRatingReview.objects.all().values()))
+    ratings['Book-Rating']=ratings['rate']
     ratings['ISBN']=ratings['book_id']
-    ratings['User-ID']=ratings['club_id']
+    ratings['User-ID']=ratings['user_id']
+    ratings=ratings.drop(columns=['id', 'user_id','book_id','rate','review','created_at'])
+
+    ratings=pd.concat([club_ratings, csv_ratings,ratings])
     return (ratings, books)
 
 def train():
-    ratings = pd.read_csv('bookclubs/dataset/BX-Book-Ratings.csv', sep = ';', quotechar = '"', encoding = 'latin-1',header = 0 )
-    books = pd.read_csv('bookclubs/dataset/BX-Books.csv', sep = ';', quotechar = '"', encoding = 'latin-1',header = 0 )
-    ratings = ratings.loc[ratings["Book-Rating"] != 0]
-    get_model(ratings)
+    get_model(csv_ratings)
 
 def get_model(ratings):
     user_ids = ratings["User-ID"].unique().tolist()
     user2user_encoded = {x: i for i, x in enumerate(user_ids)}
-    userencoded2user = {i: x for i, x in enumerate(user_ids)}
     book_ids = ratings["ISBN"].unique().tolist()
     book2book_encoded = {x: i for i, x in enumerate(book_ids)}
     book_encoded2book = {i: x for i, x in enumerate(book_ids)}
@@ -63,22 +69,10 @@ def get_model(ratings):
     num_users = len(user2user_encoded)
     num_books = len(book_encoded2book)
     ratings["rating"] = ratings["Book-Rating"].values.astype(np.float32)
-    # min and max ratings will be used to normalize the ratings later
-    min_rating = min(ratings["rating"])
-    max_rating = max(ratings["rating"])
-
-    # print(
-    #     "Number of users: {}, Number of Books: {}, Min rating: {}, Max rating: {}".format(
-    #         num_users, num_books, min_rating, max_rating
-    #     )
-    # )
-
+  
     ratings = ratings.sample(frac=1, random_state=42)
     x = ratings[["user", "book"]].values
-    # Normalize the targets between 0 and 1. Makes it easy to train.
-    # y = ratings["rating"].apply(lambda x: (x - min_rating) / (max_rating - min_rating)).values
     y = ratings["rating"].values
-    # Assuming training on 90% of the data and validating on 10%.
     train_indices = int(0.6 * ratings.shape[0])
     x_train, x_val, y_train, y_val = (
         x[:train_indices],
@@ -118,9 +112,7 @@ def get_model(ratings):
             book_vector = self.book_embedding(inputs[:, 1])
             book_bias = self.book_bias(inputs[:, 1])
             dot_user_book = tf.tensordot(user_vector, book_vector, 2)
-            # Add all the components (including bias)
             x = dot_user_book + user_bias + book_bias
-            # The sigmoid activation forces the rating to between 0 and 1
             return tf.nn.sigmoid(x)
 
 
@@ -129,7 +121,7 @@ def get_model(ratings):
     model.compile(optimizer = "adam", loss = tf.keras.losses.MeanSquaredError(),
                   metrics =[tf.keras.metrics.TopKCategoricalAccuracy(k=1), tf.keras.metrics.RootMeanSquaredError()])
 
-    history = model.fit(
+    model.fit(
         x=x_train,
         y=y_train,
         batch_size=65536,
@@ -141,23 +133,22 @@ def get_model(ratings):
 
 def get_recommendations(userID):
 
+
     train()
-    (ratings, books)=get_data_for_recommendations()
+    (ratings, books)=get_data_for_recommendations(userID)
+
     (model,user2user_encoded,book2book_encoded,book_encoded2book)=get_model(ratings)
    
 
     user_id = np.int64(userID)
 
     books_watched_by_user = ratings[ratings['User-ID'] == user_id]
-    # print(len(books_watched_by_user))
-    # if (len(books_watched_by_user) == 0) :
-    #     return []
+    
 
     books_not_watched = books[
         ~books["ISBN"].isin(books_watched_by_user.ISBN.values)
     ]["ISBN"]
 
-    #this means that club has read all books so there is no book to recommend
     if len(books_not_watched) == 0:
         return []
     books_not_watched = list(
@@ -179,12 +170,7 @@ def get_recommendations(userID):
     ]
     
 
-
-    # print("----" * 8)
-    # print("Top 10 book recommendations")
-    # print("----" * 8)
     recommended_books = books[books["ISBN"].isin(recommended_book_ids)]
-    
-    print(recommended_books['ISBN'])
+
     return recommended_books['ISBN']
 
