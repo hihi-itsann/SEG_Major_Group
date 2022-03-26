@@ -106,6 +106,7 @@ class MemberListViewTestCase(TestCase):
             status_code=302, target_status_code=200,
             fetch_redirect_response=True
         )
+        
 
     def test_unsuccessfully_get_member_list_of_non_exist_club(self):
         self.client.login(username=self.user2.username, password='Password123')
