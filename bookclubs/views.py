@@ -767,16 +767,16 @@ from django.core.serializers.json import DjangoJSONEncoder
 
 @login_required
 @club_exists
-#@membership_required
-#@not_last_host
+@membership_required
+@not_last_host
 def show_book_recommendations(request, club_name):
     """Choose a book for the meeting"""
     return render(request, "show_book_recommendations.html",{'club_name':club_name})
 
 @login_required
 @club_exists
-#@membership_required
-#@not_last_host 
+@membership_required
+@not_last_host 
 def show_book_recommendations_show(request, club_name):
     """Choose a book for the meeting"""
     current_club=Club.objects.get(club_name=club_name)
