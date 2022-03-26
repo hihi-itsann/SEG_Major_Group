@@ -588,9 +588,17 @@ def unban_member(request, club_name, user_id):
 @management_required
 def remove_member(request, club_name, user_id):
     current_club = Club.objects.get(club_name=club_name)
+    current_user_role = Role.objects.get(club=current_club, user = request.user).club_role
+    print(current_user_role)
     try:
         member = User.objects.get(id=user_id, club__club_name=current_club.club_name)
-        current_club.remove_user_from_club(member)
+        member_role = Role.objects.get(club=current_club, user = member).club_role
+        print(member_role)
+        if current_user_role=='MOD' and member_role=='MOD':
+            messages.add_message(request, messages.WARNING, "Moderator can't remove each other!")
+            return redirect('member_list', club_name)
+        else:
+            current_club.remove_user_from_club(member)
     except ObjectDoesNotExist:
         messages.add_message(request, messages.WARNING, "User doesn't exist")
         return redirect('member_list', club_name)
