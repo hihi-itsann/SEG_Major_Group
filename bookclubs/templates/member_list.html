@@ -49,14 +49,23 @@
                     </td>
                     {% if is_owner %}
                     <td>
-                      <a class="btn btn-outline-dark" href="{% url 'remove_from_club' club_name=club.club_name  user_id=role.user.id %}">Remove</a>
-                      <a class="btn btn-submit" href="{% url 'unban_from_club' club_name=club.club_name  user_id=role.user.id %}">Unban</a>
+                      {% if role.club_role == 'MOD' %}
+                        <a class="btn btn-outline-dark" href="{% url 'transfer_ownership' club_name=club.club_name  user_id=role.user.id %}">Transfer Ownership</a>
+                        <a class="btn btn-outline-dark" href="{% url 'demote_moderator' club_name=club.club_name  user_id=role.user.id %}">demote</a>
+                        <a class="btn btn-outline-dark" href="{% url 'remove_from_club' club_name=club.club_name  user_id=role.user.id %}">Remove</a>
+                        <a class="btn btn-outline-dark" style="background-color: lightcoral" href="{% url 'ban_from_club' club_name=club.club_name  user_id=role.user.id %}">Ban</a>
+
+                      {% elif role.club_role == 'BAN' %}
+                        <a class="btn btn-submit" href="{% url 'unban_from_club' club_name=club.club_name  user_id=role.user.id %}">Unban</a>
+                        <a class="btn btn-outline-dark" href="{% url 'remove_from_club' club_name=club.club_name  user_id=role.user.id %}">Remove</a>
+
+                      {% elif role.club_role == 'MEM' %}
                       <a class="btn btn-outline-dark" href="{% url 'promote_member' club_name=club.club_name  user_id=role.user.id %}">Promote</a>
                       <a class="btn btn-outline-dark" href="{% url 'remove_from_club' club_name=club.club_name  user_id=role.user.id %}">Remove</a>
-                      <a class="btn btn-outline-dark" href="{% url 'transfer_ownership' club_name=club.club_name  user_id=role.user.id %}">Transfer Ownership</a>
                       <a class="btn btn-outline-dark" style="background-color: lightcoral" href="{% url 'ban_from_club' club_name=club.club_name  user_id=role.user.id %}">Ban</a>
-                    </td>
                     {% endif %}
+                  {% endif %}
+                    </td>
                   </tr>
                 {% endfor %}
               </tbody>

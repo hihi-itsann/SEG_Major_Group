@@ -656,7 +656,7 @@ def promote_member(request, club_name, user_id):
 @membership_required
 def member_list(request, club_name):
     is_owner=False
-    is_ban = False
+    is_banned = False
     is_moderator = False
     current_club = Club.objects.get(club_name=club_name)
     current_user = request.user
@@ -667,7 +667,7 @@ def member_list(request, club_name):
         is_ban = True
     if current_user_role == 'MOD':
         is_moderator = True
-    roles = Role.objects.filter(club=current_club).exclude(club_role='BAN')
+    roles = Role.objects.filter(club=current_club)
     roles_num= roles.count()
     club_owner = Role.objects.get(club=current_club, club_role='OWN').user
     moderator_ids = Role.objects.filter(club=current_club, club_role='MOD').values_list('user', flat=True)
@@ -780,7 +780,7 @@ def show_book_recommendations(request, club_name):
 @login_required
 @club_exists
 @membership_required
-@not_last_host 
+@not_last_host
 def show_book_recommendations_show(request, club_name):
     """Choose a book for the meeting"""
     current_club=Club.objects.get(club_name=club_name)
@@ -791,11 +791,11 @@ def show_book_recommendations_show(request, club_name):
 
     else :
         recommended_books = Book.objects.all().filter(ISBN__in=recommendations)
-   
+
     data=dict()
     data['recommended_books']=list(recommended_books.values())
     data['club_name']=club_name
-    
+
     return JsonResponse(data)
 
 
@@ -912,4 +912,3 @@ def edit_meeting(request, club_name, meeting_id):
             return redirect('show_meeting', club_name, meeting_id)
     return render(request, 'edit_meeting.html', {'form': form, 'club_name': club_name, 'club': current_club,
                                                  'meeting': meeting, 'meeting_id': meeting_id})
-

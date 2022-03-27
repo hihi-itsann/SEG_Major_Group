@@ -46,7 +46,7 @@ class User(AbstractUser):
     )
     meeting_preference = models.CharField(max_length=1, choices=MEETING_CHOICES, blank=True)
 
-    
+
     class Meta:
         """Model options."""
 
@@ -307,10 +307,10 @@ class Club(models.Model):
         new_owner_role = Role.objects.get(club=self, user=new_owner)
         old_owner_role = Role.objects.get(club=self, user=old_owner)
         if old_owner_role.club_role == 'OWN' and new_owner_role.club_role == 'MOD':
-            new_owner_role.club_role = 'OWN'
-            new_owner_role.save()
             old_owner_role.club_role = 'MOD'
             old_owner_role.save()
+            new_owner_role.club_role = 'OWN'
+            new_owner_role.save()
             return
 
         else:
