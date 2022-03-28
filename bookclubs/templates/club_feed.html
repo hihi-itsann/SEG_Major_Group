@@ -23,7 +23,7 @@
                     </div>
                     <h5 class="w-75 mx-auto mb-3"  style="color:#ff9f1c">{{ club.description }} </h5>
                     <div class="d-flex justify-content-center">
-                      {% if is_owner %}
+                      {% if is_owner or is_moderator%}
                       <ul>
                           <a href='{% url 'update_club_info' club.club_name %}'
                                  class="btn btn-outline-dark">
@@ -35,8 +35,6 @@
                           </a>
                           <a href='{% url 'application_list' club.club_name %}'
                                  class="btn btn-outline-dark">View Applicants List</a>
-                          <a href='{% url 'show_book_recommendations_show' club.club_name %}'
-                                  class="btn btn-outline-dark">Show book recommendation</a>
                         </ul>
                       {% endif %}
                     </div>
@@ -44,6 +42,9 @@
                     <div class="d-flex justify-content-center">
                     <a href='{% url 'member_list' club.club_name %}'
                            class="btn btn-outline-dark">View Member List</a>
+                    <br>
+                    <a href='{% url 'show_book_recommendations' club.club_name %}'
+                            class="btn btn-outline-dark">Show book recommendation</a>
                   </div>
                   </div>
                   <div class="border-bottom py-4 text-center">
