@@ -23,7 +23,7 @@
                     </div>
                     <h5 class="w-75 mx-auto mb-3"  style="color:#ff9f1c">{{ club.description }} </h5>
                     <div class="d-flex justify-content-center">
-                      {% if is_owner or is_moderator%}
+                      {% if is_owner%}
                       <ul>
                           <a href='{% url 'update_club_info' club.club_name %}'
                                  class="btn btn-outline-dark">
