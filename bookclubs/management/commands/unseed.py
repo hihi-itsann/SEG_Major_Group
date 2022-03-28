@@ -7,6 +7,7 @@ class Command(BaseCommand):
     help = 'Empties the database'
 
     def handle(self, *args, **options):
+        print(f'Unseeding started...', end='\r')
         if ClubBookAverageRating.objects.all().count() > 0:
             print(f'Unseeding ClubBookAverageRating...', end='\r')
             ClubBookAverageRating.objects.all().delete()
@@ -51,5 +52,6 @@ class Command(BaseCommand):
             print(f'Unseeding Book...', end='\r')
             Book.objects.all().delete()
             print(f'Unseeded Book.')
+        print('Unseeding finished.')
 
 
