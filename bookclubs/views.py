@@ -30,6 +30,7 @@ from bookclubs.meeting_link import create_zoom_meeting, get_join_link, get_start
 from datetime import datetime
 from bookclubs.recommender.keras import get_recommendations
 
+
 @login_prohibited
 def home(request):
     return render(request, 'home.html')
@@ -173,7 +174,7 @@ class PasswordView(LoginRequiredMixin, FormView):
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
 
-#----------------------------------book functions-----------------------------------
+# ----------------------------------book functions-----------------------------------
 
 class BookListView(LoginRequiredMixin, ListView):
     """View that shows a list of all books"""
@@ -317,7 +318,7 @@ def reading_book_list(request, book_genre='All'):
     return render(request, 'reading_book_list.html', args)
 
 
-#--------------------------application functions---------------------------------
+# --------------------------application functions---------------------------------
 
 
 @login_required
@@ -419,11 +420,7 @@ def reject_applicant(request, club_name, user_id):
     return redirect(f'/club/{club_name}/applications/')
 
 
-
-
-
-
-#----------------------------club functions---------------------------------------
+# ----------------------------club functions---------------------------------------
 
 @login_required
 @club_exists
@@ -442,7 +439,7 @@ def club_feed(request, club_name):
         is_moderator = True
     return render(request, 'club_feed.html',
                   {'club': current_club, 'is_moderator': is_moderator, 'is_owner': is_owner, 'members': members,
-                   'management': management, 'posts':posts})
+                   'management': management, 'posts': posts})
 
 
 @login_required
@@ -466,6 +463,7 @@ def delete_club(request, club_name):
     current_club = Club.objects.get(club_name=club_name)
     current_club.delete()
     return feed(request)
+
 
 @login_required
 @club_exists
@@ -494,7 +492,7 @@ def update_club_info(request, club_name):
     club = Club.objects.get(club_name=club_name)
     form = ClubForm(instance=club)
     if request.method == 'POST':
-        form =  ClubForm(request.POST,instance=club)
+        form = ClubForm(request.POST, instance=club)
         if form.is_valid():
             club = form.save()
             return redirect('club_feed', club.club_name)
@@ -551,7 +549,6 @@ def club_list(request):
                                               'is_suitable_clubs': is_suitable_clubs})
 
 
-
 @login_required
 @club_exists
 @owner_required
@@ -566,6 +563,7 @@ def ban_member(request, club_name, user_id):
         return redirect('member_list', club_name)
     else:
         return redirect('member_list', club_name)
+
 
 @login_required
 @club_exists
@@ -588,11 +586,11 @@ def unban_member(request, club_name, user_id):
 @management_required
 def remove_member(request, club_name, user_id):
     current_club = Club.objects.get(club_name=club_name)
-    current_user_role = Role.objects.get(club=current_club, user = request.user).club_role
+    current_user_role = Role.objects.get(club=current_club, user=request.user).club_role
     try:
         member = User.objects.get(id=user_id, club__club_name=current_club.club_name)
-        member_role = Role.objects.get(club=current_club, user = member).club_role
-        if current_user_role=='MOD' and member_role=='MOD':
+        member_role = Role.objects.get(club=current_club, user=member).club_role
+        if current_user_role == 'MOD' and member_role == 'MOD':
             messages.add_message(request, messages.WARNING, "Moderator can't remove each other!")
             return redirect('member_list', club_name)
         else:
@@ -651,24 +649,22 @@ def promote_member(request, club_name, user_id):
     else:
         return redirect('member_list', club_name)
 
+
 @login_required
 @club_exists
 @membership_required
 def member_list(request, club_name):
-    is_owner=False
-    is_banned = False
+    is_owner = False
     is_moderator = False
     current_club = Club.objects.get(club_name=club_name)
     current_user = request.user
     current_user_role = Role.objects.get(club=current_club, user=current_user).club_role
     if current_user_role == 'OWN':
         is_owner = True
-    if current_user_role == 'BAN':
-        is_ban = True
     if current_user_role == 'MOD':
         is_moderator = True
     roles = Role.objects.filter(club=current_club)
-    roles_num= roles.count()
+    roles_num = roles.count()
     club_owner = Role.objects.get(club=current_club, club_role='OWN').user
     moderator_ids = Role.objects.filter(club=current_club, club_role='MOD').values_list('user', flat=True)
     club_moderators = User.objects.filter(id__in=moderator_ids)
@@ -678,12 +674,12 @@ def member_list(request, club_name):
     club_banned = User.objects.filter(id__in=banned_ids)
     context = {'club': current_club, 'current_user': current_user, 'current_user_role': current_user_role,
                'club_owner': club_owner, 'club_moderators': club_moderators, 'club_members': club_members,
-               'club_banned': club_banned, 'is_owner':is_owner, 'roles':roles, 'roles_num':roles_num}
+               'club_banned': club_banned, 'is_owner': is_owner, 'is_moderator': is_moderator, 'roles': roles,
+               'roles_num': roles_num}
     return render(request, 'member_list.html', context)
 
 
-
-#-----------------------post and comment functions-------------------------------
+# -----------------------post and comment functions-------------------------------
 
 
 @login_required
@@ -752,7 +748,6 @@ class CreateCommentView(LoginRequiredMixin, CreateView):
         return reverse('club_feed', kwargs={'club_name': club.club_name})
 
 
-
 class DeleteCommentView(LoginRequiredMixin, DeleteView):
     model = Comment
     template_name = 'delete_comment.html'
@@ -764,10 +759,10 @@ class DeleteCommentView(LoginRequiredMixin, DeleteView):
         return reverse('club_feed', kwargs={'club_name': club.club_name})
 
 
-
-#--------------------meeting functions-----------------------------------------
+# --------------------meeting functions-----------------------------------------
 import json
 from django.core.serializers.json import DjangoJSONEncoder
+
 
 @login_required
 @club_exists
@@ -775,7 +770,8 @@ from django.core.serializers.json import DjangoJSONEncoder
 @not_last_host
 def show_book_recommendations(request, club_name):
     """Choose a book for the meeting"""
-    return render(request, "show_book_recommendations.html",{'club_name':club_name})
+    return render(request, "show_book_recommendations.html", {'club_name': club_name})
+
 
 @login_required
 @club_exists
@@ -783,18 +779,18 @@ def show_book_recommendations(request, club_name):
 @not_last_host
 def show_book_recommendations_show(request, club_name):
     """Choose a book for the meeting"""
-    current_club=Club.objects.get(club_name=club_name)
+    current_club = Club.objects.get(club_name=club_name)
     recommendations = get_recommendations(current_club.id)
 
-    if len(recommendations)==0:
-        recommended_books=[]
+    if len(recommendations) == 0:
+        recommended_books = []
 
-    else :
+    else:
         recommended_books = Book.objects.all().filter(ISBN__in=recommendations)
 
-    data=dict()
-    data['recommended_books']=list(recommended_books.values())
-    data['club_name']=club_name
+    data = dict()
+    data['recommended_books'] = list(recommended_books.values())
+    data['club_name'] = club_name
 
     return JsonResponse(data)
 
