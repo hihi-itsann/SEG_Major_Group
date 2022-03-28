@@ -13,6 +13,8 @@ class UserModelTestCase(TestCase):
 
     def setUp(self):
         self.user = User.objects.get(username='@johndoe')
+        self.user_two = User.objects.get(username='@janedoe')
+        self.user_three = User.objects.get(username='@Alexdoe')
 
     def _assert_user_is_valid(self):
         try:
@@ -243,6 +245,14 @@ class UserModelTestCase(TestCase):
     # test for full_name method
     def test_get_full_name(self):
         self.assertEqual("John Doe", self.user.full_name())
+
+    # tet for get_pronouns
+    def test_get_pronouns(self):
+        self.assertEqual(self.user.get_pronouns(), 'he/ him')
+
+        self.assertEqual(self.user_two.get_pronouns(), 'she/ her')
+
+        self.assertEqual(self.user_three.get_pronouns(), 'they/ them (consult for other pronouns)')
 
     # test for gravatar
     def test_gravatar(self):

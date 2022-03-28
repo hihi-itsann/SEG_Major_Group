@@ -20,6 +20,9 @@ class PostModelTestCase(TestCase):
             body="The quick brown fox jumps over the lazy dog."
         )
 
+    def test_to_string(self):
+        self.assertEqual(self.post.__str__(), f'{self.post.title} | {self.post.author}')
+
     def test_valid_comment(self):
         try:
             self.post.full_clean()
