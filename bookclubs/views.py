@@ -353,8 +353,9 @@ def edit_application(request, club_name):
     """Deletes current application and replaces it with another application with updated statement"""
     club_applied = Club.objects.get(club_name=club_name)
     application = Application.objects.get(user=request.user, club=club_applied)
-    form = ApplicationForm(request.POST, instance=application)
+    form = ApplicationForm(instance=application)
     if request.method == 'POST':
+        form = ApplicationForm(request.POST, instance=application)
         if form.is_valid():
             form.save()
             messages.add_message(request, messages.SUCCESS, "Application edited successfully!")
@@ -900,8 +901,9 @@ def edit_meeting(request, club_name, meeting_id):
     """Edit details of meeting"""
     current_club = Club.objects.get(club_name=club_name)
     meeting = Meeting.objects.get(id=meeting_id)
-    form = MeetingForm(request.POST, instance=meeting)
+    form = MeetingForm(instance=meeting)
     if request.method == 'POST':
+        form = MeetingForm(request.POST, instance=meeting)
         if form.is_valid():
             form.save()
             messages.add_message(request, messages.SUCCESS, "Meeting edited successfully!")
