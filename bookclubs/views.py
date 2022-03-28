@@ -792,6 +792,10 @@ def show_book_recommendations_show(request, club_name):
     data = dict()
     data['recommended_books'] = list(recommended_books.values())
     data['club_name'] = club_name
+    # books=Book.objects.all().filter(ISBN='0060914068')
+    # data = dict()
+    # data['recommended_books'] = list(books.values())
+    # data['club_name'] = club_name
 
     return JsonResponse(data)
 
