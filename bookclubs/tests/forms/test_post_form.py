@@ -9,6 +9,17 @@ class PostFormTestCase(TestCase):
     def setUp(self):
         super(TestCase, self).setUp()
         self.user = User.objects.get(username='@johndoe')
+        self.form_input = {
+            'title' : 'this is a title.',
+            'author' : self.user,
+            body="The quick brown fox jumps over the lazy dog."
+        }
+
+    def test_post_must_not_be_blank(self):
+        self.form_input['title'] = ''
+        self.form_input['body'] = ''
+        form = PostForm(data=self.form_input)
+        self.assertFalse(form_is_valid())
 
     def test_form_contains_required_fields(self):
         form = PostForm()
