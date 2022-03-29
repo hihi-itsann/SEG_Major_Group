@@ -317,9 +317,7 @@ def reading_book_list(request, book_genre='All'):
     args = {'unreadBooks': unreadBooks, 'readingBooks': readingBooks, 'finishedBooks': finishedBooks, 'genres': genres}
     return render(request, 'reading_book_list.html', args)
 
-
 # --------------------------application functions---------------------------------
-
 
 @login_required
 @club_exists

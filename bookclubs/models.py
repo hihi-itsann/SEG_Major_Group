@@ -81,7 +81,13 @@ class User(AbstractUser):
         applicant_clubs = Application.objects.filter(user=self, status='P').values_list('club', flat=True)
         return Club.objects.filter(id__in=applicant_clubs)
 
+    def get_upvoted_posts(self):
+        posts_upvoted = Vote.objects.filter(user=self, vote_type=True).values_list('post', flat=True)
+        return Post.objects.filter(id__in=posts_upvoted)
 
+    def get_downvoted_posts(self):
+        posts_downvoted = Vote.objects.filter(user=self, vote_type=False).values_list('post', flat=True)
+        return Post.objects.filter(id__in=posts_downvoted)
 
 class Book(models.Model):
     ISBN = models.CharField(
@@ -388,7 +394,7 @@ class Role(models.Model):
 
 class Post(models.Model):
 
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=255, blank=False)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     club = models.ForeignKey(Club, on_delete=models.CASCADE)
     body = models.CharField(max_length=520, blank=False)
@@ -406,11 +412,12 @@ class Post(models.Model):
             vote = Vote.objects.get(post=self, user=user)
             if vote.vote_type == True:
                 vote.delete()
+                return 'i.fa.upvotes-green'
             else:
                 vote.delete()
-                Vote.objects.create(post=self, user=user, vote_type=True)
+                Vote.objects.create(post=self, user=user, vote_type= True)
         else:
-            Vote.objects.create(post=self, user=user, vote_type=True)
+            Vote.objects.create(post=self, user=user, vote_type= True)
 
     def toggle_downvote(self, user):
         if Vote.objects.filter(post=self, user=user).count() == 1:
@@ -419,24 +426,23 @@ class Post(models.Model):
                 vote.delete()
             else:
                 vote.delete()
-                Vote.objects.create(post=self, user=user, vote_type=False)
+                Vote.objects.create(post=self, user=user, vote_type= False)
 
         else:
-            Vote.objects.create(post=self, user=user, vote_type=False)
+            Vote.objects.create(post=self, user=user, vote_type= False)
 
     def get_upvotes(self):
-        return Vote.objects.filter(post=self, vote_type=True).count()
+        return Vote.objects.filter(post=self, vote_type= True).count()
 
     def get_downvotes(self):
-        return Vote.objects.filter(post=self, vote_type=False).count()
-
-
+        return Vote.objects.filter(post=self, vote_type= False).count()
 
 
 class Vote(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='post_vote')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_vote')
     vote_type = models.BooleanField()
+
 
     class Meta:
         unique_together = ('user', 'post')
