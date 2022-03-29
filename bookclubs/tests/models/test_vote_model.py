@@ -11,7 +11,7 @@ class VoteModelTestCase(TestCase):
     ]
 
     def setUp(self):
-        self.user = User.objects.get(Username='@johndoe')
+        self.user = User.objects.get(username='@johndoe')
         self.club = Club.objects.get(club_name='private_online')
         self.post = Post.objects.create(
             title="this is a title.",
@@ -25,4 +25,18 @@ class VoteModelTestCase(TestCase):
             vote_type=True
         )
 
-    # def test_valid_vote(self):
+    def test_valid_vote(self):
+        try:
+            self.vote.full_clean()
+        except:
+            self.fail("Test vote should be valid")
+
+    def test_author_must_not_be_blank(self):
+        self.vote.user = None
+        with self.assertRaises(ValidationError):
+            self.vote.full_clean()
+
+    def test_post_must_not_be_blank(self):
+        self.vote.post = None
+        with self.assertRaises(ValidationError):
+            self.vote.full_clean()
