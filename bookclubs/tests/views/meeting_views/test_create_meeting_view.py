@@ -25,23 +25,24 @@ class CreateMeetingViewTestCase(TestCase):
     def setUp(self):
         self.owner = User.objects.get(username='@johndoe')
         self.user = User.objects.get(username='@janedoe')
-        self.club = Club.objects.get(club_name='private_online')
+        self.club = Club.objects.get(club_name='private_in-person')
+        self.online_club = Club.objects.get(club_name='private_online')
         self.book = Book.objects.get(ISBN="0195153448")
         self.another_book = Book.objects.get(ISBN='0002005018')
         self.url = reverse(self.VIEW, kwargs={'club_name': self.club.club_name, 'book_isbn': self.book.ISBN})
         Role.objects.create(user=self.owner, club=self.club, club_role='OWN')
         self.form_input = {
-            'club': self.club,
-            'book': self.book,
+            # 'club': self.club,
+            # 'book': self.book,
             'topic': 'alpha bravo charlie',
             'description': 'delta foxtrot golf hotel india',
-            'meeting_status': 'OFF',
+            # 'meeting_status': self.club.meeting_status,
             'location': 'Bush House',
             'date': date.today() + timedelta(days=5),
             'time_start': '10:00',
-            'duration': 60,
-            'join_link': '',
-            'start_link': ''
+            'duration': 30,
+            # 'join_link': '',
+            # 'start_link': ''
         }
 
     def log_in(self, user):
