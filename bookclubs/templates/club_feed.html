@@ -53,93 +53,93 @@
                       <h4 style="color:#ff9f1c">Meeting Status: {{ club.get_meeting_status }}</h4><br>
                       <h4 style="color:#ff9f1c">Public Status: {{ club.get_public_status }}</h4><br>
 
-                      {% if user.is_authenticated %}
-                        <a href="{% url 'create_post' club.pk%}" class="btn btn-outline-dark">Create Post</a>
-                      {% endif %}
-                    </div>
-                  </div>
+              {% if user.is_authenticated %}
+              <a href="{% url 'create_post' club.pk%}" class="btn btn-outline-dark">Create Post</a>
+              {% endif %}
+            </div>
+          </div>
 
-                </div>
-                <div class="col-lg-8">
-                  <div class="profile-feed">
-                    <div class="d-flex align-items-start profile-feed-item">
-                        <h1 style="color:#3A5A40">POSTs</h1>
-                        <ul>
-                        {% for post in posts%}
-
-                        <div class="post" id={{post.id}}>
-                          <div class="ui fluid card">
-                            <div class="content">
-
-                              <div class="right floated meta">
-                                <div class="ui grid">
-                                  <div class="row" style="color:#344E41">
-                                    <b><u>{{ post.title }}</u> - <i>{{ post.author }}</i> {{ post.post_date }} {{ post.post_datetime }}</b>
-                                  </div>
-                                </div>
-                              </div>
-
-                             <div class="content">
-                                <p style="color:#344E41">  {{ post.body }} </p>
-
-                                <div class="card-action">
-          <a href="{% url 'post_upvote' post.id %}"><i id="upvotes" class="fa fa-thumbs-up" style="color:green" fill="currentColor"></i></a>{{ post.get_upvotes }}
-          <a href="{% url 'post_downvote' post.id %}"><i id="downvote" class="fa fa-thumbs-down" style="color:red" fill="currentColor"></i></a>{{ post.get_downvotes }}
-          {% for post_upvoted in user.get_upvoted_posts %}
-          {% if post == post_upvoted %}
-          <p style="font-size:small"> You have upvoted this post </p>
-          {% endif %}
-          {% endfor %}
-          {% for post_downvoted in user.get_downvoted_posts %}
-          {% if post == post_downvoted %}
-          <p style="font-size:small"> You have downvoted this post </p>
-          {% endif %}
-          {% endfor %}
         </div>
+        <div class="col-lg-8">
+          <div class="profile-feed">
+            <div class="d-flex align-items-start profile-feed-item">
+              <h1 style="color:#3A5A40">POSTs</h1>
+              <ul>
+                {% for post in posts%}
 
-                                <small>
-                                    {% if user.is_authenticated %}
-                                      <a href="{% url 'create_comment' post.pk%}" style="color:#A3B18A">(Comment on this post)</a>
-                                      {% if user.id == post.author.id or is_owner%}
-                                        <a href="{% url 'delete_post' post.pk %}" style="color:#A3B18A">(Delete this post)</a>
-                                      {% endif %}
-                                    {% endif %}
-                                </small>
+                <div class="post" id={{post.id}}>
+                  <div class="ui fluid card">
+                    <div class="content">
 
-                                <br/>
-                                  {% if not post.comments.all %}
-                                      <b style="color:#ff9f1c">No Comments Yet</b>
-                                  {% else %}
-                                      <b style="color:#ff9f1c">Comments:</b>
-                                      <br/>
-                                      {% for comment in post.comments.all%}
-                                          <b><i style="color:#344E41">{{ comment.author.username }}</i> - <i style="color:#344E41">{{ post.post_datetime }}</i></b>
-                                          <small>
-                                              {% if user.is_authenticated %}
-                                                {% if user.id == post.author.id or user.id == comment.author.id or is_owner%}
-                                                  <a href="{% url 'delete_comment' comment.pk %}" style="color:#A3B18A">(Delete this comment)</a>
-                                                {% endif %}
-                                              {% endif %}
-                                          </small>
-                                          <br/>
-                                          {{ comment.body}}
-
-                                          <br/>
-                                      {% endfor %}
-                                  {% endif %}
-
-                                  <br/><br/>
-                              </div>
+                      <div class="right floated meta">
+                        <div class="ui grid">
+                          <div class="row" style="color:#344E41">
+                            <b><u>{{ post.title }}</u> - <i>{{ post.author }}</i> {{ post.post_date }} {{ post.post_datetime }}</b>
                           </div>
                         </div>
+                      </div>
+
+                      <div class="content">
+                        <p style="color:#344E41">  {{ post.body }} </p>
+
+                        <div class="card-action">
+                          <a href="{% url 'post_upvote' post.id %}"><i id="upvotes" class="fa fa-thumbs-up" style="color:green" fill="currentColor"></i></a>{{ post.get_upvotes }}
+                          <a href="{% url 'post_downvote' post.id %}"><i id="downvote" class="fa fa-thumbs-down" style="color:red" fill="currentColor"></i></a>{{ post.get_downvotes }}
+                          {% for post_upvoted in user.get_upvoted_posts %}
+                          {% if post == post_upvoted %}
+                          <p style="font-size:small"> You have upvoted this post </p>
+                          {% endif %}
+                          {% endfor %}
+                          {% for post_downvoted in user.get_downvoted_posts %}
+                          {% if post == post_downvoted %}
+                          <p style="font-size:small"> You have downvoted this post </p>
+                          {% endif %}
+                          {% endfor %}
                         </div>
+
+                        <small>
+                          {% if user.is_authenticated %}
+                          <a href="{% url 'create_comment' post.pk%}" style="color:#A3B18A">(Comment on this post)</a>
+                          {% if user.id == post.author.id or is_owner%}
+                          <a href="{% url 'delete_post' post.pk %}" style="color:#A3B18A">(Delete this post)</a>
+                          {% endif %}
+                          {% endif %}
+                        </small>
+
+                        <br/>
+                        {% if not post.comments.all %}
+                        <b style="color:#ff9f1c">No Comments Yet</b>
+                        {% else %}
+                        <b style="color:#ff9f1c">Comments:</b>
+                        <br/>
+                        {% for comment in post.comments.all%}
+                        <b><i style="color:#344E41">{{ comment.author.username }}</i> - <i style="color:#344E41">{{ post.post_datetime }}</i></b>
+                        <small>
+                          {% if user.is_authenticated %}
+                          {% if user.id == post.author.id or user.id == comment.author.id or is_owner%}
+                          <a href="{% url 'delete_comment' comment.pk %}" style="color:#A3B18A">(Delete this comment)</a>
+                          {% endif %}
+                          {% endif %}
+                        </small>
+                        <br/>
+                        {{ comment.body}}
+
+                        <br/>
                         {% endfor %}
-                        </ul>
+                        {% endif %}
+
+                        <br/><br/>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
+                {% endfor %}
+              </ul>
             </div>
           </div>
         </div>
       </div>
     </div>
+  </div>
+</div>
 {% endblock %}

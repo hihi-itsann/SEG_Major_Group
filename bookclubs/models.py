@@ -412,7 +412,6 @@ class Post(models.Model):
             vote = Vote.objects.get(post=self, user=user)
             if vote.vote_type == True:
                 vote.delete()
-                return 'i.fa.upvotes-green'
             else:
                 vote.delete()
                 Vote.objects.create(post=self, user=user, vote_type= True)
