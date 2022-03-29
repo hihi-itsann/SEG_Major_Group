@@ -83,8 +83,8 @@ coverage run manage.py test{% extends 'base_content.html' %}
                         <p style="color:#344E41">  {{ post.body }} </p>
 
                         <div class="card-action">
-                          <a href="{% url 'post_upvote' post.id %}"><i id="upvotes" class="fa fa-thumbs-up" style="color:green" fill="currentColor"></i></a>{{ post.get_upvotes }}
-                          <a href="{% url 'post_downvote' post.id %}"><i id="downvote" class="fa fa-thumbs-down" style="color:red" fill="currentColor"></i></a>{{ post.get_downvotes }}
+                          <a href="{% url 'post_upvote' post.id %}" title="Upvote this post"><i id="upvotes" class="fa fa-thumbs-up" style="color:green; font-size:25px" fill="currentColor"></i></a>{{ post.get_upvotes }}
+                          <a href="{% url 'post_downvote' post.id %}" title="Downvote this post"><i id="downvote" class="fa fa-thumbs-down" style="color:red; font-size:25px" fill="currentColor"></i></a>{{ post.get_downvotes }}
                           {% for post_upvoted in user.get_upvoted_posts %}
                           {% if post == post_upvoted %}
                           <p style="font-size:small"> You have upvoted this post </p>
