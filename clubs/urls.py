@@ -57,7 +57,6 @@ urlpatterns = [
     path('club/<str:club_name>/unban/<int:user_id>/', views.unban_member, name='unban_from_club'),
     path('club/<str:club_name>/member_list/', views.member_list, name='member_list'),
 
-
     # Application Views
     path('my_applications/', views.my_applications, name='my_applications'),
     path('club/<str:club_name>/apply/', views.create_application, name='create_application'),

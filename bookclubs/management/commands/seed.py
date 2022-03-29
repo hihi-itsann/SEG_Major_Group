@@ -25,8 +25,9 @@ class Command(BaseCommand):
     CLUB_COUNT = 10
     POST_COUNT = 100
     COMMENT_COUNT = 100
-    MEETING_COUNT = 20
+    MEETING_PER_CLUB_COUNT = 2
     APPLICATION_PER_CLUB_COUNT = 10
+    MEETING_ATTENDANCE_PER_MEETING = 5
     DEFAULT_PASSWORD = 'Password123'
     USER_IN_CLUB_PROBABILITY = 0.2
     USER_RATE_BOOK_PROBABILITY = 0.3
@@ -39,7 +40,7 @@ class Command(BaseCommand):
         self.faker = Faker('en_GB')
 
     def handle(self, *args, **options):
-        
+
         self.load_data_from_csv()
 
         self.create_books()
@@ -132,6 +133,12 @@ class Command(BaseCommand):
 
     def create_users(self):
         user_count = 0
+        print(f"Seeding user {user_count}/{self.USER_COUNT}", end='\r')
+        try:
+            self.create_gravatar_user()
+            user_count = 1
+        except:
+            pass
         while user_count < self.USER_COUNT:
             print(f"Seeding user {user_count}/{self.USER_COUNT}", end='\r')
             try:
@@ -170,6 +177,40 @@ class Command(BaseCommand):
             country=country,
             meeting_preference=meeting_preference
         )
+
+    def create_gravatar_user(self):
+        # Should always be userID = 0 as it is the first seeded user
+        if User.objects.filter(email__exact="getgoogle@hotmail.com"):
+            pass
+        else:
+            first_name = self.faker.first_name()
+            last_name = 'Gravatar'
+            email = 'getgoogle@hotmail.com'
+            # This is not a fake email, but it is an inactive email that has been set up for this purpose and has a
+            # gravatar account associated with it
+            username = '@gravatar'
+            bio = self.faker.text(max_nb_chars=520)
+            dob = self.faker.date_of_birth(minimum_age=8, maximum_age=100)
+            gender = self.faker.random_choices(elements=('M', 'F', 'O'), length=1)[0]
+            location = self.faker.street_name()
+            city = self.faker.city()
+            country = self.faker.country()
+            meeting_preference = self.faker.random_choices(elements=('O', 'P'), length=1)[0]
+            gravatar_user = User.objects.create_user(
+                userID=0,
+                username=username,
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                password=Command.DEFAULT_PASSWORD,
+                bio=bio,
+                dob=dob,
+                gender=gender,
+                location=location,
+                city=city,
+                country=country,
+                meeting_preference=meeting_preference
+            )
 
     def create_clubs(self):
         club_count = 0
@@ -275,19 +316,19 @@ class Command(BaseCommand):
 
     def create_meetings(self):
         meeting_count = 0
-        while meeting_count < self.MEETING_COUNT:
-            print(f"Seeding meeting {meeting_count}/{self.MEETING_COUNT}", end='\r')
-            try:
-                meeting = self.create_meeting()
-            except:
-                continue
-            meeting_count += 1
+        for club in self.clubs:
+            for meet in range(0, self.MEETING_PER_CLUB_COUNT):
+                print(f"Seeding meeting {meeting_count}/{self.MEETING_PER_CLUB_COUNT * self.CLUB_COUNT}", end='\r')
+                try:
+                    self.create_meeting()
+                except:
+                    continue
+                meeting_count += 1
         print("Meeting seeding complete.      ")
 
     def create_meeting(self):
-
         date = self.faker.future_date()
-        time_start = self.faker.time(pattern= '%H:%M')
+        time_start = self.faker.time(pattern='%H:%M')
         duration = randint(15, 45)
         club = self.get_random_club()
         book = self.get_random_book()
@@ -296,12 +337,14 @@ class Command(BaseCommand):
         meeting_status = club.meeting_status
         if meeting_status == 'ONL':
             location = 'Meeting link to be created...'
-            create_zoom_meeting(date, time_start,duration)
+            create_zoom_meeting(date, time_start, duration)
             join_link = get_join_link()
             start_link = get_start_link()
 
         else:
             location = self.faker.street_name()
+            join_link = None
+            start_link = None
         meeting = Meeting.objects.create(
             club=club,
             book=book,
@@ -327,10 +370,12 @@ class Command(BaseCommand):
     def create_meeting_attendance(self):
         meeting_attendance_count = 0
         for meeting in self.meetings:
-            print(f"Seeding attendance {meeting_attendance_count}/{self.MEETING_COUNT * 10}", end='\r')
             meeting_attendance_count += 1
             host = self.create_meeting_host(meeting)
-            for i in range(9):
+            for i in range(self.MEETING_ATTENDANCE_PER_MEETING - 1):
+                print(
+                    f"Seeding attendance {meeting_attendance_count}/{self.MEETING_PER_CLUB_COUNT * self.CLUB_COUNT * self.MEETING_ATTENDANCE_PER_MEETING}",
+                    end='\r')
                 try:
                     self.create_meeting_attendee(meeting, host)
                 except:
@@ -363,15 +408,16 @@ class Command(BaseCommand):
     def create_applications(self):
         application_count = 0
         for club in self.clubs:
-            # print(f"Seeding role {role_count}/{self.CLUB_COUNT*len(self.df_users)}", end='\r')
-            print(f"Seeding application {application_count}/{self.APPLICATION_PER_CLUB_COUNT * self.CLUB_COUNT}",
-                  end='\r')
-            for i in range(0, self.APPLICATION_PER_CLUB_COUNT):
-                try:
-                    self.create_application(club)
-                except:
-                    continue
-                application_count += 1
+            priv_club_count = self.clubs.filter(public_status='PRI').count()
+            if club.public_status == 'PRI':
+                for i in range(0, self.APPLICATION_PER_CLUB_COUNT):
+                    print(f"Seeding application {application_count}/{self.APPLICATION_PER_CLUB_COUNT * priv_club_count}"
+                          , end='\r')
+                    try:
+                        self.create_application(club)
+                    except:
+                        continue
+                    application_count += 1
         print("Application seeding complete.      ")
 
     def create_application(self, club):
@@ -380,7 +426,8 @@ class Command(BaseCommand):
         Application.objects.create(
             user=user,
             club=club,
-            statement=statement
+            statement=statement,
+            status='P'
         )
 
     def get_random_non_member(self, club):
