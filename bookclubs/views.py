@@ -590,7 +590,7 @@ def remove_member(request, club_name, user_id):
         member = User.objects.get(id=user_id, club__club_name=current_club.club_name)
         member_role = Role.objects.get(club=current_club, user=member).club_role
         if current_user_role == 'MOD' and member_role == 'MOD':
-            messages.add_message(request, messages.WARNING, "Moderator can't remove each other!")
+            messages.add_message(request, messages.WARNING, "Moderators can't remove each other!")
             return redirect('member_list', club_name)
         else:
             current_club.remove_user_from_club(member)
@@ -609,7 +609,7 @@ def transfer_ownership(request, club_name, user_id):
     try:
         moderator = User.objects.get(id=user_id, club__club_name=current_club.club_name)
         current_club.transfer_ownership(request.user, moderator)
-        messages.success(request, f'You have transfered owner to {moderator.username}!')
+        messages.success(request, f'You have transferred owner privileges to {moderator.username}!')
     except (ObjectDoesNotExist):
         messages.add_message(request, messages.WARNING, "User doesn't exist")
         return redirect('member_list', club_name)
@@ -625,7 +625,7 @@ def demote_moderator(request, club_name, user_id):
     try:
         moderator = User.objects.get(id=user_id, club__club_name=current_club.club_name)
         current_club.toggle_member(moderator)
-        messages.success(request, f'You have demoted {moderator.username} to member !')
+        messages.success(request, f'You have demoted {moderator.username} to the position of member!')
     except (ObjectDoesNotExist):
         messages.add_message(request, messages.WARNING, "User doesn't exist")
         return redirect('member_list', club_name)
@@ -641,7 +641,7 @@ def promote_member(request, club_name, user_id):
     try:
         changing_user = User.objects.get(id=user_id)
         current_club.toggle_moderator(changing_user)
-        messages.success(request, f'You have promted {changing_user.username} to moderator!')
+        messages.success(request, f'You have promoted {changing_user.username} to the position of moderator!')
     except (ObjectDoesNotExist):
         messages.add_message(request, messages.WARNING, "User doesn't exist")
         return redirect('member_list', club_name)

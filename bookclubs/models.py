@@ -515,7 +515,7 @@ class Meeting(models.Model):
             return f'Meeting Held: {self.location} {self.club.city} {self.club.country}'
 
     class Meta:
-        ordering = ['-date']
+        ordering = ['date']
 
 
 class MeetingAttendance(models.Model):

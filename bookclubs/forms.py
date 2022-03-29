@@ -36,13 +36,13 @@ class NewPasswordMixin(forms.Form):
 
 
 def validate_date_not_in_future(value):
-    if value <= timezone.now().date():
-        raise forms.ValidationError('date needs to be in the future')
+    if value < timezone.now().date():
+        raise forms.ValidationError('Date needs to be in the future.')
 
 
 def validate_date_not_in_past(value):
     if value >= timezone.now().date():
-        raise forms.ValidationError('Date needs to be in the past')
+        raise forms.ValidationError('Date needs to be in the past.')
 
 
 class SignUpForm(NewPasswordMixin, forms.ModelForm):
