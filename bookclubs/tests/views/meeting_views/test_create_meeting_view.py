@@ -82,34 +82,32 @@ class CreateMeetingViewTestCase(TestCase):
         after_count = Meeting.objects.count()
         self.assertEqual(after_count, before_count)
 
-    # # TODO: Test is failing due to Key Error
-    # def test_create_meeting_successful_when_a_member(self):
-    #     self.log_in(self.user)
-    #     Role.objects.create(user=self.user, club=self.club, club_role='MEM')
-    #     before_count = Meeting.objects.count()
-    #     before_count_attendance = MeetingAttendance.objects.count()
-    #     response = self.client.post(self.url, self.form_input, follow=True)
-    #     after_count = Meeting.objects.count()
-    #     after_count_attendance = MeetingAttendance.objects.count()
-    #     self.assertEqual(after_count, before_count + 1)
-    #     self.assertEqual(after_count_attendance, before_count_attendance + 1)
-    #     response_url = reverse('meeting_list', kwargs={'club_name': self.club.club_name})
-    #     self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-    #     self.assertTemplateUsed(response, 'meeting_list.html')
+    def test_create_meeting_successful_when_a_member(self):
+        self.log_in(self.user)
+        Role.objects.create(user=self.user, club=self.club, club_role='MEM')
+        before_count = Meeting.objects.count()
+        before_count_attendance = MeetingAttendance.objects.count()
+        response = self.client.post(self.url, self.form_input, follow=True)
+        after_count = Meeting.objects.count()
+        after_count_attendance = MeetingAttendance.objects.count()
+        self.assertEqual(after_count, before_count + 1)
+        self.assertEqual(after_count_attendance, before_count_attendance + 1)
+        response_url = reverse('meeting_list', kwargs={'club_name': self.club.club_name})
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+        self.assertTemplateUsed(response, 'meeting_list.html')
 
-    # # TODO: Test is failing due to Key Error
-    # def test_create_meeting_is_successful_when_owner(self):
-    #     self.log_in(self.owner)
-    #     before_count = Meeting.objects.count()
-    #     before_count_attendance = MeetingAttendance.objects.count()
-    #     response = self.client.post(self.url, self.form_input, follow=True)
-    #     after_count = Meeting.objects.count()
-    #     after_count_attendance = MeetingAttendance.objects.count()
-    #     self.assertEqual(after_count, before_count + 1)
-    #     self.assertEqual(after_count_attendance, before_count_attendance + 1)
-    #     response_url = reverse('meeting_list', kwargs={'club_name': self.club.club_name})
-    #     self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-    #     self.assertTemplateUsed(response, 'meeting_list.html')
+    def test_create_meeting_is_successful_when_owner(self):
+        self.log_in(self.owner)
+        before_count = Meeting.objects.count()
+        before_count_attendance = MeetingAttendance.objects.count()
+        response = self.client.post(self.url, self.form_input, follow=True)
+        after_count = Meeting.objects.count()
+        after_count_attendance = MeetingAttendance.objects.count()
+        self.assertEqual(after_count, before_count + 1)
+        self.assertEqual(after_count_attendance, before_count_attendance + 1)
+        response_url = reverse('meeting_list', kwargs={'club_name': self.club.club_name})
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+        self.assertTemplateUsed(response, 'meeting_list.html')
 
     def test_create_meeting_is_unsuccessful_when_same_last_host(self):
         self.log_in(self.owner)
@@ -136,35 +134,34 @@ class CreateMeetingViewTestCase(TestCase):
         response_url = reverse('meeting_list', kwargs={'club_name': self.club.club_name})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
 
-    # # TODO: Test is failing due to Key Error
-    # def test_create_meeting_is_successful_when_not_same_last_host(self):
-    #     self.log_in(self.owner)
-    #     another_meeting = Meeting.objects.create(
-    #         club=self.club,
-    #         book=self.another_book,
-    #         topic='alpha bravo charlie',
-    #         description='delta foxtrot golf hotel india',
-    #         meeting_status='OFF',
-    #         location='Bush House',
-    #         date='2024-04-01',
-    #         time_start='10:00',
-    #         duration=60
-    #     )
-    #     MeetingAttendance.objects.create(
-    #         user=self.user,
-    #         meeting=another_meeting,
-    #         meeting_role='H'
-    #     )
-    #     before_count = Meeting.objects.count()
-    #     before_count_attendance = MeetingAttendance.objects.count()
-    #     response = self.client.post(self.url, self.form_input, follow=True)
-    #     after_count = Meeting.objects.count()
-    #     after_count_attendance = MeetingAttendance.objects.count()
-    #     self.assertEqual(after_count, before_count + 1)
-    #     self.assertEqual(after_count_attendance, before_count_attendance + 1)
-    #     response_url = reverse('meeting_list', kwargs={'club_name': self.club.club_name})
-    #     self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-    #     self.assertTemplateUsed(response, 'meeting_list.html')
+    def test_create_meeting_is_successful_when_not_same_last_host(self):
+        self.log_in(self.owner)
+        another_meeting = Meeting.objects.create(
+            club=self.club,
+            book=self.another_book,
+            topic='alpha bravo charlie',
+            description='delta foxtrot golf hotel india',
+            meeting_status='OFF',
+            location='Bush House',
+            date='2024-04-01',
+            time_start='10:00',
+            duration=60
+        )
+        MeetingAttendance.objects.create(
+            user=self.user,
+            meeting=another_meeting,
+            meeting_role='H'
+        )
+        before_count = Meeting.objects.count()
+        before_count_attendance = MeetingAttendance.objects.count()
+        response = self.client.post(self.url, self.form_input, follow=True)
+        after_count = Meeting.objects.count()
+        after_count_attendance = MeetingAttendance.objects.count()
+        self.assertEqual(after_count, before_count + 1)
+        self.assertEqual(after_count_attendance, before_count_attendance + 1)
+        response_url = reverse('meeting_list', kwargs={'club_name': self.club.club_name})
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+        self.assertTemplateUsed(response, 'meeting_list.html')
 
     def test_create_meeting_shows_form(self):
         self.log_in(self.owner)

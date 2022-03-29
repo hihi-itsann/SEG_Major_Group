@@ -119,3 +119,29 @@ class MeetingListViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'meeting_list.html')
         self.assertContains(response, f'{self.meeting.book.title}')
         self.assertContains(response, f'{self.another_meeting.book.title}')
+
+    def test_past_meeting_not_in_current_meetings(self):
+        self.log_in(self.host)
+        self.meeting.delete()
+        self.another_meeting.delete()
+        past_meeting = Meeting.objects.create(
+            club=self.club,
+            book=self.another_book,
+            topic='alpha bravo charlie',
+            description='delta foxtrot golf hotel india',
+            meeting_status='OFF',
+            location='Bush House',
+            date=date.today() - timedelta(days=5),
+            time_start='10:00',
+            duration=60
+        )
+        MeetingAttendance.objects.create(
+            user=self.host,
+            meeting=past_meeting,
+            meeting_role='H'
+        )
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, 'meeting_list.html')
+        self.assertNotContains(response, f'{past_meeting.book.title}')
+
+

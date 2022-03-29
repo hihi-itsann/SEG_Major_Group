@@ -10,8 +10,6 @@ import matplotlib.pyplot as plt
 from keras import backend as K
 import numpy as np
 from bookclubs.models import Book, ClubBookAverageRating, Club,BookRatingReview
-csv_ratings = pd.read_csv('bookclubs/dataset/BX-Book-Ratings.csv', sep = ';', quotechar = '"', encoding = 'latin-1',header = 0 )
-csv_ratings = csv_ratings.loc[csv_ratings["Book-Rating"] != 0]
 
 def get_club_books_average_rating(clubID):
     """ Saves the average rating of books read by users of each club (banned member are not included) """
@@ -33,9 +31,7 @@ def get_club_books_average_rating(clubID):
                 )
 
 def get_data_for_recommendations(clubID):
-    ClubBookAverageRating.objects.all().delete()
-
-    get_club_books_average_rating(clubID)
+    
     club_ratings = pd.DataFrame(list(ClubBookAverageRating.objects.all().values()))
     books = pd.DataFrame(list(Book.objects.all().values()))
     club_ratings['Book-Rating']=club_ratings['rate']/club_ratings['number_of_ratings']
@@ -127,47 +123,69 @@ def get_model(ratings):
         validation_data=(x_val, y_val),
     )
     return (model,user2user_encoded,book2book_encoded,book_encoded2book)
+import operator
+
+def get_10_books_with_highest_rating():
+    book_ratings = pd.DataFrame(list(BookRatingReview.objects.all().values()))
+    avg_book_rating=dict()
+    for book in book_ratings['book_id']:
+        if not avg_book_rating.get(book):
+            avg_book_rating[book]=float((Book.objects.all().get(ISBN=book)).getAverageRate())
+    sorted_d = dict( sorted(avg_book_rating.items(), key=operator.itemgetter(1),reverse=True))
+
+
+    return list(sorted_d)[:10]
 
 def get_recommendations(userID):
+    global csv_ratings
+    csv_ratings = pd.read_csv('bookclubs/dataset/BX-Book-Ratings.csv', sep = ';', quotechar = '"', encoding = 'latin-1',header = 0 )
+    csv_ratings = csv_ratings.loc[csv_ratings["Book-Rating"] != 0]
 
 
     train()
-    (ratings, books)=get_data_for_recommendations(userID)
 
-    (model,user2user_encoded,book2book_encoded,book_encoded2book)=get_model(ratings)
+    ClubBookAverageRating.objects.all().delete()
+    get_club_books_average_rating(userID)
+    if len(ClubBookAverageRating.objects.all())==0:
+        recommended_books=get_10_books_with_highest_rating()
+        return recommended_books
+    else:
    
-
-    user_id = np.int64(userID)
-
-    books_watched_by_user = ratings[ratings['User-ID'] == user_id]
+        (ratings, books)=get_data_for_recommendations(userID)
+        (model,user2user_encoded,book2book_encoded,book_encoded2book)=get_model(ratings)
     
 
-    books_not_watched = books[
-        ~books["ISBN"].isin(books_watched_by_user.ISBN.values)
-    ]["ISBN"]
+        user_id = np.int64(userID)
 
-    if len(books_not_watched) == 0:
-        return []
-    books_not_watched = list(
-        set(books_not_watched).intersection(set(book2book_encoded.keys()))
-    )
-   
-    books_not_watched = [[book2book_encoded.get(x)] for x in books_not_watched]
-   
-    user_encoder = user2user_encoded.get(user_id)
-   
-    user_book_array = np.hstack(
-        ([[user_encoder]] * len(books_not_watched), books_not_watched)
-    )
-    ratings = model.predict(user_book_array).flatten()
-    top_ratings_indices = ratings.argsort()[-10:][::-1]
+        books_watched_by_user = ratings[ratings['User-ID'] == user_id]
+        
 
-    recommended_book_ids = [
-        book_encoded2book.get(books_not_watched[x][0]) for x in top_ratings_indices
-    ]
+        books_not_watched = books[
+            ~books["ISBN"].isin(books_watched_by_user.ISBN.values)
+        ]["ISBN"]
+
+        if len(books_not_watched) == 0:
+            return []
+        books_not_watched = list(
+            set(books_not_watched).intersection(set(book2book_encoded.keys()))
+        )
     
+        books_not_watched = [[book2book_encoded.get(x)] for x in books_not_watched]
+    
+        user_encoder = user2user_encoded.get(user_id)
+    
+        user_book_array = np.hstack(
+            ([[user_encoder]] * len(books_not_watched), books_not_watched)
+        )
+        ratings = model.predict(user_book_array).flatten()
+        top_ratings_indices = ratings.argsort()[-10:][::-1]
 
-    recommended_books = books[books["ISBN"].isin(recommended_book_ids)]
+        recommended_book_ids = [
+            book_encoded2book.get(books_not_watched[x][0]) for x in top_ratings_indices
+        ]
+        
 
-    return recommended_books['ISBN']
+        recommended_books = books[books["ISBN"].isin(recommended_book_ids)]
+
+        return recommended_books['ISBN']
 

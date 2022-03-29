@@ -1,12 +1,15 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+
 from bookclubs.models import User, Post, Club
+
 
 class PostModelTestCase(TestCase):
 
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
         'bookclubs/tests/fixtures/default_clubs.json'
+
     ]
 
     def setUp(self):
@@ -19,14 +22,22 @@ class PostModelTestCase(TestCase):
             club=self.club,
             body="The quick brown fox jumps over the lazy dog."
         )
+        
+    def test_to_string(self):
+        self.assertEqual(self.post.__str__(), f'{self.post.title} | {self.post.author}')
 
-    def test_valid_comment(self):
+    def test_valid_post(self):
         try:
             self.post.full_clean()
         except ValidationError:
             self.fail("Test post should be valid")
 
-    def test_author_must_not_be_blank(self):
+    def test_post_title_must_not_be_blank(self):
+        self.post.title = ''
+        with self.assertRaises(ValidationError):
+            self.post.full_clean()
+
+    def test_post_author_must_not_be_blank(self):
         self.post.author = None
         with self.assertRaises(ValidationError):
             self.post.full_clean()
@@ -41,7 +52,8 @@ class PostModelTestCase(TestCase):
         with self.assertRaises(ValidationError):
             self.post.full_clean()
 
-    def test_body_must_not_be_overlong(self):
-        self.post.body = 'x' * 521
+    def test_post_rejects_overlong_input_text(self):
+        self.post.title = 'x'*255
+        self.post.body ='x'*521
         with self.assertRaises(ValidationError):
             self.post.full_clean()

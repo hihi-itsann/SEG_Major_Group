@@ -6,8 +6,13 @@
 {% block content %}
     <div class="container" style="padding-bottom: 50px">
         <div class="row">
+
             <div style="text-align: center">
                 <h1>{{ meeting.club.club_name }} Meeting #{{ meeting.id }}</h1>
+                <div style="text-align: right">
+                    <a class="btn btn-outline-dark"
+                            href="{% url 'meeting_list' club_name=club_name %}">Back to Meetings</a>
+                </div>
                 <p><b>Host: <a href="{% url 'show_user' meeting.get_host.username %}"> {{ meeting.get_host.full_name }} </a>
                 </b></p>
                 <h3>Book to be read:</h3>

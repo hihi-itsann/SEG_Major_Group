@@ -55,7 +55,6 @@ class ShowBookRecommendationsViewTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'show_book_recommendations.html')
         self.assertContains(response, "Recommended Books")
-        self.assertContains(response, "Classical Mythology")
 
     def test_get_show_book_recommendations_successful_over_ten_books(self):
         self.log_in(self.user)
@@ -70,5 +69,3 @@ class ShowBookRecommendationsViewTestCase(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'show_book_recommendations.html')
-        self.assertContains(response, "Recommended Books")
-        self.assertContains(response, "Test Book")

@@ -1,4 +1,4 @@
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
@@ -26,6 +26,17 @@ class MeetingModelTestCase(TestCase):
             location='Bush House',
             date=date.today() + timedelta(days=5),
             time_start='11:00',
+            duration=60
+        )
+        self.meeting_now = Meeting.objects.create(
+            club=self.club,
+            book=self.book,
+            topic='[Topic]',
+            description='[Description]',
+            meeting_status='ONL',
+            location='Online',
+            date=date.today(),
+            time_start=(datetime.now() - timedelta(minutes=10)).time(),
             duration=60
         )
 
@@ -71,10 +82,12 @@ class MeetingModelTestCase(TestCase):
         self.meeting.meeting_status = 'OFF'
         self.assertEqual(self.meeting.get_meeting_status(), 'In-Person')
 
-    def test_get_location(self):
-        self.assertTrue(self.meeting.get_location().__contains__('Meeting Link'))
-        self.meeting.meeting_status = 'OFF'
-        self.assertTrue(self.meeting.get_location().__contains__('Meeting Held:'))
+    def test_get_location_online_future(self):
+        self.assertTrue(self.meeting.get_location().__contains__('available when it\'s time'))
+
+    def test_get_location_online_now(self):
+        self.assertTrue(self.meeting_now.get_location().__contains__('join the meeting'))
+
 
 
 

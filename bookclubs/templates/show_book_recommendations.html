@@ -92,6 +92,10 @@
 
                     {
                         bookISBN=data.recommended_books[i].ISBN ;
+                        
+                        club_name=(data.club_name).replace(/\s/g, '%20')
+                        href_link= `/club/`+club_name+`/meeting/book/`+bookISBN+`/create/`
+                        
                         text+=   ` <tr class="row_hover">
                                                 <td>
                                                     <img src="`+data.recommended_books[i].image_url_m+`">
@@ -99,12 +103,12 @@
                                                 <td>`+data.recommended_books[i].title+`</td>
                                                 <td>`+data.recommended_books[i].author+`</td>
                                                 <td>`+bookISBN+`</td>
-                                                <td>
-                                                        <a href="{% url 'create_meeting' club_name=club_name book_isbn="`+bookISBN+`" %}" class="btn btn-outline-dark">
-                                                            Choose
-                                                        </a>
+                                                <td><a href='`+href_link+`' class="btn btn-outline-dark">    
+                                                     Choose
+                                                    </a>
                                                 </td>
                                             </tr>  `;
+                        console.log(text)
 
                             } 
 
