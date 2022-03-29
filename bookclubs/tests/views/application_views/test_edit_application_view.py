@@ -98,4 +98,4 @@ class EditApplicationViewTestCase(TestCase):
         self.assertTemplateUsed(response, f'{self.VIEW}.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, ApplicationForm))
-        self.assertTrue(form.is_bound)
+        self.assertFalse(form.is_bound)

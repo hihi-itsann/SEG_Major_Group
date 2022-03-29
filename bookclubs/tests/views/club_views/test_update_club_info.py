@@ -278,7 +278,7 @@ class UpdateClubViewTestCase(TestCase):
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.user.refresh_from_db()
 
-    def test_succesful_club1_update(self):
+    def test_successful_club1_update(self):
         self.client.login(username=self.user.username, password='Password123')
         before_count = Club.objects.count()
         response = self.client.post(self.url1, self.form_input_online_public, follow=True)
@@ -298,7 +298,7 @@ class UpdateClubViewTestCase(TestCase):
         self.assertEqual(self.club1.genre, 'Non-Fiction')
         self.assertEqual(self.club1.description, 'description')
 
-    def test_succesful_club2_update(self):
+    def test_successful_club2_update(self):
         self.client.login(username=self.user.username, password='Password123')
         before_count = Club.objects.count()
         response = self.client.post(self.url2, self.form_input_online_private, follow=True)
@@ -338,7 +338,7 @@ class UpdateClubViewTestCase(TestCase):
         self.assertEqual(self.club3.genre, 'Fiction')
         self.assertEqual(self.club3.description, 'description')
 
-    def test_succesful_club3_update(self):
+    def test_successful_club3_update(self):
         self.client.login(username=self.user.username, password='Password123')
         before_count = Club.objects.count()
         response = self.client.post(self.url3, self.form_input_in_person_public, follow=True)
