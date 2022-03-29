@@ -330,7 +330,7 @@ def club_feed(request, club_name):
         is_moderator = True
     return render(request, 'club_feed.html',
                   {'club': current_club, 'is_moderator': is_moderator, 'is_owner': is_owner, 'members': members,
-                   'management': management})
+                   'management': management, 'user': request.user})
 
 
 @login_required
