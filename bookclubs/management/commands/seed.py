@@ -320,17 +320,17 @@ class Command(BaseCommand):
             for meet in range(0, self.MEETING_PER_CLUB_COUNT):
                 print(f"Seeding meeting {meeting_count}/{self.MEETING_PER_CLUB_COUNT * self.CLUB_COUNT}", end='\r')
                 try:
-                    self.create_meeting()
+                    self.create_meeting(club)
                 except:
                     continue
                 meeting_count += 1
         print("Meeting seeding complete.      ")
 
-    def create_meeting(self):
+    def create_meeting(self, club):
         date = self.faker.future_date()
         time_start = self.faker.time(pattern='%H:%M')
         duration = randint(15, 45)
-        club = self.get_random_club()
+        club = club
         book = self.get_random_book()
         topic = self.faker.text(max_nb_chars=60)
         description = self.faker.text(max_nb_chars=520)
