@@ -800,8 +800,8 @@ def show_book_recommendations_show(request, club_name):
 
 @login_required
 @club_and_book_exists
-# @membership_required
-# @not_last_host
+@membership_required
+@not_last_host
 def create_meeting(request, club_name, book_isbn):
     """Creates a new meeting within a club"""
     current_club = Club.objects.get(club_name=club_name)

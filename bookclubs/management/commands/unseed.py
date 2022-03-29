@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from bookclubs.models import User, Post, Comment, Club, Role, Book, BookRatingReview, Meeting, ClubBookAverageRating, MeetingAttendance, Application
 
-
+from bookclubs.meeting_link import delete_zoom_meeting
 class Command(BaseCommand):
     help = 'Empties the database'
 
@@ -19,6 +19,7 @@ class Command(BaseCommand):
         if Meeting.objects.all().count() > 0:
             print(f'Unseeding Meeting...', end='\r')
             Meeting.objects.all().delete()
+            delete_zoom_meeting()
             print(f'Unseeded Meeting.')
         if Comment.objects.all().count() > 0:
             print(f'Unseeding Comment...', end='\r')
