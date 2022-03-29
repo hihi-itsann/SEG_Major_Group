@@ -2,19 +2,28 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from libgravatar import Gravatar
 
-from bookclubs.models import User
+from bookclubs.models import User, Application, Club, Role, Vote, Post
 
 
 class UserModelTestCase(TestCase):
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
-        'bookclubs/tests/fixtures/other_users.json'
+        'bookclubs/tests/fixtures/other_users.json',
+        'bookclubs/tests/fixtures/default_clubs.json',
+
     ]
 
     def setUp(self):
         self.user = User.objects.get(username='@johndoe')
         self.user_two = User.objects.get(username='@janedoe')
         self.user_three = User.objects.get(username='@Alexdoe')
+        self.club = Club.objects.get(club_name='private_online')
+        self.post = Post.objects.create(
+            title="test",
+            author=self.user,
+            club=self.club,
+            body="The quick brown fox jumps over the lazy dog."
+        )
 
     def _assert_user_is_valid(self):
         try:
@@ -242,26 +251,48 @@ class UserModelTestCase(TestCase):
         self.user.meeting_preference = 'B'
         self._assert_user_is_invalid()
 
-    # test for full_name method
+    # Method Tests for User Model
+
     def test_get_full_name(self):
+        """Test full_name method"""
         self.assertEqual("John Doe", self.user.full_name())
 
-    # tet for get_pronouns
     def test_get_pronouns(self):
+        """Test get_pronouns method"""
         self.assertEqual(self.user.get_pronouns(), 'he/ him')
 
         self.assertEqual(self.user_two.get_pronouns(), 'she/ her')
 
         self.assertEqual(self.user_three.get_pronouns(), 'they/ them (consult for other pronouns)')
 
-    # test for gravatar
     def test_gravatar(self):
+        """Test gravatar method"""
         user_gravatar_url = Gravatar(self.user.email).get_image(size=120, default='mp')
         size = user_gravatar_url.__sizeof__()
         self.assertEqual(user_gravatar_url, self.user.gravatar())
         self.assertEqual(size, self.user.gravatar().__sizeof__())
 
-    # test for mini_gravatar
     def test_mini_gravatar(self):
+        """Test mini_gravatar method"""
         size = self.user.gravatar(size=60).__sizeof__()
         self.assertEqual(size, self.user.mini_gravatar().__sizeof__())
+
+    def test_get_clubs(self):
+        """Test get_clubs"""
+        Role.objects.create(user=self.user, club=self.club, club_role='MEM')
+        self.assertIn(self.club, self.user.get_clubs())
+
+    def test_get_applied_clubs(self):
+        """Test get_applied_clubs"""
+        Application.objects.create(user=self.user, club=self.club, statement='test', status='P')
+        self.assertIn(self.club, self.user.get_applied_clubs())
+
+    def test_get_upvoted_posts(self):
+        """Test get_upvoted_posts"""
+        Vote.objects.create(user=self.user, post=self.post, vote_type=True)
+        self.assertIn(self.post, self.user.get_upvoted_posts())
+
+    def test_get_downvoted_posts(self):
+        """Test get_downvoted_posts"""
+        Vote.objects.create(user=self.user, post=self.post, vote_type=False)
+        self.assertIn(self.post, self.user.get_downvoted_posts())
