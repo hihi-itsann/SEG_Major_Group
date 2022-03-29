@@ -11,7 +11,7 @@
           <h1 class="card-title text-uppercase mb-0" style="color:#344E41">{{ club.club_name }}</h1>
             <h4 style="color:#344E41">Member List</h4>
             {% if is_owner %}
-              <p style="color:#f77f00">You are owner!</p>
+              <p style="color:#f77f00">You are the owner!</p>
             {% endif %}
             <table class="table no-wrap user-table mb-0" style="background-color:#EFF6E0; border:none;">
               <thead>
@@ -23,7 +23,7 @@
                     <th scope="col" class="border-0 text-uppercase font-medium" style="color:#f77f00">Manage</th>
                   {% endif %}
                 </tr>
-              </thread>
+              </thead>
               <tbody>
                 {% for role in roles %}
                   <tr>
