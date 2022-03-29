@@ -10,7 +10,7 @@
           <div class="card">
             <div class="card-body">
               <div class="row">
-                <div class="col-lg-4">
+                <div class="col-lg-5">
                   <div class="border-bottom text-center pb-4">
                     <div class="mb-3">
                       <h3 style="color:#3A5A40"><b>{{ club.club_name }}</b></h3>
@@ -60,11 +60,12 @@
           </div>
 
         </div>
-        <div class="col-lg-8">
+        <div class="col-lg-7">
           <div class="profile-feed">
             <div class="d-flex align-items-start profile-feed-item">
-              <h1 style="color:#3A5A40">POSTs</h1>
+
               <ul>
+                <h1 style="color:#3A5A40">POSTs</h1>
                 {% for post in posts%}
 
                 <div class="post" id={{post.id}}>
@@ -83,38 +84,39 @@
                         <p style="color:#344E41">  {{ post.body }} </p>
 
                         <div class="card-action">
-                          <a href="{% url 'post_upvote' post.id %}" title="Upvote this post"><i id="upvotes" class="fa fa-thumbs-up" style="color:green; font-size:25px" fill="currentColor"></i></a>{{ post.get_upvotes }}
-                          <a href="{% url 'post_downvote' post.id %}" title="Downvote this post"><i id="downvote" class="fa fa-thumbs-down" style="color:red; font-size:25px" fill="currentColor"></i></a>{{ post.get_downvotes }}
+                          <a href="{% url 'post_upvote' post.id %}" title="Upvote this post"><i id="upvotes" class="fa fa-thumbs-up" style="color:#227c9d; font-size:20px" fill="currentColor"></i></a>{{ post.get_upvotes }}
+                          <a href="{% url 'post_downvote' post.id %}" title="Downvote this post"><i id="downvote" class="fa fa-thumbs-down" style="color:#fe6d73; font-size:20px" fill="currentColor"></i></a>{{ post.get_downvotes }}
                           {% for post_upvoted in user.get_upvoted_posts %}
-                          {% if post == post_upvoted %}
-                          <p style="font-size:small"> You have upvoted this post </p>
-                          {% endif %}
+                            {% if post == post_upvoted %}
+                            <p style="font-size:small"> You have upvoted this post </p>
+                            {% endif %}
                           {% endfor %}
+
                           {% for post_downvoted in user.get_downvoted_posts %}
-                          {% if post == post_downvoted %}
-                          <p style="font-size:small"> You have downvoted this post </p>
-                          {% endif %}
+                            {% if post == post_downvoted %}
+                            <p style="font-size:small"> You have downvoted this post </p>
+                            {% endif %}
                           {% endfor %}
                         </div>
 
                         <small>
                           {% if user.is_authenticated %}
-                          <a href="{% url 'create_comment' post.pk%}" style="color:#A3B18A">(Comment on this post)</a>
-                          {% if user.id == post.author.id or is_owner%}
-                          <a href="{% url 'delete_post' post.pk %}" style="color:#A3B18A">(Delete this post)</a>
-                          {% endif %}
+                            <a href="{% url 'create_comment' post.pk%}" style="color:#A3B18A">(Comment on this post)</a>
+                            {% if user.id == post.author.id or is_owner%}
+                            <a href="{% url 'delete_post' post.pk %}" style="color:#A3B18A">(Delete this post)</a>
+                            {% endif %}
                           {% endif %}
                         </small>
 
                         <br/>
                         {% if not post.comments.all %}
-                        <b style="color:#ff9f1c">No Comments Yet</b>
+                          <b style="color:#ff9f1c">No Comments Yet</b>
                         {% else %}
-                        <b style="color:#ff9f1c">Comments:</b>
-                        <br/>
+                          <b style="color:#ff9f1c">Comments:</b>
+                          <br/>
                         {% for comment in post.comments.all%}
-                        <b><i style="color:#344E41">{{ comment.author.username }}</i> - <i style="color:#344E41">{{ post.post_datetime }}</i></b>
-                        <small>
+                          <b><i style="color:#344E41">{{ comment.author.username }}</i> - <i style="color:#344E41">{{ post.post_datetime }}</i></b>
+                          s<small>
                           {% if user.is_authenticated %}
                           {% if user.id == post.author.id or user.id == comment.author.id or is_owner%}
                           <a href="{% url 'delete_comment' comment.pk %}" style="color:#A3B18A">(Delete this comment)</a>
