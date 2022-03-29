@@ -1,32 +1,123 @@
 {% extends 'base_content.html' %}
+{% block title %}
+| Member List
+{% endblock %}
 {% block content %}
 <div class="container">
-      <div class="col-xs-12 col-lg-6 col-xl-8">
-          <br>
-          <h1>{{ club.club_name }}</h1>
-          <div>
-              <p>Member List</p>
-              {% if owner %}
-                You are owner!
-              {% endif %}
-              <hr class="row-divider">
-                  <div>
-                      <table class="table table-dark table-striped">
-                          <tr>
-                              <th scope="col">Position</th>
-                              <th scope="col">Full name</th>
-                              <th scope="col">Username</th>
-                          </tr>
-                            {% for role in roles %}
-                                <tr>
-                                    <td>{{ role.club_role }}</td>
-                                    <td>{{ role.user.full_name }}</td>
-                                    <td><a href="{% url 'show_user' username=role.user.username %}"> {{ role.user.username}} </a></td>
-                                </tr>
-                            {% endfor %}
-                        </table>
-                  </div>
-          </div>
+  <div class ="row">
+    <div class="col-md-12">
+      <div class="card text-center" style="border:none">
+        <div class="card-body" style="background-color:#EFF6E0; border:none;">
+          <h1 class="card-title text-uppercase mb-0" style="color:#344E41">{{ club.club_name }}</h1>
+            <h4 style="color:#344E41">Member List</h4>
+            {% if is_owner %}
+              <p style="color:#f77f00">You are owner!</p>
+            {% endif %}
+            <table class="table no-wrap user-table mb-0" style="background-color:#EFF6E0; border:none;">
+              <thead>
+                <tr>
+                  <th scope="col" class="border-0 text-uppercase font-medium" style="color:#f77f00">Position</th>
+                  <th scope="col" class="border-0 text-uppercase font-medium" style="color:#f77f00">Name</th>
+                  <th scope="col" class="border-0 text-uppercase font-medium" style="color:#f77f00">Username</th>
+                  {% if is_owner %}
+                    <th scope="col" class="border-0 text-uppercase font-medium" style="color:#f77f00">Manage</th>
+                  {% endif %}
+                </tr>
+              </thread>
+              <tbody>
+                {% for role in roles %}
+                  <tr>
+                    <td>{{ role.club_role }}</td>
+                    <td>{{ role.user.first_name }} {{ role.user.last_name }}</td>
+                    <td>
+                      <!-- Trigger/Open The Modal -->
+                      <div id="{{role.user.full_name}}" class="myBtn btn btn-normal">{{role.user.username}}</div>
+                      <!-- The Modal -->
+                      <div id="{{role.user.club_role}}" class="modal">
+                        <!-- Modal content -->
+                        <div class="modal-content">
+                          <span class="close">×</span>
+                          <p>Email: {{role.user.email}}</p>
+                          <p>Bio: {{role.user.bio}}</p>
+                          <p>Date of Birth: {{role.user.dob}}</p>
+                          <p>Gender: {{role.user.gender}}</p>
+                          <p>Location: {{role.user.location}}</p>
+                          <p>City: {{role.user.city}}</p>
+                          <p>Country: {{role.user.country}}</p>
+                        </div>
+                      </div>
+                    </td>
+                    {% if is_owner %}
+                    <td>
+                      {% if role.club_role == 'MOD' %}
+                        <a class="btn btn-outline-dark" href="{% url 'transfer_ownership' club_name=club.club_name  user_id=role.user.id %}">Transfer Ownership</a>
+                        <a class="btn btn-outline-dark" href="{% url 'demote_moderator' club_name=club.club_name  user_id=role.user.id %}">demote</a>
+                        <a class="btn btn-outline-dark" href="{% url 'remove_from_club' club_name=club.club_name  user_id=role.user.id %}">Remove</a>
+                        <a class="btn btn-outline-dark" style="background-color: lightcoral" href="{% url 'ban_from_club' club_name=club.club_name  user_id=role.user.id %}">Ban</a>
+
+                      {% elif role.club_role == 'BAN' %}
+                        <a class="btn btn-submit" href="{% url 'unban_from_club' club_name=club.club_name  user_id=role.user.id %}">Unban</a>
+                        <a class="btn btn-outline-dark" href="{% url 'remove_from_club' club_name=club.club_name  user_id=role.user.id %}">Remove</a>
+
+                      {% elif role.club_role == 'MEM' %}
+                      <a class="btn btn-outline-dark" href="{% url 'promote_member' club_name=club.club_name  user_id=role.user.id %}">Promote</a>
+                      <a class="btn btn-outline-dark" href="{% url 'remove_from_club' club_name=club.club_name  user_id=role.user.id %}">Remove</a>
+                      <a class="btn btn-outline-dark" style="background-color: lightcoral" href="{% url 'ban_from_club' club_name=club.club_name  user_id=role.user.id %}">Ban</a>
+                    {% endif %}
+                    </td>
+                  {% elif is_moderator %}
+                  <td>
+                    {% if role.club_role == 'MOD' %}
+                      <a class="btn btn-outline-dark" href="{% url 'demote_moderator' club_name=club.club_name  user_id=role.user.id %}">demote</a>
+                      <a class="btn btn-outline-dark" href="{% url 'remove_from_club' club_name=club.club_name  user_id=role.user.id %}">Remove</a>
+                      <a class="btn btn-outline-dark" style="background-color: lightcoral" href="{% url 'ban_from_club' club_name=club.club_name  user_id=role.user.id %}">Ban</a>
+
+                    {% elif role.club_role == 'BAN' %}
+                      <a class="btn btn-submit" href="{% url 'unban_from_club' club_name=club.club_name  user_id=role.user.id %}">Unban</a>
+                      <a class="btn btn-outline-dark" href="{% url 'remove_from_club' club_name=club.club_name  user_id=role.user.id %}">Remove</a>
+
+                    {% elif role.club_role == 'MEM' %}
+                    <a class="btn btn-outline-dark" href="{% url 'promote_member' club_name=club.club_name  user_id=role.user.id %}">Promote</a>
+                    <a class="btn btn-outline-dark" href="{% url 'remove_from_club' club_name=club.club_name  user_id=role.user.id %}">Remove</a>
+                    <a class="btn btn-outline-dark" style="background-color: lightcoral" href="{% url 'ban_from_club' club_name=club.club_name  user_id=role.user.id %}">Ban</a>
+                  {% endif %}
+                  </td>
+                  {% endif %}
+
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+        </div>
       </div>
+    </div>
   </div>
+</div>
+<script>
+    var modal = document.getElementsByClassName('modal');
+
+    // Get the button that opens the modal
+    var btn = document.getElementsByClassName("myBtn");
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close");
+    for (let i = 0; i < btn.length; i++) {
+    // When the user clicks the button, open the modal
+    btn[i].onclick = function() {
+    modal[i].style.display = "block";
+    }
+
+    // When the user clicks on <span> (x), close the modal
+    span[i].onclick = function() {
+    modal[i].style.display = "none";
+    }
+
+    }
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+    if (event.target == modal) {
+    modal.style.display = "none";
+    }
+  }
+</script>
 {% endblock %}

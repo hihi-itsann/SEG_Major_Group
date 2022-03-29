@@ -1,5 +1,8 @@
 {% extends 'base_content.html' %}
-{% block title %} | Create comment {% endblock %}
+{% block title %}
+| Create comment
+{% endblock %}
+
 {% block content %}
 <div class="container">
   <div class="row">
@@ -9,7 +12,7 @@
            <form method="POST">
              {% csrf_token %}
             {% include 'partials/bootstrap_form.html' with form=form %}
-             <button type="submit" class="btn btn-secondary">Post</button>
+             <button type="submit" class="btn btn-submit">Post</button>
            </form>
        </div>
      </div>

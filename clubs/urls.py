@@ -28,8 +28,8 @@ urlpatterns = [
     path('log_in/', views.LogInView.as_view(), name='log_in'),
     path('log_out/', views.log_out, name='log_out'),
     path('profile/', views.ProfileUpdateView.as_view(), name='profile'),
-    path('user/<str:username>/', views.show_user, name='show_user'),
     path('password/', views.PasswordView.as_view(), name='password'),
+    path('user/<str:username>/', views.show_user, name='show_user'),
 
     # Book Views
     path('book_list/<str:book_genre>/', views.BookListView.as_view(), name='book_list'),
@@ -42,20 +42,21 @@ urlpatterns = [
     path('reading_book_list/<str:book_genre>/', views.reading_book_list, name='reading_book_list'),
 
     # Club Views
-    path('club/<str:club_name>/feed/', views.club_feed, name='club_feed'),
-    path('club/<str:club_name>/', views.club_welcome, name='club_welcome'),
-    path('create_club/', views.create_club, name='create_club'),
-    path('club/<str:club_name>/delete/', views.delete_club, name='delete_club'),
-    path('club_list/', views.club_list, name='club_list'),
-    # path('club_list/in_person_club_list', views.in_person_club_list, name='in_person_club_list'),
-    # path('club_list/online_club_list', views.online_club_list, name='online_club_list'),
     path('my_clubs/', views.my_clubs, name='my_clubs'),
+    path('club_list/', views.club_list, name='club_list'),
+    path('create_club/', views.create_club, name='create_club'),
+    path('club/<str:club_name>/feed/', views.club_feed, name='club_feed'),
+    path('club/<str:club_name>/leave_club/', views.leave_club, name='leave_club'),
     path('club/<str:club_name>/update_club_info/', views.update_club_info, name='update_club_info'),
-    path('club/<str:club_name>/remove/<int:user_id>/', views.remove_member, name='remove_applicant'),
-    path('club/<str:club_name>/moderator_management/', views.moderator_list, name='moderator_list'),
-    path('club/<str:club_name>/moderator_management/new_owner/<int:user_id>/', views.transfer_ownership,
-         name='transfer_ownership'),
+    path('club/<str:club_name>/transfer_ownership/<int:user_id>/', views.transfer_ownership, name='transfer_ownership'),
+    path('club/<str:club_name>/delete/', views.delete_club, name='delete_club'),
+    path('club/<str:club_name>/promote/<int:user_id>/', views.promote_member, name='promote_member'),
+    path('club/<str:club_name>/demote/<int:user_id>/', views.demote_moderator, name='demote_moderator'),
+    path('club/<str:club_name>/remove/<int:user_id>/', views.remove_member, name='remove_from_club'),
+    path('club/<str:club_name>/ban/<int:user_id>/', views.ban_member, name='ban_from_club'),
+    path('club/<str:club_name>/unban/<int:user_id>/', views.unban_member, name='unban_from_club'),
     path('club/<str:club_name>/member_list/', views.member_list, name='member_list'),
+
 
     # Application Views
     path('my_applications/', views.my_applications, name='my_applications'),
@@ -66,10 +67,9 @@ urlpatterns = [
     path('club/<str:club_name>/accept/<int:user_id>/', views.accept_applicant, name='accept_applicant'),
     path('club/<str:club_name>/reject/<int:user_id>/', views.reject_applicant, name='reject_applicant'),
 
-    # Post Views
-    path('post_comment/', views.PostCommentView.as_view(), name='post_comment'),
-    path('create_post/', views.CreatePostView.as_view(), name='create_post'),
-    path('article/delete/<int:pk>/', views.DeletePostView.as_view(), name='delete_post'),
+    # Post Comment Views
+    path('create_post/<int:pk>/', views.CreatePostView.as_view(), name='create_post'),
+    path('delete_post/<int:pk>/', views.DeletePostView.as_view(), name='delete_post'),
     path('upvote/<post_id>/', views.post_upvote, name='post_upvote'),
     path('downvote/<post_id>/', views.post_downvote, name='post_downvote'),
     path('create_comment/<int:pk>/', views.CreateCommentView.as_view(), name='create_comment'),
@@ -77,6 +77,7 @@ urlpatterns = [
 
     # Meeting Views
     path('club/<str:club_name>/meeting/show_books/', views.show_book_recommendations, name='show_book_recommendations'),
+    path('club/<str:club_name>/meeting/show_books/show', views.show_book_recommendations_show, name='show_book_recommendations_show'),
     path('club/<str:club_name>/meeting/book/<str:book_isbn>/create/', views.create_meeting, name='create_meeting'),
     path('club/<str:club_name>/meeting_list/', views.meeting_list, name='meeting_list'),
     path('club/<str:club_name>/meeting/<int:meeting_id>/', views.show_meeting, name='show_meeting'),
@@ -84,5 +85,8 @@ urlpatterns = [
     path('club/<str:club_name>/meeting/<int:meeting_id>/leave/', views.leave_meeting, name='leave_meeting'),
     path('club/<str:club_name>/meeting/<int:meeting_id>/delete/', views.delete_meeting, name='delete_meeting'),
     path('club/<str:club_name>/meeting/<int:meeting_id>/edit/', views.edit_meeting, name='edit_meeting'),
+    
+
+    
 
 ]

@@ -1,16 +1,19 @@
 {% extends 'base_content.html' %}
-{% block title %} What's on your mind? {% endblock %}
+{% block title %}
+| Create Post
+{% endblock %}
+
 {% block content %}
 
 <div class="container">
 
-    <h1>CREATE A POST</h1>
-    <h2>Your every thought is worth to be recorded!</h2>
+    <h1 class="text-center" style="color:#344E41">CREATE A POST</h1>
+    <h2 class="text-center" style="color:#344E41">Your every thought is worth to be recorded!</h2>
     <div class="form-group">
-        <form method="POST">
+        <form method="POST" style="color:#344E41">
           {% csrf_token %}
           {{ form.as_p }}
-          <button type="submit" class="btn btn-secondary">Let Everyone see your thought!</button>
+          <button type="submit" class="btn btn-submit">Let Everyone see your thought!</button>
     </div>
 </div>
 {% endblock %}

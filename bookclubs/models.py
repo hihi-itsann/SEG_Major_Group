@@ -1,13 +1,16 @@
 import datetime
+import traceback
+from django.contrib import messages
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator, MinLengthValidator, MinValueValidator, MaxValueValidator
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db.utils import OperationalError
 from libgravatar import Gravatar
 from django.db.models import Avg
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-
+import json
 
 class User(AbstractUser):
     userID = models.IntegerField(unique=True, null=True)
@@ -43,8 +46,6 @@ class User(AbstractUser):
     )
     meeting_preference = models.CharField(max_length=1, choices=MEETING_CHOICES, blank=True)
 
-    def get_rated_books(self):
-        return BookRatingReview.objects.all().filter(user=self)
 
     class Meta:
         """Model options."""
@@ -113,18 +114,22 @@ class Book(models.Model):
 
     def get_ISBN(self):
         return self.ISBN
-
+    def toJson(self):
+        return json.dumps(self, default=lambda o: o.__dict__)
     @staticmethod
     def get_genres():
-        books = Book.objects.all()
-        if books.count() > 0:
-            genres = []
-            for book in books:
-                genres.append((book.genre.title(), book.genre.title()))
-            genres = list(set(genres))
-        else:
-            genres = [('Fiction', 'Fiction'), ('Non-Fiction', 'Non-Fiction')]
-        return genres
+        genres = [('Fiction', 'Fiction'), ('Non-Fiction', 'Non-Fiction')]
+        try:
+            books = Book.objects.all()
+            if books.count() > 0:
+                for book in books:
+                    genres.append((book.genre.title(), book.genre.title()))
+                genres = list(set(genres))
+        except OperationalError:
+            # print(traceback.format_exc())
+            print("Genres are being set to the default of Fiction and Non-Fiction until books are added to the system.")
+        finally:
+            return genres
 
     # def getReadingStatus(self,user):
     #     return BookStatus.objects.get(user=user, book=self).status
@@ -257,19 +262,26 @@ class Club(models.Model):
     club_members = models.ManyToManyField(User, through='Role')
 
     def get_club_name(self):
+        """Return club name"""
         return self.club_name
 
     def get_club_role(self, user):
+        """Return the club role for the user (already part of the club)"""
         return Role.objects.get(club=self, user=user).club_role
 
     def toggle_member(self, user):
+        """User that is part of the club becomes a member"""
         role = Role.objects.get(club=self, user=user)
-        role.club_role = 'MEM'
-        role.save()
+        if role.club_role == 'OWN' or role.club_role == 'BAN':
+            return
+        else:
+            role.club_role = 'MEM'
+            role.save()
 
     def toggle_moderator(self, user):
+        """User that is part of the club becomes a moderator"""
         role = Role.objects.get(club=self, user=user)
-        if role.club_role == 'BAN':
+        if role.club_role == 'OWN' or role.club_role == 'BAN':
             return
         else:
             role.club_role = 'MOD'
@@ -277,33 +289,48 @@ class Club(models.Model):
             return
 
     def ban_member(self, user):
+        """User is banned from the club, they cannot re-apply to join"""
         role = Role.objects.get(club=self, user=user)
-        if role.club_role == 'MEM':
+        if role.club_role == 'OWN' or role.club_role == 'BAN':
+            return
+        else:
             role.club_role = 'BAN'
+            role.save()
+            return
+
+    def unban_member(self, user):
+        """Unban a banned user, they now re-join the club."""
+        role = Role.objects.get(club=self, user=user)
+        if role.club_role == 'BAN':
+            role.club_role = 'MEM'
             role.save()
             return
         else:
             return
 
-    def unban_member(self, user):
-        role = Role.objects.get(club=self, user=user)
-        if role.club_role == 'BAN':
-            role.delete()
+    def transfer_ownership(self, old_owner, new_owner):
+        """Transfer ownership to a moderator in the club"""
+        new_owner_role = Role.objects.get(club=self, user=new_owner)
+        old_owner_role = Role.objects.get(club=self, user=old_owner)
+        if old_owner_role.club_role == 'OWN' and new_owner_role.club_role == 'MOD':
+            old_owner_role.club_role = 'MOD'
+            old_owner_role.save()
+            new_owner_role.club_role = 'OWN'
+            new_owner_role.save()
             return
+
         else:
             return
 
-    def transfer_ownership(self, old_owner, new_owner):
-        new_owner_role = Role.objects.get(club=self, user=new_owner)
-        old_owner_role = Role.objects.get(club=self, user=old_owner)
-        if new_owner_role.club_role == 'MOD':
-            new_owner_role.club_role = 'OWN'
-            new_owner_role.save()
-            old_owner_role.club_role = 'MOD'
-            old_owner_role.save()
+    def remove_user_from_club(self, user):
+        """User is removed from the club, however they can re-apply to join the club immediately after"""
+        role = Role.objects.get(club=self, user=user)
+        if role.club_role == 'OWN' or role.club_role == 'BAN':
             return
         else:
-            return
+            role.delete()
+            if Application.objects.filter(user=user, club=self).count() == 1:
+                Application.objects.get(user=user, club=self).delete()
 
     def get_members(self):
         return self.club_members.all().filter(
@@ -328,22 +355,17 @@ class Club(models.Model):
             club__club_name=self.club_name,
             role__club_role='OWN')
 
-    def remove_user_from_club(self, user):
-        role = Role.objects.get(club=self, user=user)
-        role.delete()
-
-    def change_club_status(self, choice):
-        if choice == True:
-            self.public_status = True
-        else:
-            self.status = False
-        self.save()
-
     def get_meeting_status(self):
         if self.meeting_status == 'ONL':
             return 'Online'
         else:
             return 'In-Person'
+
+    def get_public_status(self):
+        if self.public_status == 'PRI':
+            return 'Private'
+        else:
+            return 'Public'
 
 
 class Role(models.Model):
@@ -360,7 +382,11 @@ class Role(models.Model):
         max_length=3,
         choices=RoleOptions.choices,
         default=RoleOptions.MEMBER,
+        # unique=True,
     )
+
+    class Meta:
+        unique_together = ('user', 'club')
 
     def get_club_role(self):
         return self.RoleOptions(self.club_role).name.title()
@@ -370,15 +396,16 @@ class Post(models.Model):
 
     title = models.CharField(max_length=255, blank=False)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    body = models.TextField(max_length=520, blank=False)
+    club = models.ForeignKey(Club, on_delete=models.CASCADE)
+    body = models.CharField(max_length=520, blank=False)
     post_date = models.DateField(auto_now_add=True)
     post_datetime = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        ordering = ['-post_date', '-post_datetime']
+
     def __str__(self):
         return self.title + ' | ' + str(self.author)
-
-    def get_absolute_url(self):
-        return reverse('feed')
 
     def toggle_upvote(self, user):
         if Vote.objects.filter(post=self, user=user).count() == 1:
@@ -426,9 +453,6 @@ class Comment(models.Model):
     body = models.CharField(max_length=520, blank=False)
     related_post = models.ForeignKey(Post, related_name="comments", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-
-    def get_absolute_url(self):
-        return reverse('feed')
 
     class Meta:
         ordering = ['-created_at']
@@ -510,11 +534,13 @@ class MeetingAttendance(models.Model):
 class ClubBookAverageRating(models.Model):
     club = models.ForeignKey(Club, on_delete=models.CASCADE)
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
-    rate = models.FloatField(default=0, validators=[MinValueValidator(0.0), MaxValueValidator(10.0)])
+    rate = models.FloatField(default=0)
     number_of_ratings = models.IntegerField()
 
     def add_rating(self, rate):
         self.rate += rate
+        self.save()
 
     def increment_number_of_ratings(self):
         self.number_of_ratings += 1
+        self.save()

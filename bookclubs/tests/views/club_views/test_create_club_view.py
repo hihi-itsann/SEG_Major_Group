@@ -24,8 +24,6 @@ class CreateClubViewTestCase(TestCase):
             'country': 'country1',
             'public_status': 'PUB',
             'genre': 'Non-Fiction',
-            # 'genre': 'Social Science',
-
             'description': 'description',
         }
 
@@ -58,7 +56,6 @@ class CreateClubViewTestCase(TestCase):
             'city': 'city1',
             'country': 'country1',
             'public_status': 'PUB',
-            # 'genre': 'Social Science',
             'genre': 'Non-Fiction',
             'description': 'description',
         }
@@ -170,7 +167,7 @@ class CreateClubViewTestCase(TestCase):
         self.assertEqual(club.genre, 'Fiction')
         self.assertEqual(club.description, 'description')
 
-    def test_unsuccesful_in_person_public_create_club(self):
+    def test_unsuccessful_in_person_public_create_club(self):
         self.form_input_in_person_public['club_name'] = ''
         self.client.login(username=self.user.username, password='Password123')
         before_count = Club.objects.count()
@@ -183,7 +180,7 @@ class CreateClubViewTestCase(TestCase):
         form = response.context['form']
         self.assertTrue(isinstance(form, ClubForm))
 
-    def test_succesful_in_person_public_create_club(self):
+    def test_successful_in_person_public_create_club(self):
         self.client.login(username=self.user.username, password='Password123')
         before_count = Club.objects.count()
         response = self.client.post(self.url, self.form_input_in_person_public, follow=True)

@@ -1,4 +1,8 @@
 {% extends 'base_content.html' %}
+{% block title %}
+| Reading List
+{% endblock %}
+
 {% block content %}
     <br>
     <header class="text-center" style="color:#2F3E46">
@@ -7,9 +11,9 @@
 
     <!--Genre buttons-->
     <div class="btn-group-mg">
-      <a href="{% url 'reading_book_list' 'All' %}"class="btn btn-normal">All</a>
+      <a href="{% url 'reading_book_list' 'All' %}"class="btn btn-apply">All</a>
       {% for genre in genres %}
-        <a href="{% url 'reading_book_list' genre %}"class="btn btn-normal">{{ genre }}</a>
+        <a href="{% url 'reading_book_list' genre %}"class="btn btn-apply">{{ genre }}</a>
       {% endfor %}
     </div>
 
@@ -21,14 +25,15 @@
           <div class="card border-0 shadow">
             <div class="card-body text-center">
               <img src="../../static/images/unreadbooks.jpg" class="card-img-top" style="width: 100%; height: 320px;">
-              <h5 class="card-title mb-0" style="color:#fb8500">Unread Books</h5>
+              <br>
+              <h5 class="card-title mb-0" style="color:#db222a">Unread Books</h5>
               <br>
               {% if not unreadBooks %}
                 <h5 >Empty</h5>
               {% else %}
                 {% for book in unreadBooks%}
                     <img src="{{ book.image_url_m }}">
-                    <h5><a href="{% url 'show_book' book.ISBN %}">{{ book.title }}</a></h5>
+                    <h5><a href="{% url 'show_book' book.ISBN %}" style="color:#db222a">{{ book.title }}</a></h5>
                     <br>
                 {% endfor %}
               {% endif %}
@@ -47,7 +52,7 @@
               {% else %}
                 {% for book in readingBooks%}
                     <img src="{{ book.image_url_m }}">
-                    <h5><a href="{% url 'show_book' book.ISBN %}">{{ book.title }}</a></h5>
+                    <h5><a href="{% url 'show_book' book.ISBN %}" style="color:#598392">{{ book.title }}</a></h5>
                     <br>
                 {% endfor %}
               {% endif %}
@@ -65,7 +70,7 @@
               {% else %}
                 {% for book in finishedBooks%}
                     <img src="{{ book.image_url_m }}">
-                    <h5><a href="{% url 'show_book' book.ISBN %}">{{ book.title }}</a></h5>
+                    <h5 ><a href="{% url 'show_book' book.ISBN %}" style="color:#40916c">{{ book.title }}</a></h5>
                     <br>
                 {% endfor %}
               {% endif %}

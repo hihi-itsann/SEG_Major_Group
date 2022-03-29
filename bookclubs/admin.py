@@ -1,11 +1,11 @@
 from django.contrib import admin
 from .models import User, Application, Club, Role, Book, BookRatingReview, BookStatus, Vote, Comment, Post, Meeting, \
-    MeetingAttendance
+    MeetingAttendance,ClubBookAverageRating
 
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ['userID','username',
+    list_display = ['id', 'userID','username',
                     'email','meeting_preference','location','country','city']
 
 
@@ -63,7 +63,7 @@ class CommentAdmin(admin.ModelAdmin):
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
     list_display = [
-        'title', 'author', 'body', 'post_date', 'post_datetime'
+        'title', 'author','club', 'body', 'post_date', 'post_datetime'
     ]
 
 @admin.register(Meeting)
@@ -76,4 +76,9 @@ class MeetingAdmin(admin.ModelAdmin):
 class MeetingAttendanceAdmin(admin.ModelAdmin):
     list_display = [
         'id', 'user', 'meeting', 'meeting_role'
+    ]
+@admin.register(ClubBookAverageRating)
+class ClubBookAverageRatingAdmin(admin.ModelAdmin):
+    list_display = [
+        'club', 'book', 'rate', 'number_of_ratings'
     ]

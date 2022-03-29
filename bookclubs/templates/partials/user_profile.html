@@ -1,15 +1,59 @@
-<div class="row content">
-    <div class="col">
-        <img src="{{ user.gravatar }}" alt="Gravatar of {{ user.full_name }}" class="rounded-circle profile-image">
-        <div class="profile-text">
-            <h3 class="profile-title">{{ user.full_name }}</h3>
-            <p class="profile-username">{{ user.username }}</p>
-        </div>
-    </div>
-</div>
-<div class="row content">
-    <div class="col">
-        <p class="profile-bio">{{ user.bio }}</p>
-        <p>Pronouns: {{ user.get_pronouns }}</p>
-    </div>
-</div>
+<section class="section about-section gray-bg">
+                    <div class="container" style="color:#2f3e46">
+                        <div class="row align-items-center flex-row-reverse">
+                            <div class="col-lg-6">
+                                <div class="about-text go-to">
+                                    <h3 class="dark-color">About Me: {{user.first_name}} {{user.last_name}}</h3>
+                                    <h6 class="theme-color lead">Bio: {{ user.bio }}</h6>
+                                    <div class="row about-list">
+                                        <div class="col-md-6">
+                                            <div class="media">
+                                                <label><b>Birthday</b></label>
+                                                <p>{{user.dob}}</p>
+                                            </div>
+                                            <div class="media">
+                                                <label><b>Location</b></label>
+                                                <p>{{user.location}}</p>
+                                            </div>
+                                            <div class="media">
+                                                <label><b>Address</b></label>
+                                                <p>{{user.city}},{{user.country}}</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="media">
+                                                <label><b>E-mail</b></label>
+                                                <p>{{user.email}}</p>
+                                            </div>
+                                            <div class="media">
+                                                <label><b>Pronouns</b></label>
+                                                <p>{{user.get_pronouns}}</p>
+                                            </div>
+                                            <div class="media">
+                                                <label><b>Username</b></label>
+                                                <p>{{user.username}}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="about-avatar">
+                                    <img src="{{ user.gravatar }}" alt="Gravatar of {{ user.full_name }}" class="rounded-circle profile-image">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="counter">
+                            <div class="row">
+                              <h3>User belongs to:</h3>
+                              {% for club in user.get_clubs %}
+                              <div class="col-6 col-lg-3">
+                                  <div class="count-data text-center">
+                                      <p class="m-0px font-w-600">{{ club.club_name }}</p>
+                                  </div>
+                              </div>
+                              {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </section>

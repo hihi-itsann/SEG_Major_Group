@@ -1,6 +1,6 @@
 {% extends 'base_content.html' %}
 {% block title %}
-Create new club
+| Create club
 {% endblock %}
 {% block content %}
       <div class="container py-5 h-100">
@@ -16,7 +16,7 @@ Create new club
                     <div class="col">
                         {% csrf_token %}
                         {% include 'partials/bootstrap_form.html' with form=form %}
-                        <input type="submit" value="Create club!" class="btn btn-outline-dark">
+                        <input type="submit" value="Create club!" class="btn btn-submit">
 
                     </div>
                   </div>

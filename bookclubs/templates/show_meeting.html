@@ -1,6 +1,10 @@
 {% extends 'base_content.html' %}
+{% block title %}
+| Show Meeting
+{% endblock %}
+
 {% block content %}
-    <div class="container" style="padding-bottom: inherit">
+    <div class="container" style="padding-bottom: 50px">
         <div class="row">
             <div style="text-align: center">
                 <h1>{{ meeting.club.club_name }} Meeting #{{ meeting.id }}</h1>
@@ -26,15 +30,15 @@
 
                 {% if is_host %}
                     {% if meeting.get_meeting_status == 'Online' and meeting.get_is_time %}
-                        <button type="button" class="btn btn-outline-dark"><a
-                            href={{meeting.start_link}}>Start Meeting</a></button>
+                        <a class="btn btn-outline-dark"
+                            href={{meeting.start_link}}>Start Meeting</a>
                     {% endif %}
-                    <button type="button" class="btn btn-outline-dark"><a
+                    <a class="btn btn-outline-dark"
                             href="{% url 'edit_meeting' club_name=club_name meeting_id=meeting.id %}">Edit
-                        Meeting</a></button>
-                    <button type="button" class="btn btn-outline-dark"><a
+                        Meeting</a>
+                    <a class="btn btn-outline-dark"
                         href="{% url 'delete_meeting' club_name=club_name meeting_id=meeting.id %}">Cancel
-                    Meeting</a></button>
+                    Meeting</a>
 
                         {% else %}
                     {% if is_attendee_only %}
@@ -42,23 +46,24 @@
 
                         <h7>Can't join us anymore?</h7>
                         <br>
-                        <button type="button" class="btn btn-outline-dark">
-                            <a href="{% url 'leave_meeting' club_name=club_name meeting_id=meeting.id %}">Not Going</a>
-                        </button>
+                        
+                            <a class="btn btn-outline-dark" href="{% url 'leave_meeting' club_name=club_name meeting_id=meeting.id %}">Not Going</a>
+                        
                         {% if meeting.get_meeting_status == 'Online' and meeting.get_is_time %}
-                            <button type="button" class="btn btn-outline-dark">
-                                    <a href={{meeting.join_link}}>Join Now </a>
-                                </button>
+                            
+                                    <a class="btn btn-outline-dark" href={{meeting.join_link}}>Join Now </a>
+                                
                         {% endif %}
                     {% else %}
                         <h7>Want to join us?</h7>
                         <br>
-                        <button type="button" class="btn btn-outline-dark">
-                            <a href="{% url 'join_meeting' club_name=club_name meeting_id=meeting.id %}">Attend</a>
-                        </button>
+                        
+                            <a class="btn btn-outline-dark" href="{% url 'join_meeting' club_name=club_name meeting_id=meeting.id %}">Attend</a>
+                        
                     {% endif %}
                 {% endif %}
 
         </div>
             </div>
+    </div>
 {% endblock %}

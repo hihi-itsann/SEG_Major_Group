@@ -50,5 +50,17 @@
        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ipsum dolor sit amet consectetur adipiscing. Mauris in aliquam sem fringilla ut morbi tincidunt augue interdum."
 
      }
-   }
+   },
+      {
+        "model": "bookclubs.club",
+        "pk": 5,
+        "fields": {
+          "club_name": "club5",
+          "meeting_status": "OFF",
+          "location": "Bush House",
+          "public_status": "PUB",
+          "genre": "Fiction",
+          "description":"test club5"
+        }
+      }
 ]
