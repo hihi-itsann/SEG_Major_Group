@@ -5,7 +5,7 @@ from bookclubs.models import User, Club, Application, Role
 from bookclubs.tests.helpers import reverse_with_next
 
 
-class EditApplicationViewTestCase(TestCase):
+class WithdrawApplicationViewTestCase(TestCase):
     """Tests for the withdrawal of an application"""
 
     VIEW = 'withdraw_application'
@@ -23,10 +23,10 @@ class EditApplicationViewTestCase(TestCase):
     def log_in(self, user):
         self.client.login(username=user.username, password="Password123")
 
-    def test_create_application_url(self):
+    def test_withdraw_application_url(self):
         self.assertEqual(self.url, f'/club/{self.club.club_name}/withdraw_application/')
 
-    def test_edit_application_redirects_when_not_logged_in(self):
+    def test_withdraw_application_redirects_when_not_logged_in(self):
         before_count = Application.objects.count()
         redirect_url = reverse_with_next('log_in', self.url)
         response = self.client.get(self.url)
@@ -34,7 +34,7 @@ class EditApplicationViewTestCase(TestCase):
         self.assertEqual(after_count, before_count)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
-    def test_edit_application_redirects_when_an_owner(self):
+    def test_withdraw_application_redirects_when_an_owner(self):
         self.log_in(self.user)
         Role.objects.create(user=self.user, club=self.club, club_role='OWN')
         before_count = Application.objects.count()
@@ -44,7 +44,7 @@ class EditApplicationViewTestCase(TestCase):
         self.assertEqual(after_count, before_count)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
-    def test_edit_application_redirects_when_a_banned_user(self):
+    def test_withdraw_application_redirects_when_a_banned_user(self):
         self.log_in(self.user)
         Role.objects.create(user=self.user, club=self.club, club_role='BAN')
         before_count = Application.objects.count()
@@ -54,7 +54,7 @@ class EditApplicationViewTestCase(TestCase):
         self.assertEqual(after_count, before_count)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
-    def test_edit_application_redirects_when_a_member(self):
+    def test_withdraw_application_redirects_when_a_member(self):
         self.log_in(self.user)
         Role.objects.create(user=self.user, club=self.club, club_role='MEM')
         before_count = Application.objects.count()
@@ -64,7 +64,7 @@ class EditApplicationViewTestCase(TestCase):
         self.assertEqual(after_count, before_count)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
-    def test_edit_application_redirects_when_rejected_applicant(self):
+    def test_withdraw_application_redirects_when_rejected_applicant(self):
         self.log_in(self.user)
         Application.objects.create(user=self.user, club=self.club, statement='not empty', status='R')
         before_count = Application.objects.count()
