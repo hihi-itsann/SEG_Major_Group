@@ -1,8 +1,11 @@
 from django.test import TestCase
+
 from bookclubs.models import Club, Book, ClubBookAverageRating
 
 
 class ClubBookAverageRatingModelMethodsTestCase(TestCase):
+    """Unit tests for the methods in the ClubBookAverageRating model"""
+
     fixtures = [
         'bookclubs/tests/fixtures/default_clubs.json',
         'bookclubs/tests/fixtures/default_book.json',
@@ -17,6 +20,8 @@ class ClubBookAverageRatingModelMethodsTestCase(TestCase):
             rate=0,
             number_of_ratings=0
         )
+
+    # Method tests
 
     def test_add_rating(self):
         """Test add_rating method"""

@@ -12,6 +12,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 import json
 
+
 class User(AbstractUser):
     userID = models.IntegerField(unique=True, null=True)
     username = models.CharField(
@@ -45,7 +46,6 @@ class User(AbstractUser):
         ('P', 'In-person')
     )
     meeting_preference = models.CharField(max_length=1, choices=MEETING_CHOICES, blank=True)
-
 
     class Meta:
         """Model options."""
@@ -89,6 +89,7 @@ class User(AbstractUser):
         posts_downvoted = Vote.objects.filter(user=self, vote_type=False).values_list('post', flat=True)
         return Post.objects.filter(id__in=posts_downvoted)
 
+
 class Book(models.Model):
     ISBN = models.CharField(
         primary_key=True,
@@ -114,8 +115,10 @@ class Book(models.Model):
 
     def get_ISBN(self):
         return self.ISBN
+
     def toJson(self):
         return json.dumps(self, default=lambda o: o.__dict__)
+
     @staticmethod
     def get_genres():
         genres = [('Fiction', 'Fiction'), ('Non-Fiction', 'Non-Fiction')]
@@ -393,7 +396,6 @@ class Role(models.Model):
 
 
 class Post(models.Model):
-
     title = models.CharField(max_length=255, blank=False)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     club = models.ForeignKey(Club, on_delete=models.CASCADE)
@@ -414,9 +416,9 @@ class Post(models.Model):
                 vote.delete()
             else:
                 vote.delete()
-                Vote.objects.create(post=self, user=user, vote_type= True)
+                Vote.objects.create(post=self, user=user, vote_type=True)
         else:
-            Vote.objects.create(post=self, user=user, vote_type= True)
+            Vote.objects.create(post=self, user=user, vote_type=True)
 
     def toggle_downvote(self, user):
         if Vote.objects.filter(post=self, user=user).count() == 1:
@@ -425,23 +427,22 @@ class Post(models.Model):
                 vote.delete()
             else:
                 vote.delete()
-                Vote.objects.create(post=self, user=user, vote_type= False)
+                Vote.objects.create(post=self, user=user, vote_type=False)
 
         else:
-            Vote.objects.create(post=self, user=user, vote_type= False)
+            Vote.objects.create(post=self, user=user, vote_type=False)
 
     def get_upvotes(self):
-        return Vote.objects.filter(post=self, vote_type= True).count()
+        return Vote.objects.filter(post=self, vote_type=True).count()
 
     def get_downvotes(self):
-        return Vote.objects.filter(post=self, vote_type= False).count()
+        return Vote.objects.filter(post=self, vote_type=False).count()
 
 
 class Vote(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='post_vote')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_vote')
     vote_type = models.BooleanField()
-
 
     class Meta:
         unique_together = ('user', 'post')
@@ -473,7 +474,8 @@ class Meeting(models.Model):
     time_start = models.TimeField(blank=False)
     duration = models.IntegerField(blank=False, default=30)
     join_link = models.URLField(blank=True, null=True)
-    start_link = models.URLField(blank=True,null=True)
+    start_link = models.URLField(blank=True, null=True)
+
     def get_time_end(self):
         time1 = self.time_start
         timedelta = datetime.timedelta(minutes=self.duration)
@@ -500,7 +502,7 @@ class Meeting(models.Model):
             return 'In-Person'
 
     def get_is_time(self):
-        return datetime.datetime.now().date()==self.date and datetime.datetime.now().time() > self.time_start and datetime.datetime.now().time() < self.get_time_end()
+        return datetime.datetime.now().date() == self.date and datetime.datetime.now().time() > self.time_start and datetime.datetime.now().time() < self.get_time_end()
 
     def get_location(self):
         if self.meeting_status == 'ONL':
