@@ -510,8 +510,6 @@ class Meeting(models.Model):
                 return f"Meeting Link will be available when it's time"
             else:
                 return f"It's time to join the meeting!"
-
-
         else:
             return f'Meeting Held: {self.location} {self.club.city} {self.club.country}'
 

@@ -38,7 +38,7 @@ class MeetingModelTestCase(TestCase):
             meeting_status='ONL',
             location='Online',
             date=date.today(),
-            time_start=(datetime.now() - timedelta(minutes=10)).time(),
+            time_start=(datetime.now() - timedelta(minutes=15)).time(),
             duration=60
         )
 
