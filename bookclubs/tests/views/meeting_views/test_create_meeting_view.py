@@ -3,9 +3,11 @@ from datetime import date, timedelta
 from django.test import TestCase
 from django.urls import reverse
 
+
 from bookclubs.forms import MeetingForm
 from bookclubs.models import User, Club, Meeting, Role, Book, MeetingAttendance
 from bookclubs.tests.helpers import reverse_with_next
+from bookclubs.meeting_link import delete_zoom_meeting
 
 
 class CreateMeetingViewTestCase(TestCase):
@@ -172,3 +174,28 @@ class CreateMeetingViewTestCase(TestCase):
         form = response.context['form']
         self.assertTrue(isinstance(form, MeetingForm))
         self.assertFalse(form.is_bound)
+
+    def test_create_and_delete_online_meeting_successful(self):
+        """Test creattion of an online meeti"""
+        Role.objects.create(user=self.user, club=self.online_club, club_role='MEM')
+        self.log_in(self.user)
+        url = reverse(self.VIEW, kwargs={'club_name': self.online_club.club_name, 'book_isbn': self.another_book.ISBN})
+        form_input = {
+            'topic': 'Online Meeting ',
+            'description': 'delta foxtrot golf hotel india',
+            'location': 'Bush House',
+            'date': date.today() + timedelta(days=5),
+            'time_start': '10:00',
+            'duration': 30,
+        }
+        before_count = Meeting.objects.count()
+        before_count_attendance = MeetingAttendance.objects.count()
+        response = self.client.post(url, form_input, follow=True)
+        after_count = Meeting.objects.count()
+        after_count_attendance = MeetingAttendance.objects.count()
+        self.assertEqual(after_count, before_count + 1)
+        self.assertEqual(after_count_attendance, before_count_attendance + 1)
+        response_url = reverse('meeting_list', kwargs={'club_name': self.online_club.club_name})
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+        self.assertTemplateUsed(response, 'meeting_list.html')
+        delete_zoom_meeting()
