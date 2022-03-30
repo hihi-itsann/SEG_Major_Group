@@ -16,7 +16,7 @@ class ClubFeedViewTestCase(TestCase):
         self.user = User.objects.get(username='@johndoe')
         self.client.login(username=self.user.username, password='Password123')
         self.user2 = User.objects.get(username='@janedoe')
-        self.user3 = User.objects.get(username='@Alexdoe')
+        self.user3 = User.objects.get(username='@alexdoe')
         self.club1 =  Club.objects.get(club_name='private_online')
         self.club2 =  Club.objects.get(club_name='public_online')
         self.club3 =  Club.objects.get(club_name='private_in-person')

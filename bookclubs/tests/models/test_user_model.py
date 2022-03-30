@@ -16,7 +16,7 @@ class UserModelTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.get(username='@johndoe')
         self.user_two = User.objects.get(username='@janedoe')
-        self.user_three = User.objects.get(username='@Alexdoe')
+        self.user_three = User.objects.get(username='@alexdoe')
         self.club = Club.objects.get(club_name='private_online')
         self.post = Post.objects.create(
             title="test",

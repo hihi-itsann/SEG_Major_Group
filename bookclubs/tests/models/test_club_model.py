@@ -12,7 +12,7 @@ class ClubModelTestCase(TestCase):
     def setUp(self):
         self.owner = User.objects.get(username='@johndoe')
         self.moderator = User.objects.get(username='@janedoe')
-        self.member = User.objects.get(username='@Alexdoe')
+        self.member = User.objects.get(username='@alexdoe')
         self.club = Club.objects.create(
             club_name='Club Name',
             meeting_status='OFF',
