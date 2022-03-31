@@ -1,11 +1,13 @@
 from django.test import TestCase
 from django.urls import reverse
+
 from bookclubs.models import User, Book, BookStatus
-from bookclubs.views import reading_book_list
 from bookclubs.tests.helpers import reverse_with_next
-from django.test import RequestFactory
+
 
 class ReadingBookListViewTest(TestCase):
+    """Tests for showing the reading book list"""
+
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
     ]
@@ -16,7 +18,7 @@ class ReadingBookListViewTest(TestCase):
         self._create_reading_books(3)
 
     def test_reading_book_list_url(self):
-        self.assertEqual(self.url,f'/reading_book_list/All/')
+        self.assertEqual(self.url, f'/reading_book_list/All/')
 
     def test_get_reading_book_list_with_all_genres(self):
         self.client.login(username=self.user.username, password='Password123')
@@ -73,7 +75,7 @@ class ReadingBookListViewTest(TestCase):
                 ISBN=f'XXXXXXXXX{book_id}',
                 title=f'unreadBooktitle{book_id}',
                 author=f'author{book_id}',
-                year_of_publication=book_id+1000,
+                year_of_publication=book_id + 1000,
                 publisher=f'Last{book_id}',
                 image_url_s=f'url-s{book_id}',
                 image_url_m=f'url-m{book_id}',
@@ -89,7 +91,7 @@ class ReadingBookListViewTest(TestCase):
                 ISBN=f'YYYYYYYYY{book_id}',
                 title=f'readingBooktitle{book_id}',
                 author=f'author{book_id}',
-                year_of_publication=book_id+1000,
+                year_of_publication=book_id + 1000,
                 publisher=f'Last{book_id}',
                 image_url_s=f'url-s{book_id}',
                 image_url_m=f'url-m{book_id}',
@@ -106,7 +108,7 @@ class ReadingBookListViewTest(TestCase):
                 ISBN=f'ZZZZZZZZZ{book_id}',
                 title=f'finishedBooktitle{book_id}',
                 author=f'author{book_id}',
-                year_of_publication=book_id+1000,
+                year_of_publication=book_id + 1000,
                 publisher=f'Last{book_id}',
                 image_url_s=f'url-s{book_id}',
                 image_url_m=f'url-m{book_id}',

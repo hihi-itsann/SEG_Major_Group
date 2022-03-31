@@ -1,16 +1,17 @@
 from django.test import TestCase
 from django.urls import reverse
+
 from bookclubs.forms import RateReviewForm
 from bookclubs.models import User, Book, BookStatus, BookRatingReview
 from bookclubs.tests.helpers import reverse_with_next
 
 
 class CreateBookRateViewTestCase(TestCase):
-    """Tests of the create book rate view."""
+    """Tests for the create book rate view."""
 
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
-        'bookclubs/tests/fixtures/default_book.json'
+        'bookclubs/tests/fixtures/default_book.json',
     ]
 
     def setUp(self):
@@ -57,5 +58,5 @@ class CreateBookRateViewTestCase(TestCase):
         self.assertEqual(after_count, before_count + 1)
         book = Book.objects.get(ISBN='0195153448')
         self.assertTemplateUsed(response, 'show_book.html')
-        response_url = '{}#education'.format(reverse('show_book',kwargs={'ISBN': self.book.ISBN}))
+        response_url = '{}#education'.format(reverse('show_book', kwargs={'ISBN': self.book.ISBN}))
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
