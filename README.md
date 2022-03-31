@@ -48,7 +48,7 @@ This is a readme file for our SEG Major Group Project.
 	* Explore and rate books in the book list section, and filter them by genre
 	* Add books to their reading list where they can set their reading status as: unread, reading and finished reading.
 * As a club moderator or owner you can:
-	** Create meetings that can be either online or in person
+	* Create meetings that can be either online or in person
   * See club applicants, members and banned members
 * As a club owner you can:
 	* Modify club info and delete the club
