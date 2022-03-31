@@ -15,6 +15,7 @@ This is a readme file for our SEG Major Group Project.
   * [Reference List](#Reference-list "Go to Reference List")
 
 ## Contributors
+**Team Name: Major Group**
 :space_invader:***Artificial Intelligence Group:***
   * Rishi Ganeshan (K20004392)
   * Encheng Wu (K20070867)
@@ -99,13 +100,13 @@ Book Clubs - Django Web Application Setup Instructions
     python3 manage.py runserver  
 
 **8. Run the tests:**  
-  *If the programme gives test errors run first:*  
+  *-If the programme gives test errors run first:*  
 
     python3 manage.py collectstatic  
   *then*  
 
     python3 manage.py test  
-  *If you want to test with coverage:*    
+  *-If you want to test with coverage:*    
 
     coverage run manage.py test
 
