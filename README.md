@@ -31,38 +31,48 @@ This is a readme file for our SEG Major Group Project.
 * Anqi Jin (K20073503)
 
 ## Description
-**Book Club** is a book clubs management web application where the user can explore and join book clubs in order to discuss about books according to their preferences. This is a social networking platform where bookworms can share their thoughts about books they have read during meetings (either in person or online) or simply via creating a post in the clubs they belong to. Our AI system will also recommend users books according to the clubs they have joined (the preferences of the club members will affect the recommendations of the system).
+**Book Club** is a club management web application where the user can explore and join book clubs in order to discuss books according to their preferences. This is a social networking platform where bookworms can share their thoughts about books they have read in their own time and for meetings (in person or online) or simply via creating a post in one of the clubs that they belong to. Our AI system will also recommend users books that club members might like when they create a meeting (the preferences of the club members will affect the recommendations of the system).
 
 ## Features
 * When the user has signed up and logged into the website they will be redirected to the club home page where:
 	* A different book quote will be displayed everyday
-	* Profits of reading will be displayed in order to encourage people to read books
+	* Advantages of reading will be displayed in order to encourage people to read books
 * All users can:
 	* Create a profile and edit it afterwards
 	* Create, join and leave book clubs
 	* Explore different clubs according to their preferences
 	* Create an application to join private clubs (users are automatically accepted to public clubs)
-	* Join meetings that can be either online or in person
-	* Create posts on the club feed
-	* Upvote/downvote, comment on posts
-	* Delete own posts
 	* Explore and rate books in the book list section, and filter them by genre
-	* Add books to their reading list where they can set their reading status as: unread, reading and finished reading.
-* As a club moderator or owner you can:
-	* Create meetings that can be either online or in person
-  * See club applicants, members and banned members
-* As a club owner you can:
-	* Modify club info and delete the club
+	* Add books to their reading list where they can set their reading status as: unread, reading and finished reading
+* As a club member, you can:
+  * See a list of all the people in the club
+  * Create meetings that others can join on the day using Zoom if it is an online-based club
+  * Join meetings that have been hosted by others in the club
+  * Create posts that are put on the club feed
+  * Comment and upvote or downvote posts to express opinions on other people's posts
+  * Delete their own posts
+* As a club moderator, you can:
+  * Do all the things that a member can do
+  * Accept and reject applications to the club
+  * Remove members who are being disruptive
+* As a club owner, you can:
+  * Do all the things that a moderator can
+	* Modify the club's information
+  * Transfer the ownership of the club to a moderator
+  * Promote a member to moderator
+  * Demote a moderator to member
+  * Ban a member from the club, so the member can no longer access the club and cannot re-apply for the club
+  * Delete the club
 * An interactive dinosaur game will be displayed while the system loads the book recommendations
 
 ## Technologies
 * Our project was built employing Python/Django.
 * **Keras**, **TensorFlow**, **Numpy** and **Pandas** were used to produce the (AI) Recommender system
-* **Libgravatar** was used to provide url to users’ profile picture
-* **Coverage** was used for monitoring the programme’s testing
-* **Faker** was used to generate fake data for bootstrapping the database
+* **Libgravatar** was used to show the users’ profile pictures
+* **Coverage** was used for monitoring the program’s testing
+* **Faker** was used to generate fake data for seeding the database
 * **Google-pasta** was used to generate hidden game
-* **Bootstrap** was used to design the programme's front-end
+* **Bootstrap** was used to design the program's front-end
 
 <!-- The location where the software or software component is deployed and sufficient information to access it.  The latter includes access credentials for the different types of user who may employ the software. -->
 
@@ -100,7 +110,7 @@ Book Clubs - Django Web Application Setup Instructions
     python3 manage.py runserver  
 
 **8. Run the tests:**  
-  *-If the programme gives test errors run first:*  
+  *-If the program gives test errors run first:*  
 
     python3 manage.py collectstatic  
   *then*  
