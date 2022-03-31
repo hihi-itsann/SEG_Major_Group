@@ -1,14 +1,10 @@
 from django import forms
-from django.core.validators import RegexValidator
-from .models import User, Club, Application, Role, Post, Comment, BookRatingReview, Meeting, MeetingAttendance, Book
 from django.contrib.auth import authenticate
-# from django.forms.widgets import DateInput
-from django.db import IntegrityError
+from django.core.validators import RegexValidator
 from django.utils import timezone
+
 from .models import Post
-
-
-# from django.forms.widgets import DateInput
+from .models import User, Club, Application, Comment, BookRatingReview, Meeting, MeetingAttendance, Book
 
 
 class NewPasswordMixin(forms.Form):
@@ -27,7 +23,6 @@ class NewPasswordMixin(forms.Form):
 
     def clean(self):
         """ Ensure that new_password and password_confirmation contain the same password."""
-
         super().clean()
         new_password = self.cleaned_data.get('new_password')
         password_confirmation = self.cleaned_data.get('password_confirmation')
@@ -36,11 +31,13 @@ class NewPasswordMixin(forms.Form):
 
 
 def validate_date_not_in_future(value):
+    """Validates that the date is in the past or present."""
     if value < timezone.now().date():
         raise forms.ValidationError('Date needs to be in the future.')
 
 
 def validate_date_not_in_past(value):
+    """Validates that the date is in the future."""
     if value >= timezone.now().date():
         raise forms.ValidationError('Date needs to be in the past.')
 
@@ -52,7 +49,6 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
 
     class Meta:
         """Form options."""
-
         model = User
         fields = ['first_name', 'last_name', 'username', 'email', 'bio', 'dob', 'gender', 'location', 'city', 'country',
                   'meeting_preference']
@@ -60,7 +56,6 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
 
     def save(self):
         """Create a new user."""
-
         super().save(commit=False)
         user = User.objects.create_user(
             self.cleaned_data.get('username'),
@@ -78,12 +73,13 @@ class SignUpForm(NewPasswordMixin, forms.ModelForm):
 
 
 class LogInForm(forms.Form):
+    """Form enabling registered users to log in."""
+
     username = forms.CharField(label="Username")
     password = forms.CharField(label="Password", widget=forms.PasswordInput())
 
     def get_user(self):
         """Returns authenticated user if possible."""
-
         user = None
         if self.is_valid():
             username = self.cleaned_data.get('username')
@@ -93,12 +89,12 @@ class LogInForm(forms.Form):
 
 
 class UserForm(forms.ModelForm):
-    """Form to update user profiles."""
+    """Form enabling users to update their profiles."""
+
     dob = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), validators=[validate_date_not_in_past])
 
     class Meta:
         """Form options."""
-
         model = User
         fields = ['first_name', 'last_name', 'username', 'email', 'bio', 'dob', 'gender', 'location', 'city', 'country',
                   'meeting_preference']
@@ -112,13 +108,11 @@ class PasswordForm(NewPasswordMixin):
 
     def __init__(self, user=None, **kwargs):
         """Construct new form instance with a user instance."""
-
         super().__init__(**kwargs)
         self.user = user
 
     def clean(self):
         """Clean the data and generate messages for any errors."""
-
         super().clean()
         password = self.cleaned_data.get('password')
         if self.user is not None:
@@ -130,7 +124,6 @@ class PasswordForm(NewPasswordMixin):
 
     def save(self):
         """Save the user's new password."""
-
         new_password = self.cleaned_data['new_password']
         if self.user is not None:
             self.user.set_password(new_password)
@@ -139,6 +132,8 @@ class PasswordForm(NewPasswordMixin):
 
 
 class RateReviewForm(forms.ModelForm):
+    """Form enabling users to rate and review a book."""
+
     class Meta:
         model = BookRatingReview
         fields = ['rate', 'review']
@@ -148,7 +143,7 @@ class RateReviewForm(forms.ModelForm):
 
 
 class ClubForm(forms.ModelForm):
-    """Create and update club form"""
+    """Form enabling users to create and update a club."""
 
     class Meta:
         model = Club
@@ -164,7 +159,6 @@ class ClubForm(forms.ModelForm):
         ('PRI', 'Private')
     )
 
-    # GENRE_CHOICES = [('Fiction', 'Fiction'), ('Non-Fiction', 'Non-Fiction')]
     GENRE_CHOICES = Book.get_genres()
 
     meeting_status = forms.ChoiceField(widget=forms.Select(), label='Meetings Held', choices=MEETING_CHOICES)
@@ -177,6 +171,8 @@ class ClubForm(forms.ModelForm):
 
 
 class ApplicationForm(forms.ModelForm):
+    """Form enabling a user to apply for a club which is private."""
+
     class Meta:
         model = Application
         fields = ['statement']
@@ -184,6 +180,7 @@ class ApplicationForm(forms.ModelForm):
                                                                                               'join this club?'}), }
 
     def original_save(self, user=None, club=None):
+        """Saves a new application with the user and club."""
         super().save(commit=False)
         application = Application.objects.create(
             user=user,
@@ -195,19 +192,21 @@ class ApplicationForm(forms.ModelForm):
 
 
 class PostForm(forms.ModelForm):
+    """Form enabling a user to create a post in a club."""
+
     class Meta:
         model = Post
         fields = ('title', 'body')
-
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control',
-                                            'placeholder': 'What is the name of the book that you just finished?'}),
+                                            'placeholder': 'What is the name of the book that you\'ve just finished?'}),
             'body': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'What are your thoughts?'}),
-
         }
 
 
 class CommentForm(forms.ModelForm):
+    """Form enabling a user to create a comment on a post in a club."""
+
     class Meta:
         model = Comment
         fields = ('body',)
@@ -218,6 +217,8 @@ class CommentForm(forms.ModelForm):
 
 
 class MeetingForm(forms.ModelForm):
+    """Form enabling a user to create a meeting."""
+
     date = forms.DateField(
         widget=forms.SelectDateWidget(),
         initial=timezone.now().date(),
@@ -227,17 +228,16 @@ class MeetingForm(forms.ModelForm):
     class Meta:
         model = Meeting
         fields = ('topic', 'description', 'location', 'date', 'time_start', 'duration')
-
         widgets = {
             'topic': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Topic'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Agenda'}),
             'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Location'}),
-            # 'date': forms.DateInput(attrs={'class': 'form-control', 'format': "%Y-%m-%d", 'placeholder': 'yyyy-mm-dd'}),
             'time_start': forms.TimeInput(attrs={'class': 'form-control', 'placeholder': 'hh:mm'}),
             'duration': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Minutes'})
         }
 
     def original_save(self, user=None, club=None, book=None, join_link=None, start_link=None):
+        """Saves a new meeting with user, club, club and potential join and start links."""
         super().save(commit=False)
         meeting = Meeting.objects.create(
             club=club,
@@ -252,7 +252,7 @@ class MeetingForm(forms.ModelForm):
             join_link=join_link,
             start_link=start_link
         )
-        host = MeetingAttendance.objects.create(
+        MeetingAttendance.objects.create(
             user=user,
             meeting=meeting,
             meeting_role='H'
