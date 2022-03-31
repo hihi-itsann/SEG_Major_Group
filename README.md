@@ -30,7 +30,7 @@ This is a readme file for our SEG Major Group Project.
 * Anqi Jin (K20073503)
 
 ## Description
-**Book Club** is a book clubs management web application where the user can explore and join book clubs in order to discuss about books according to their preferences. This is a networking platform where bookworms can share their thoughts about books they have read during meetings (either in person or online) or simply via creating a post in the clubs they belong to. Our AI system will also recommend users books according to the clubs they have joined (the preferences of the club members will affect the recommendations of the system).
+**Book Club** is a book clubs management web application where the user can explore and join book clubs in order to discuss about books according to their preferences. This is a social networking platform where bookworms can share their thoughts about books they have read during meetings (either in person or online) or simply via creating a post in the clubs they belong to. Our AI system will also recommend users books according to the clubs they have joined (the preferences of the club members will affect the recommendations of the system).
 
 ## Features
 * When the user has signed up and logged into the website they will be redirected to the club home page where:
@@ -56,38 +56,38 @@ This is a readme file for our SEG Major Group Project.
 
 ## Technologies
 * Our project was built employing Python/Django.
-* Keras, TensorFlow, Numpy and Pandas were used to produce the (AI) Recommender system
-* Libgravatar was used to provide url to users’ profile picture
-* Coverage was used for monitoring the programme’s testing
-* Faker was used to generate fake data for bootstrapping the database
-* Google-pasta was used to generate hidden game
-* Bootstrap was used to design the programme's front-end
+* *Keras*, *TensorFlow*, *Numpy* and *Pandas* were used to produce the (AI) Recommender system
+* *Libgravatar* was used to provide url to users’ profile picture
+* *Coverage* was used for monitoring the programme’s testing
+* *Faker* was used to generate fake data for bootstrapping the database
+* *Google-pasta* was used to generate hidden game
+* *Bootstrap* was used to design the programme's front-end
 
 <!-- The location where the software or software component is deployed and sufficient information to access it.  The latter includes access credentials for the different types of user who may employ the software. -->
 
 ## How to run the project
 Book Clubs - Django Web Application Setup Instructions
-1. Install virtual environment:
+*1. Install virtual environment:*
     virtualenv venv
-2. Launch virtual environment:
+*2. Launch virtual environment:*
     source venv/bin/activate
-3. Install required applications:
+*3. Install required applications:*
     pip3 install -r requirements.txt
-4. Get the database
+*4. Get the database1:*
     python3 manage.py makemigrations
     python3 manage.py migrate
-5. Create Super User:
+*5. Create Super User:*
     python3 manage.py createsuperuser
-6. Seeder and unseeder (Seeder can only be run once, unless run unseed again):
+*6. Seeder and unseeder (Seeder can only be run once, unless run unseed again):*
     python3 manage.py seed
     python3 manage.py unseed
-7. Run the server/application:
+*7. Run the server/application:*
     python3 manage.py runserver
-8. Run the tests:
+*8. Run the tests:*
     python3 manage.py test
 
 ## License
-By contributing, you agree that your contributions will be licensed under its MIT License.
+By contributing, you agree that your contributions will be licensed under its *MIT License*.
 
 ## Reference List
 * The hidden game was adapted from [Dino-Game](https://github.com/WebDevSimplified/chrome-dino-game-clone "Dino-Game")
