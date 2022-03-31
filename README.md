@@ -1,7 +1,7 @@
 # 5CCS2SEG_Major_Group_Project: Book Club
 This is a readme file for our SEG Major Group Project.
 ## Table of Contents
-  (#Contributors "Goto Contributors")
+  *(#heading-1 "Goto Contributors")
 
 ## Contributors
 ***Artificial Intelligence Group:***
