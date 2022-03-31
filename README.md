@@ -57,7 +57,7 @@ This is a readme file for our SEG Major Group Project.
   * Remove members who are being disruptive
 * As a club owner, you can:
   * Do all the things that a moderator can
-	* Modify the club's information
+  * Modify the club's information
   * Transfer the ownership of the club to a moderator
   * Promote a member to moderator
   * Demote a moderator to member
