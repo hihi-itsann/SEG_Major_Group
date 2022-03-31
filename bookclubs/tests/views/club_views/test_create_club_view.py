@@ -1,15 +1,16 @@
 from django.test import TestCase
-from django.contrib.auth.hashers import check_password
-from bookclubs.forms import ClubForm
 from django.urls import reverse
+
+from bookclubs.forms import ClubForm
 from bookclubs.models import Club, User, Book
-from bookclubs.tests.helpers import reverse_with_next
 
 
 class CreateClubViewTestCase(TestCase):
+    """Tests for the creation of a club"""
+
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
-        'bookclubs/tests/fixtures/default_book.json'
+        'bookclubs/tests/fixtures/default_book.json',
     ]
 
     def setUp(self):
@@ -84,7 +85,7 @@ class CreateClubViewTestCase(TestCase):
         form = response.context['form']
         self.assertTrue(isinstance(form, ClubForm))
 
-    def test_succesful_online_public_create_club(self):
+    def test_successful_online_public_create_club(self):
         self.client.login(username=self.user.username, password='Password123')
         before_count = Club.objects.count()
         response = self.client.post(self.url, self.form_input_online_public, follow=True)
@@ -103,7 +104,7 @@ class CreateClubViewTestCase(TestCase):
         self.assertEqual(club.genre, 'Non-Fiction')
         self.assertEqual(club.description, 'description')
 
-    def test_unsuccesful_online_private_create_club(self):
+    def test_unsuccessful_online_private_create_club(self):
         self.form_input_online_private['club_name'] = ''
         self.client.login(username=self.user.username, password='Password123')
         before_count = Club.objects.count()
@@ -116,7 +117,7 @@ class CreateClubViewTestCase(TestCase):
         form = response.context['form']
         self.assertTrue(isinstance(form, ClubForm))
 
-    def test_succesful_online_private_create_club(self):
+    def test_successful_online_private_create_club(self):
         self.client.login(username=self.user.username, password='Password123')
         before_count = Club.objects.count()
         response = self.client.post(self.url, self.form_input_online_private, follow=True)
@@ -135,7 +136,7 @@ class CreateClubViewTestCase(TestCase):
         self.assertEqual(club.genre, 'Fiction')
         self.assertEqual(club.description, 'description')
 
-    def test_unsuccesful_in_person_private_create_club(self):
+    def test_unsuccessful_in_person_private_create_club(self):
         self.form_input_in_person_private['club_name'] = ''
         self.client.login(username=self.user.username, password='Password123')
         before_count = Club.objects.count()
