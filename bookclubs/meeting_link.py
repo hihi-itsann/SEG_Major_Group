@@ -1,12 +1,10 @@
-from email import message
-from urllib import response
-import jwt
-
 import datetime
+import time
 
+import jwt
 import requests
 
-import time
+
 # create a function to generate a token using the pyjwt library
 def generateToken():
     token = jwt.encode(
@@ -22,56 +20,55 @@ def generateToken():
     return token
 
 
-def create_zoom_meeting(date,start_time,duration):  
-
-   
-    email="bookclub2022@protonmail.com"
+def create_zoom_meeting(date, start_time, duration):
+    email = "bookclub2022@protonmail.com"
 
     headers = {'authorization': 'Bearer %s' % generateToken(),
                'content-type': 'application/json'}
 
+    url = "https://api.zoom.us/v2/users/{}/meetings".format(email)
+    date = str(date) + "T" + str(start_time) + ":00"
+    start_time = datetime.datetime.strptime(start_time, "%H:%M")
+    obj = {"topic": "Book Club", "start_time": date, "duration": duration, "password": "1234",
+           "timezone": (time.tzname)[0]}
 
-    url ="https://api.zoom.us/v2/users/{}/meetings".format(email)
-    date=str(date)+"T"+str(start_time)+":00"
-    start_time=datetime.datetime.strptime(start_time, "%H:%M")
-    obj={"topic":"Book Club","start_time":date,"duration":duration, "password":"1234","timezone":(time.tzname)[0]}
-
-    create_meeting=requests.post(url, json=obj, headers=headers)
-    response_data=create_meeting.json()
+    create_meeting = requests.post(url, json=obj, headers=headers)
+    response_data = create_meeting.json()
     global join_link, start_link
-    join_link=response_data["join_url"]
-    start_link=response_data["start_url"]
-def get_join_link():
+    join_link = response_data["join_url"]
+    start_link = response_data["start_url"]
 
+
+def get_join_link():
     return join_link
+
+
 def get_start_link():
     return start_link
 
+
 def delete_zoom_meeting():
-    
-    email="bookclub2022@protonmail.com"
+    email = "bookclub2022@protonmail.com"
 
     headers = {'authorization': 'Bearer %s' % generateToken(),
-            'content-type': 'application/json'}
+               'content-type': 'application/json'}
 
-    url="https://api.zoom.us/v2/users/{}/meetings".format(email)
-        
-    delete_meeting=requests.get(url, headers=headers)
-    response_data=delete_meeting.json()
+    url = "https://api.zoom.us/v2/users/{}/meetings".format(email)
 
-    while(len(response_data['meetings'])):
-        email="bookclub2022@protonmail.com"
+    delete_meeting = requests.get(url, headers=headers)
+    response_data = delete_meeting.json()
+
+    while (len(response_data['meetings'])):
+        email = "bookclub2022@protonmail.com"
 
         headers = {'authorization': 'Bearer %s' % generateToken(),
-                'content-type': 'application/json'}
+                   'content-type': 'application/json'}
 
-        url="https://api.zoom.us/v2/users/{}/meetings".format(email)
-            
-        delete_meeting=requests.get(url, headers=headers)
-        response_data=delete_meeting.json()
+        url = "https://api.zoom.us/v2/users/{}/meetings".format(email)
+
+        delete_meeting = requests.get(url, headers=headers)
+        response_data = delete_meeting.json()
         for meeting in response_data['meetings']:
-            meetingId=meeting['id']
-            url="https://api.zoom.us/v2/meetings/"+str(meetingId)
+            meetingId = meeting['id']
+            url = "https://api.zoom.us/v2/meetings/" + str(meetingId)
             requests.delete(url, headers=headers)
-
-
