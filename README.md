@@ -66,7 +66,8 @@ This is a readme file for our SEG Major Group Project.
 <!-- The location where the software or software component is deployed and sufficient information to access it.  The latter includes access credentials for the different types of user who may employ the software. -->
 
 ## How to run the project
-Book Clubs - Django Web Application Setup Instructions
+Book Clubs - Django Web Application Setup Instructions  
+
 **1. Install virtual environment:**  
 
     virtualenv venv
