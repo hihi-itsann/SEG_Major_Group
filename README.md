@@ -1,5 +1,6 @@
 # 5CCS2SEG_Major_Group_Project: Book Club
 This is a readme file for our SEG Major Group Project.
+
 ## Table of Contents
   * [Contributors](#Contributors "Go to Contributors")
   * [Description](#Description "Go to Description")
@@ -7,7 +8,7 @@ This is a readme file for our SEG Major Group Project.
   * [Technologies](#Technologies "Go to Technologies")
   * [Installations](#How_to_run_the_project "Go to Installations")
   * [License](#License "Go to License")
-  * [Reference List](#Reference List "Go to Reference List")
+  * [Reference List](#Reference_List "Go to Reference List")
 
 ## Contributors
 ***Artificial Intelligence Group:***
@@ -61,26 +62,26 @@ This is a readme file for our SEG Major Group Project.
 ## How to run the project
 Book Clubs - Django Web Application Setup Instructions
 1. Install virtual environment:
-virtualenv venv
+    virtualenv venv
 2. Launch virtual environment:
-source venv/bin/activate
+    source venv/bin/activate
 3. Install required applications:
-pip3 install -r requirements.txt
+    pip3 install -r requirements.txt
 4. Get the database
-python3 manage.py makemigrations
-python3 manage.py migrate
+    python3 manage.py makemigrations
+    python3 manage.py migrate
 5. Create Super User:
-python3 manage.py createsuperuser
+    python3 manage.py createsuperuser
 6. Seeder and unseeder (Seeder can only be run once, unless run unseed again):
-python3 manage.py seed
-python3 manage.py unseed
+    python3 manage.py seed
+    python3 manage.py unseed
 7. Run the server/application:
-python3 manage.py runserver
+    python3 manage.py runserver
 8. Run the tests:
-python3 manage.py test
+    python3 manage.py test
 
 ## License
 By contributing, you agree that your contributions will be licensed under its MIT License.
 
 ## Reference List
-* The hidden game was adapted from [Dino-game](https://github.com/WebDevSimplified/chrome-dino-game-clone "Dino-Game")
+* The hidden game was adapted from [Dino-Game](https://github.com/WebDevSimplified/chrome-dino-game-clone "Dino-Game")
