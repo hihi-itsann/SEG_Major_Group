@@ -70,22 +70,36 @@ Book Clubs - Django Web Application Setup Instructions
 
 **1. Install virtual environment:**  
 
-    virtualenv venv
-**2. Launch virtual environment:**
-    source venv/bin/activate
-**3. Install required applications:**
-    pip3 install -r requirements.txt
-**4. Get the database1:**
+    virtualenv venv  
+
+**2. Launch virtual environment:**  
+
+    source venv/bin/activate  
+
+**3. Install required applications:**  
+
+    pip3 install -r requirements.txt  
+
+**4. Get the database1:**  
+
     python3 manage.py makemigrations
-    python3 manage.py migrate
-**5. Create Super User:**
-    python3 manage.py createsuperuser
-**6. Seeder and unseeder (Seeder can only be run once, unless run unseed again):**
+    python3 manage.py migrate  
+
+**5. Create Super User:**  
+
+    python3 manage.py createsuperuser  
+
+**6. Seeder and unseeder (Seeder can only be run once, unless run unseed again):**  
+
     python3 manage.py seed
-    python3 manage.py unseed
-**7. Run the server/application:**
-    python3 manage.py runserver
-**8. Run the tests:**
+    python3 manage.py unseed  
+
+**7. Run the server/application:**  
+
+    python3 manage.py runserver  
+
+**8. Run the tests:**  
+
     python3 manage.py test
 
 ## License
