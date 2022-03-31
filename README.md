@@ -67,7 +67,8 @@ This is a readme file for our SEG Major Group Project.
 
 ## How to run the project
 Book Clubs - Django Web Application Setup Instructions
-**1. Install virtual environment:**
+**1. Install virtual environment:**  
+
     virtualenv venv
 **2. Launch virtual environment:**
     source venv/bin/activate
