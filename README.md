@@ -1,6 +1,8 @@
 # 5CCS2SEG_Major_Group_Project: Book Club
-![picture alt](https://img.shields.io/badge/Python%20Tests-607%20passed-brightgreen)
+![picture alt](https://img.shields.io/badge/tests-607%20passed-brightgreen)
 ![picture alt](https://img.shields.io/badge/coverage-93%25-green)
+![picture alt](https://img.shields.io/badge/licence-MIT-9cf)
+=============
 This is a readme file for our SEG Major Group Project.
 
 ## Table of Contents
