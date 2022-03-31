@@ -80,7 +80,7 @@ Book Clubs - Django Web Application Setup Instructions
 
     pip3 install -r requirements.txt  
 
-**4. Get the database1:**  
+**4. Get the database:**  
 
     python3 manage.py makemigrations
     python3 manage.py migrate  
