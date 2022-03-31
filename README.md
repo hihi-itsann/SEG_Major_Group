@@ -10,9 +10,9 @@ This is a readme file for our SEG Major Group Project.
   * [Description](#Description "Go to Description")
   * [Features](#Features "Go to Features")
   * [Technologies](#Technologies "Go to Technologies")
-  * [Installations](#How_to_run_the_project "Go to Installations")
+  * [Installations](#How-to-run-the-project "Go to Installations")
   * [License](#License "Go to License")
-  * [Reference List](#Reference_list)
+  * [Reference List](#Reference-list "Go to Reference List")
 
 ## Contributors
 ***Artificial Intelligence Group:***
