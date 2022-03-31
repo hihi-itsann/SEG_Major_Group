@@ -61,7 +61,9 @@ This is a readme file for our SEG Major Group Project.
 * Coverage was used for monitoring the programme’s testing
 * Faker was used to generate fake data for bootstrapping the database
 * Google-pasta was used to generate hidden game
-* Bootstrap
+* Bootstrap was used to design the programme's front-end
+
+<!-- The location where the software or software component is deployed and sufficient information to access it.  The latter includes access credentials for the different types of user who may employ the software. -->
 
 ## How to run the project
 Book Clubs - Django Web Application Setup Instructions
