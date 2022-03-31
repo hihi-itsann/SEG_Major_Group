@@ -1,4 +1,4 @@
-# 5CCS2SEG_Major_Group_Project: Book Club
+# 5CCS2SEG_Major_Group_Project: :book: Book Club :book:
 ![picture alt](https://img.shields.io/badge/tests-607%20passed-brightgreen)
 ![picture alt](https://img.shields.io/badge/coverage-93%25-green)
 ![picture alt](https://img.shields.io/badge/licence-MIT-9cf)
@@ -15,12 +15,12 @@ This is a readme file for our SEG Major Group Project.
   * [Reference List](#Reference-list "Go to Reference List")
 
 ## Contributors
-***Artificial Intelligence Group:***
+:space_invader:***Artificial Intelligence Group:***
   * Rishi Ganeshan (K20004392)
   * Encheng Wu (K20070867)
   * Yanjing Xia (K20013191)
 
-***Software Development Group:***
+:computer:***Software Development Group:***
 * An Hsu (K20002093)
 * Grace Edgecombe (K20006917)
 * Xuechao Yan (K19006213)
@@ -106,4 +106,4 @@ Book Clubs - Django Web Application Setup Instructions
 By contributing, you agree that your contributions will be licensed under its *MIT License*.
 
 ## Reference List
-* The hidden game was adapted from [Dino-Game](https://github.com/WebDevSimplified/chrome-dino-game-clone "Dino-Game")
+* The hidden game was adapted from [Dino-Game](https://github.com/WebDevSimplified/chrome-dino-game-clone "Dino-Game") :video_game:
