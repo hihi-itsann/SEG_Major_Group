@@ -1,23 +1,23 @@
-"""Tests of the feed view."""
 from django.test import TestCase
 from django.urls import reverse
-from  bookclubs.models import User
+
+from bookclubs.models import User
 from bookclubs.tests.helpers import reverse_with_next
-from django.conf import settings
 
 
 class FeedViewTestCase(TestCase):
-    """Tests of the feed view."""
+    """Tests for the feed view"""
 
-    fixtures = ['bookclubs/tests/fixtures/default_user.json']
-
+    fixtures = [
+        'bookclubs/tests/fixtures/default_user.json',
+    ]
 
     def setUp(self):
         self.user = User.objects.get(username='@johndoe')
         self.url = reverse('feed')
 
     def test_feed_url(self):
-        self.assertEqual(self.url,'/feed/')
+        self.assertEqual(self.url, '/feed/')
 
     def test_get_feed(self):
         self.client.login(username=self.user.username, password='Password123')

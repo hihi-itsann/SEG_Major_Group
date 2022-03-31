@@ -1,14 +1,16 @@
-"""Tests for the profile view."""
+from datetime import date
+
 from django.contrib import messages
 from django.test import TestCase
 from django.urls import reverse
+
 from bookclubs.forms import UserForm
 from bookclubs.models import User
 from bookclubs.tests.helpers import reverse_with_next
-from datetime import date
+
 
 class ProfileViewTestCase(TestCase):
-    """Test suite for the profile view."""
+    """Tests for the profile view"""
 
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',

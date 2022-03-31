@@ -1,19 +1,21 @@
-"""Tests of the home view."""
 from django.test import TestCase
 from django.urls import reverse
 from bookclubs.models import User
 
-class HomeViewTestCase(TestCase):
-    """Tests of the home view."""
 
-    fixtures = ['bookclubs/tests/fixtures/default_user.json']
+class HomeViewTestCase(TestCase):
+    """Tests for the home view"""
+
+    fixtures = [
+        'bookclubs/tests/fixtures/default_user.json'
+    ]
 
     def setUp(self):
         self.url = reverse('home')
         self.user = User.objects.get(username='@johndoe')
 
     def test_home_url(self):
-        self.assertEqual(self.url,'/')
+        self.assertEqual(self.url, '/')
 
     def test_get_home(self):
         response = self.client.get(self.url)
