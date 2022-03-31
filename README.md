@@ -1,6 +1,7 @@
 # 5CCS2SEG_Major_Group_Project: Book Club
 This is a readme file for our SEG Major Group Project.
 ## Table of Contents
+  (#Contributors "Goto Contributors")
 
 ## Contributors
 ***Artificial Intelligence Group:***
@@ -76,4 +77,4 @@ python3 manage.py test
 By contributing, you agree that your contributions will be licensed under its MIT License.
 
 ## Reference List
-* The hidden game was adapted from (https://github.com/WebDevSimplified/chrome-dino-game-clone)
+* The hidden game was adapted from (https://github.com/WebDevSimplified/chrome-dino-game-clone "Dino-Game")
