@@ -1,34 +1,25 @@
-from ntpath import join
-# from os import startfile
-from django.contrib import messages
-from webbrowser import get
-from django.db.models import Q  # filter exception
-from django.db.models import F
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ImproperlyConfigured
+from django.db.models import Q  # filter exception
 from django.http import Http404
 from django.http import JsonResponse
-from django.http import HttpResponse
 from django.shortcuts import render
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.views import View
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
-from django.shortcuts import redirect, render, get_object_or_404, HttpResponseRedirect
-from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, ClubForm, ApplicationForm, CommentForm, \
+
+from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, ClubForm, CommentForm, \
     RateReviewForm, PostForm, MeetingForm, ApplicationForm
-from .helpers import *
-from .models import User, Book, Application, Vote, Comment, Post, BookRatingReview, BookStatus, Club, Meeting, \
-    MeetingAttendance
-from django.core.paginator import Paginator
-from random import choice
 from bookclubs.meeting_link import create_zoom_meeting, get_join_link, get_start_link
-from datetime import datetime
 from bookclubs.recommender.keras import get_recommendations
+from .helpers import *
+from .models import User, Book, Application, Comment, Post, BookRatingReview, BookStatus, Club, Meeting, \
+    MeetingAttendance
 
 
 @login_prohibited
@@ -316,6 +307,7 @@ def reading_book_list(request, book_genre='All'):
             finishedBooks.append(bookStatus.book)
     args = {'unreadBooks': unreadBooks, 'readingBooks': readingBooks, 'finishedBooks': finishedBooks, 'genres': genres}
     return render(request, 'reading_book_list.html', args)
+
 
 # --------------------------application functions---------------------------------
 
@@ -759,8 +751,6 @@ class DeleteCommentView(LoginRequiredMixin, DeleteView):
 
 
 # --------------------meeting functions-----------------------------------------
-import json
-from django.core.serializers.json import DjangoJSONEncoder
 
 
 @login_required
