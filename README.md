@@ -56,34 +56,34 @@ This is a readme file for our SEG Major Group Project.
 
 ## Technologies
 * Our project was built employing Python/Django.
-* *Keras*, *TensorFlow*, *Numpy* and *Pandas* were used to produce the (AI) Recommender system
-* *Libgravatar* was used to provide url to users’ profile picture
-* *Coverage* was used for monitoring the programme’s testing
-* *Faker* was used to generate fake data for bootstrapping the database
-* *Google-pasta* was used to generate hidden game
-* *Bootstrap* was used to design the programme's front-end
+* **Keras**, **TensorFlow**, **Numpy** and **Pandas** were used to produce the (AI) Recommender system
+* **Libgravatar** was used to provide url to users’ profile picture
+* **Coverage** was used for monitoring the programme’s testing
+* **Faker** was used to generate fake data for bootstrapping the database
+* **Google-pasta** was used to generate hidden game
+* **Bootstrap** was used to design the programme's front-end
 
 <!-- The location where the software or software component is deployed and sufficient information to access it.  The latter includes access credentials for the different types of user who may employ the software. -->
 
 ## How to run the project
 Book Clubs - Django Web Application Setup Instructions
-*1. Install virtual environment:*
+**1. Install virtual environment:**
     virtualenv venv
-*2. Launch virtual environment:*
+**2. Launch virtual environment:**
     source venv/bin/activate
-*3. Install required applications:*
+**3. Install required applications:**
     pip3 install -r requirements.txt
-*4. Get the database1:*
+**4. Get the database1:**
     python3 manage.py makemigrations
     python3 manage.py migrate
-*5. Create Super User:*
+**5. Create Super User:**
     python3 manage.py createsuperuser
-*6. Seeder and unseeder (Seeder can only be run once, unless run unseed again):*
+**6. Seeder and unseeder (Seeder can only be run once, unless run unseed again):**
     python3 manage.py seed
     python3 manage.py unseed
-*7. Run the server/application:*
+**7. Run the server/application:**
     python3 manage.py runserver
-*8. Run the tests:*
+**8. Run the tests:**
     python3 manage.py test
 
 ## License
