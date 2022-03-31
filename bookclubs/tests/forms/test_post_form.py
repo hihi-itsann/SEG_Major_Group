@@ -1,12 +1,15 @@
 from django.test import TestCase
-from bookclubs.models import User, Post, Club
+
 from bookclubs.forms import PostForm
+from bookclubs.models import User, Club
+
 
 class PostFormTestCase(TestCase):
+    """Unit tests for the PostForm"""
 
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
-        'bookclubs/tests/fixtures/default_clubs.json'
+        'bookclubs/tests/fixtures/default_clubs.json',
     ]
 
     def setUp(self):
@@ -32,19 +35,19 @@ class PostFormTestCase(TestCase):
         self.assertIn('body', form.fields)
 
     def test_valid_post_form(self):
-        input = {'title': 'x'*255,
-                 'body': 'x'*520 }
-        form = PostForm(data=input)
+        form_input = {'title': 'x' * 255,
+                      'body': 'x' * 520}
+        form = PostForm(data=form_input)
         self.assertTrue(form.is_valid())
 
     def test_invalid_post_form_with_invalid_title(self):
-        input = {'title': 'x'*256,
-                 'body': 'x'*520 }
-        form = PostForm(data=input)
+        form_input = {'title': 'x' * 256,
+                      'body': 'x' * 520}
+        form = PostForm(data=form_input)
         self.assertFalse(form.is_valid())
 
     def test_invalid_post_form_with_invalid_body(self):
-        input = {'title': 'x'*255,
-                 'body': 'x'*521 }
-        form = PostForm(data=input)
+        form_input = {'title': 'x' * 255,
+                      'body': 'x' * 521}
+        form = PostForm(data=form_input)
         self.assertFalse(form.is_valid())

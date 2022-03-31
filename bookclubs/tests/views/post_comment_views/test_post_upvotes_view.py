@@ -1,14 +1,18 @@
 from django.test import TestCase
 from django.urls import reverse
+
 from bookclubs.models import User, Post, Club, Vote, Role
 from bookclubs.tests.helpers import reverse_with_next
 
-class PostDownvoteViewTestCase(TestCase):
 
-    VIEW = 'post_downvote'
+class PostUpvoteViewTestCase(TestCase):
+    """Tests for the up-voting of a post"""
 
-    fixtures = ['bookclubs/tests/fixtures/default_user.json',
-                'bookclubs/tests/fixtures/default_clubs.json'
+    VIEW = 'post_upvote'
+
+    fixtures = [
+        'bookclubs/tests/fixtures/default_user.json',
+        'bookclubs/tests/fixtures/default_clubs.json',
     ]
 
     def setUp(self):
@@ -27,20 +31,20 @@ class PostDownvoteViewTestCase(TestCase):
         )
         self.url = reverse(self.VIEW, kwargs={'post_id': self.post.id})
 
-    def test_post_downvote_url(self):
-        self.assertEqual(self.url, f'/downvote/{self.post.id}/')
+    def test_post_upvote_url(self):
+        self.assertEqual(self.url, f'/upvote/{self.post.id}/')
 
-    def test_post_downvote_redirects_when_not_logged_in(self):
+    def test_post_upvote_redirects_when_not_logged_in(self):
         redirect_url = reverse_with_next('log_in', self.url)
         response = self.client.get(self.url)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
-    def test_successful_post_downvote(self):
+    def test_successful_post_upvote(self):
         self.client.login(username=self.user.username, password="Password123")
         vote_count_before = Vote.objects.count()
         response = self.client.post(self.url, follow=True)
         vote_count_after = Vote.objects.count()
-        self.assertEqual(vote_count_after, vote_count_before+1)
+        self.assertEqual(vote_count_after, vote_count_before + 1)
         new_vote = Vote.objects.latest('id')
         self.assertEqual(self.user, new_vote.user)
         self.assertEqual(self.post, new_vote.post)

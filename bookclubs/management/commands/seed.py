@@ -1,21 +1,15 @@
-from ntpath import join
-from django.core.management.base import BaseCommand, CommandError
-from bookclubs.meeting_link import create_zoom_meeting, get_join_link, get_start_link
-
-from bookclubs.models import User, Post, Comment, Club, Role, Book, BookRatingReview, Meeting, MeetingAttendance, \
-    Application, ClubBookAverageRating
-
-import pytz
-from faker import Faker
-from random import randint, random
-from faker.providers import BaseProvider, address, date_time, misc
-import pandas as pd
-import datetime
-import numpy
-# from bookclubs.recommender.BooksRecommender import getgenre
-import urllib.request
 import json
-import textwrap
+import urllib.request
+from random import randint, random
+
+import pandas as pd
+import pytz
+from django.core.management.base import BaseCommand
+from faker import Faker
+
+from bookclubs.meeting_link import create_zoom_meeting, get_join_link, get_start_link
+from bookclubs.models import User, Post, Comment, Club, Role, Book, BookRatingReview, Meeting, MeetingAttendance, \
+    Application
 
 
 class Command(BaseCommand):
@@ -69,12 +63,14 @@ class Command(BaseCommand):
         self.create_meeting_attendance()
 
     def load_data_from_csv(self):
-        # self.df_users= pd.read_csv(self.usersPath, sep = ';',names = ['User-ID', 'Location', 'Age'], quotechar = '"', encoding = 'latin-1',header = 0)
+        # self.df_users= pd.read_csv(self.usersPath, sep = ';',names = ['User-ID', 'Location', 'Age'], quotechar = '"',
+        # encoding = 'latin-1',header = 0)
         self.df_books = pd.read_csv(self.booksPath, sep=';',
                                     names=['ISBN', 'Book-Title', 'Book-Author', 'Year-Of-Publication', 'Publisher',
                                            'Image-URL-S', 'Image-URL-M', 'Image-URL-L'], quotechar='"',
                                     encoding='latin-1', header=0)
-        # self.df_ratings= pd.read_csv(self.ratingsPath, sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'], quotechar = '"', encoding = 'latin-1',header = 0)
+        # self.df_ratings= pd.read_csv(self.ratingsPath, sep = ';',names = ['User-ID', 'ISBN', 'Book-Rating'],
+        # quotechar = '"', encoding = 'latin-1',header = 0)
 
     def getgenre(self, isbn):
         base_api_link = "https://www.googleapis.com/books/v1/volumes?q=isbn:"
@@ -196,7 +192,7 @@ class Command(BaseCommand):
             city = self.faker.city()
             country = self.faker.country()
             meeting_preference = self.faker.random_choices(elements=('O', 'P'), length=1)[0]
-            gravatar_user = User.objects.create_user(
+            User.objects.create_user(
                 userID=0,
                 username=username,
                 first_name=first_name,
@@ -217,7 +213,7 @@ class Command(BaseCommand):
         while club_count < self.CLUB_COUNT:
             print(f"Seeding club {club_count}/{self.CLUB_COUNT}", end='\r')
             try:
-                club = self.create_club()
+                self.create_club()
             except:
                 continue
             club_count += 1
@@ -345,7 +341,7 @@ class Command(BaseCommand):
             location = self.faker.street_name()
             join_link = None
             start_link = None
-        meeting = Meeting.objects.create(
+        Meeting.objects.create(
             club=club,
             book=book,
             topic=topic,
@@ -368,13 +364,14 @@ class Command(BaseCommand):
         return self.books[index]
 
     def create_meeting_attendance(self):
+        total_meeting_attendance = self.MEETING_PER_CLUB_COUNT * self.CLUB_COUNT * self.MEETING_ATTENDANCE_PER_MEETING
         meeting_attendance_count = 0
         for meeting in self.meetings:
             meeting_attendance_count += 1
             host = self.create_meeting_host(meeting)
             for i in range(self.MEETING_ATTENDANCE_PER_MEETING - 1):
                 print(
-                    f"Seeding attendance {meeting_attendance_count}/{self.MEETING_PER_CLUB_COUNT * self.CLUB_COUNT * self.MEETING_ATTENDANCE_PER_MEETING}",
+                    f"Seeding attendance {meeting_attendance_count}/{total_meeting_attendance}",
                     end='\r')
                 try:
                     self.create_meeting_attendee(meeting, host)
@@ -407,12 +404,13 @@ class Command(BaseCommand):
 
     def create_applications(self):
         application_count = 0
+        private_club_count = self.clubs.filter(public_status='PRI').count()
+        total_application_count = self.APPLICATION_PER_CLUB_COUNT * private_club_count
         for club in self.clubs:
-            priv_club_count = self.clubs.filter(public_status='PRI').count()
             if club.public_status == 'PRI':
                 for i in range(0, self.APPLICATION_PER_CLUB_COUNT):
-                    print(f"Seeding application {application_count}/{self.APPLICATION_PER_CLUB_COUNT * priv_club_count}"
-                          , end='\r')
+                    print(f"Seeding application {application_count}/{total_application_count}",
+                          end='\r')
                     try:
                         self.create_application(club)
                     except:

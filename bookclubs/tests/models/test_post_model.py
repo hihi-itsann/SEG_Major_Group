@@ -5,11 +5,12 @@ from bookclubs.models import User, Post, Club, Vote
 
 
 class PostModelTestCase(TestCase):
+    """Unit tests for the Post model"""
+
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
         'bookclubs/tests/fixtures/other_users.json',
-        'bookclubs/tests/fixtures/default_clubs.json'
-
+        'bookclubs/tests/fixtures/default_clubs.json',
     ]
 
     def setUp(self):
@@ -56,9 +57,10 @@ class PostModelTestCase(TestCase):
         with self.assertRaises(ValidationError):
             self.post.full_clean()
 
-    # Method Tests for Post Model
+    # Method tests
 
     def test_to_string(self):
+        """Test to_string method"""
         self.assertEqual(self.post.__str__(), f'{self.post.title} | {self.post.author}')
 
     def test_toggle_upvote_with_no_previous_vote(self):
@@ -122,7 +124,3 @@ class PostModelTestCase(TestCase):
         self.assertEqual(self.post.get_downvotes(), 1)
         Vote.objects.create(user=self.other_user, post=self.post, vote_type=False)
         self.assertEqual(self.post.get_downvotes(), 2)
-
-
-
-

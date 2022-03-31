@@ -1,17 +1,19 @@
 from django.test import TestCase
 from django.urls import reverse
+
 from bookclubs.models import User, Book, BookStatus
 from bookclubs.tests.helpers import reverse_with_next
 
 
 class ShowBookViewTestCase(TestCase):
+    """Tests for showing a book"""
 
     VIEW = 'show_book'
 
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
         'bookclubs/tests/fixtures/default_book.json',
-        'bookclubs/tests/fixtures/other_books.json'
+        'bookclubs/tests/fixtures/other_books.json',
     ]
 
     def setUp(self):
@@ -44,7 +46,7 @@ class ShowBookViewTestCase(TestCase):
         self.client.login(username=self.user.username, password='Password123')
         url = reverse('show_book', kwargs={'ISBN': 'invalid_ISBN'})
         response = self.client.get(url, follow=True)
-        response_url = reverse('book_list', kwargs={'book_genre':'All'})
+        response_url = reverse('book_list', kwargs={'book_genre': 'All'})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'book_list.html')
 

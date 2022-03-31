@@ -1,15 +1,17 @@
 from django.contrib import messages
 from django.test import TestCase
 from django.urls import reverse
-from bookclubs.models import Post, User, Book, BookStatus
+
+from bookclubs.models import User, Book, BookStatus
 from bookclubs.tests.helpers import reverse_with_next
 
 
 class CreateBookStatusTest(TestCase):
+    """Tests for the creation of a book status"""
 
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
-        'bookclubs/tests/fixtures/default_book.json'
+        'bookclubs/tests/fixtures/default_book.json',
     ]
 
     def setUp(self):
@@ -31,7 +33,7 @@ class CreateBookStatusTest(TestCase):
         book_status_count_before = BookStatus.objects.count()
         response = self.client.post(self.url, follow=True)
         book_status_count_after = BookStatus.objects.count()
-        self.assertEqual(book_status_count_after, book_status_count_before+1)
+        self.assertEqual(book_status_count_after, book_status_count_before + 1)
         response_url = reverse('reading_book_list', kwargs={'book_genre': 'All'})
         self.assertRedirects(
             response, response_url,
@@ -42,7 +44,7 @@ class CreateBookStatusTest(TestCase):
 
     def test_unsuccessful_create_book_status_when_book_status_is_already_exist(self):
         self.client.login(username='@johndoe', password='Password123')
-        response = self.client.post(self.url, follow=True)
+        self.client.post(self.url, follow=True)
         book_status_count_before = BookStatus.objects.count()
         response = self.client.post(self.url)
         book_status_count_after = BookStatus.objects.count()

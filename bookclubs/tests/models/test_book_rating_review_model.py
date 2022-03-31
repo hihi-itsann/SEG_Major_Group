@@ -1,12 +1,15 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+
 from bookclubs.models import User, BookRatingReview, Book
 
-class RatingModelTestCase(TestCase):
+
+class BookRatingReviewModelTestCase(TestCase):
+    """Unit tests for the BookRatingReview model"""
 
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
-        'bookclubs/tests/fixtures/default_book.json'
+        'bookclubs/tests/fixtures/default_book.json',
     ]
 
     def setUp(self):
@@ -20,10 +23,10 @@ class RatingModelTestCase(TestCase):
         )
 
     def test_get_book(self):
-       self.assertEqual(self.rating_review.book, self.book)
+        self.assertEqual(self.rating_review.book, self.book)
 
     def test_get_user(self):
-       self.assertEqual(self.rating_review.user, self.user)
+        self.assertEqual(self.rating_review.user, self.user)
 
     def _assert_rating_review_is_valid(self):
         self.rating_review.full_clean()

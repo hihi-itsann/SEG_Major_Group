@@ -1,14 +1,14 @@
-"""Tests for the password view."""
-from django.contrib import messages
 from django.contrib.auth.hashers import check_password
 from django.test import TestCase
 from django.urls import reverse
+
 from bookclubs.forms import PasswordForm
 from bookclubs.models import User
 from bookclubs.tests.helpers import reverse_with_next
 
+
 class PasswordViewTestCase(TestCase):
-    """Test suite for the password view."""
+    """Tests for the password view"""
 
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json'

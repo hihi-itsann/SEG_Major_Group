@@ -1,14 +1,15 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from libgravatar import Gravatar
 
 from bookclubs.models import Book
 
 
 class BookModelTestCase(TestCase):
+    """Unit tests for the Book model"""
+
     fixtures = [
         'bookclubs/tests/fixtures/default_book.json',
-        'bookclubs/tests/fixtures/other_books.json'
+        'bookclubs/tests/fixtures/other_books.json',
     ]
 
     def setUp(self):
@@ -20,9 +21,6 @@ class BookModelTestCase(TestCase):
     def _assert_book_is_invalid(self):
         with self.assertRaises(ValidationError):
             self.book.full_clean()
-
-    def test_get_isbn(self):
-        (self.book.get_ISBN(), '0195153448')
 
     def test_valid_book(self):
         self._assert_book_is_valid()
@@ -99,3 +97,9 @@ class BookModelTestCase(TestCase):
         second_book = Book.objects.get(ISBN='0002005018')
         self.book.ISBN = second_book.ISBN
         self._assert_book_is_invalid()
+
+    # Method tests
+
+    def test_get_isbn(self):
+        """Test get_ISBN method"""
+        (self.book.get_ISBN(), '0195153448')

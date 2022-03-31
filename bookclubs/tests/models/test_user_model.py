@@ -6,17 +6,18 @@ from bookclubs.models import User, Application, Club, Role, Vote, Post
 
 
 class UserModelTestCase(TestCase):
+    """Unit tests for the User model"""
+
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
         'bookclubs/tests/fixtures/other_users.json',
         'bookclubs/tests/fixtures/default_clubs.json',
-
     ]
 
     def setUp(self):
         self.user = User.objects.get(username='@johndoe')
         self.user_two = User.objects.get(username='@janedoe')
-        self.user_three = User.objects.get(username='@Alexdoe')
+        self.user_three = User.objects.get(username='@alexdoe')
         self.club = Club.objects.get(club_name='private_online')
         self.post = Post.objects.create(
             title="test",
@@ -38,7 +39,8 @@ class UserModelTestCase(TestCase):
     def test_valid_user(self):
         self._assert_user_is_valid()
 
-    # test for username
+    # Tests for username
+
     def test_username_cannot_be_blank(self):
         self.user.username = ''
         self._assert_user_is_invalid()
@@ -77,7 +79,8 @@ class UserModelTestCase(TestCase):
         self.user.username = '@@johndoe'
         self._assert_user_is_invalid()
 
-    # test for first name
+    # Tests for first name
+
     def test_first_name_must_not_be_blank(self):
         self.user.first_name = ''
         self._assert_user_is_invalid()
@@ -95,7 +98,8 @@ class UserModelTestCase(TestCase):
         self.user.first_name = 'x' * 51
         self._assert_user_is_invalid()
 
-    # test for last name
+    # Tests for last name
+
     def test_last_name_must_not_be_blank(self):
         self.user.last_name = ''
         self._assert_user_is_invalid()
@@ -113,7 +117,8 @@ class UserModelTestCase(TestCase):
         self.user.last_name = 'x' * 51
         self._assert_user_is_invalid()
 
-    # test for email
+    # Tests for email
+
     def test_email_must_not_be_blank(self):
         self.user.email = ''
         self._assert_user_is_invalid()
@@ -143,7 +148,8 @@ class UserModelTestCase(TestCase):
         self.user.email = 'johndoe@@example.org'
         self._assert_user_is_invalid()
 
-    # test for bio
+    # Tests for bio
+
     def test_bio_may_be_blank(self):
         self.user.bio = ''
         self._assert_user_is_valid()
@@ -161,7 +167,8 @@ class UserModelTestCase(TestCase):
         self.user.bio = 'x' * 521
         self._assert_user_is_invalid()
 
-    # test for date of birth
+    # Tests for date of birth
+
     def test_dob_may_be_blank(self):
         self.user.dob = ''
         self._assert_user_is_valid()
@@ -175,7 +182,8 @@ class UserModelTestCase(TestCase):
         self.user.dob = second_user.dob
         self._assert_user_is_valid()
 
-    # test for gender
+    # Tests for gender
+
     def test_gender_may_be_blank(self):
         self.user.gender = ''
         self._assert_user_is_valid()
@@ -251,7 +259,7 @@ class UserModelTestCase(TestCase):
         self.user.meeting_preference = 'B'
         self._assert_user_is_invalid()
 
-    # Method Tests for User Model
+    # Method tests
 
     def test_get_full_name(self):
         """Test full_name method"""
@@ -260,9 +268,7 @@ class UserModelTestCase(TestCase):
     def test_get_pronouns(self):
         """Test get_pronouns method"""
         self.assertEqual(self.user.get_pronouns(), 'he/ him')
-
         self.assertEqual(self.user_two.get_pronouns(), 'she/ her')
-
         self.assertEqual(self.user_three.get_pronouns(), 'they/ them (consult for other pronouns)')
 
     def test_gravatar(self):

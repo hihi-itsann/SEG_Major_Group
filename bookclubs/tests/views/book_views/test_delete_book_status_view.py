@@ -1,16 +1,18 @@
+from django.contrib import messages
 from django.test import TestCase
 from django.urls import reverse
+
 from bookclubs.models import User, Book, BookStatus
 from bookclubs.tests.helpers import reverse_with_next
-from django.contrib import messages
 
 
 class DeleteBookStatusTest(TestCase):
+    """Tests for the deletion of a book status"""
 
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
         'bookclubs/tests/fixtures/other_users.json',
-        'bookclubs/tests/fixtures/default_book.json'
+        'bookclubs/tests/fixtures/default_book.json',
     ]
 
     def setUp(self):
@@ -37,7 +39,7 @@ class DeleteBookStatusTest(TestCase):
         book_status_count_before = BookStatus.objects.count()
         response = self.client.delete(self.url)
         book_status_count_after = BookStatus.objects.count()
-        self.assertEqual(book_status_count_after, book_status_count_before-1)
+        self.assertEqual(book_status_count_after, book_status_count_before - 1)
         response_url = reverse('reading_book_list', kwargs={'book_genre': 'All'})
         self.assertRedirects(
             response, response_url,

@@ -1,9 +1,11 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+
 from bookclubs.models import User, Club, Application
 
 
 class ApplicationModelTestCase(TestCase):
+    """Unit tests for the Application model"""
 
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
@@ -24,16 +26,6 @@ class ApplicationModelTestCase(TestCase):
         self.application.statement = ''
         self._assert_application_is_invalid()
 
-    def test_change_status(self):
-        self.application.change_status('P')
-        self.assertEqual(self.application.status, 'P')
-        self.application.change_status('A')
-        self.assertEqual(self.application.status, 'A')
-        self.application.change_status('R')
-        self.assertEqual(self.application.status, 'R')
-        self.application.change_status('Z')
-        self.assertEqual(self.application.status, 'P')
-
     def _assert_application_is_invalid(self):
         with self.assertRaises(ValidationError):
             self.application.full_clean()
@@ -43,3 +35,16 @@ class ApplicationModelTestCase(TestCase):
             self.application.full_clean()
         except ValidationError:
             self.fail('Test application should be valid')
+
+    # Method tests
+
+    def test_change_status(self):
+        """Test change_status method"""
+        self.application.change_status('P')
+        self.assertEqual(self.application.status, 'P')
+        self.application.change_status('A')
+        self.assertEqual(self.application.status, 'A')
+        self.application.change_status('R')
+        self.assertEqual(self.application.status, 'R')
+        self.application.change_status('Z')
+        self.assertEqual(self.application.status, 'P')

@@ -1,11 +1,13 @@
 from datetime import timedelta, date, datetime
 
-from django.core.exceptions import ValidationError
 from django.test import TestCase
+
 from bookclubs.models import User, Club, Meeting, Book, MeetingAttendance
 
 
 class MeetingModelTestCase(TestCase):
+    """Unit tests for the Meeting model"""
+
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
         'bookclubs/tests/fixtures/other_users.json',
@@ -36,11 +38,14 @@ class MeetingModelTestCase(TestCase):
             meeting_status='ONL',
             location='Online',
             date=date.today(),
-            time_start=(datetime.now() - timedelta(minutes=10)).time(),
+            time_start=(datetime.now() - timedelta(minutes=15)).time(),
             duration=60
         )
 
+    # Method tests
+
     def test_is_attending(self):
+        """Test is_attending method"""
         host = MeetingAttendance.objects.create(user=self.user, meeting=self.meeting, meeting_role='H')
         self.assertTrue(self.meeting.is_attending(self.user))
         host.delete()
@@ -51,6 +56,7 @@ class MeetingModelTestCase(TestCase):
         self.assertFalse(self.meeting.is_attending(self.user))
 
     def test_is_host(self):
+        """Test is_host method"""
         host = MeetingAttendance.objects.create(user=self.user, meeting=self.meeting, meeting_role='H')
         self.assertTrue(self.meeting.is_host(self.user))
         host.delete()
@@ -61,6 +67,7 @@ class MeetingModelTestCase(TestCase):
         self.assertFalse(self.meeting.is_host(self.user))
 
     def test_is_attendee_only(self):
+        """Test is_attendee_only method"""
         host = MeetingAttendance.objects.create(user=self.user, meeting=self.meeting, meeting_role='H')
         self.assertFalse(self.meeting.is_attendee_only(self.user))
         host.delete()
@@ -71,6 +78,7 @@ class MeetingModelTestCase(TestCase):
         self.assertFalse(self.meeting.is_attendee_only(self.user))
 
     def test_get_host(self):
+        """Test get_host method"""
         user_two = User.objects.get(username='@janedoe')
         MeetingAttendance.objects.create(user=self.user, meeting=self.meeting, meeting_role='H')
         attendee = MeetingAttendance.objects.create(user=user_two, meeting=self.meeting, meeting_role='A')
@@ -78,18 +86,15 @@ class MeetingModelTestCase(TestCase):
         self.assertNotEqual(self.meeting.get_host(), attendee)
 
     def test_get_meeting_status(self):
+        """Test get_meeting_status method"""
         self.assertEqual(self.meeting.get_meeting_status(), 'Online')
         self.meeting.meeting_status = 'OFF'
         self.assertEqual(self.meeting.get_meeting_status(), 'In-Person')
 
     def test_get_location_online_future(self):
+        """Test get_location (on online meeting taking place in the future) method"""
         self.assertTrue(self.meeting.get_location().__contains__('available when it\'s time'))
 
     def test_get_location_online_now(self):
+        """Test get_location (on online meeting taking place now) method"""
         self.assertTrue(self.meeting_now.get_location().__contains__('join the meeting'))
-
-
-
-
-
-

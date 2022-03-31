@@ -6,7 +6,8 @@ from bookclubs.models import Application, User, Club
 
 
 class ApplicationFormTestCase(TestCase):
-    """Testing the ApplicationForm"""
+    """Unit tests for the ApplicationForm"""
+
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
         'bookclubs/tests/fixtures/default_clubs.json',

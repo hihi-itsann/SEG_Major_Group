@@ -9,7 +9,7 @@ from bookclubs.tests.helpers import reverse_with_next
 
 
 class EditMeetingViewTestCase(TestCase):
-    """Tests for the creation of a meeting"""
+    """Tests for editing the details of a meeting"""
 
     VIEW = 'edit_meeting'
 

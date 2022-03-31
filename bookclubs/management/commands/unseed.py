@@ -1,8 +1,10 @@
-from django.core.management.base import BaseCommand, CommandError
-
-from bookclubs.models import User, Post, Comment, Club, Role, Book, BookRatingReview, Meeting, ClubBookAverageRating, MeetingAttendance, Application
+from django.core.management.base import BaseCommand
 
 from bookclubs.meeting_link import delete_zoom_meeting
+from bookclubs.models import User, Post, Comment, Club, Role, Book, BookRatingReview, Meeting, ClubBookAverageRating, \
+    MeetingAttendance, Application
+
+
 class Command(BaseCommand):
     help = 'Empties the database'
 
@@ -54,5 +56,3 @@ class Command(BaseCommand):
             Book.objects.all().delete()
             print(f'Unseeded Book.')
         print('Unseeding finished.')
-
-

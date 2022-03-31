@@ -1,18 +1,18 @@
 from django.contrib import messages
 from django.test import TestCase
 from django.urls import reverse
-from bookclubs.forms import RateReviewForm
-from bookclubs.models import User, Book, BookStatus, BookRatingReview
+
+from bookclubs.models import User, Book, BookRatingReview
 from bookclubs.tests.helpers import reverse_with_next
 
 
 class DeleteBookRateViewTestCase(TestCase):
-    """Tests of the delete book rate review view."""
+    """Tests for the delete book rate review view"""
 
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
         'bookclubs/tests/fixtures/other_users.json',
-        'bookclubs/tests/fixtures/default_book.json'
+        'bookclubs/tests/fixtures/default_book.json',
     ]
 
     def setUp(self):
@@ -25,7 +25,8 @@ class DeleteBookRateViewTestCase(TestCase):
             rate=9,
             review='this is a review.'
         )
-        self.url = reverse('delete_book_rating_review', kwargs={'ISBN': self.book.ISBN, 'pk': self.book_rating_review.id})
+        self.url = reverse('delete_book_rating_review',
+                           kwargs={'ISBN': self.book.ISBN, 'pk': self.book_rating_review.id})
 
     def test_delete_rating_review_url(self):
         self.assertEqual(self.url, f'/delete_book_rating_review/{self.book.ISBN}/{self.book_rating_review.id}/')
@@ -40,7 +41,7 @@ class DeleteBookRateViewTestCase(TestCase):
         rating_review_count_before = BookRatingReview.objects.count()
         response = self.client.delete(self.url)
         rating_review_count_after = BookRatingReview.objects.count()
-        self.assertEqual(rating_review_count_after, rating_review_count_before-1)
+        self.assertEqual(rating_review_count_after, rating_review_count_before - 1)
         response_url = reverse('show_book', kwargs={'ISBN': self.book.ISBN})
         self.assertRedirects(
             response, response_url,

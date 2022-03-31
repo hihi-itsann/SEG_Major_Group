@@ -1,10 +1,13 @@
-from django.test import TestCase
-from django.forms import ValidationError
-from bookclubs.forms import validate_date_not_in_past, validate_date_not_in_future
 from datetime import date, timedelta
+
+from django.forms import ValidationError
+from django.test import TestCase
+
+from bookclubs.forms import validate_date_not_in_past, validate_date_not_in_future
 
 
 class ValidateDateFunctionsTestCase(TestCase):
+    """Unit tests for the functions which validate whether a date"""
 
     def setUp(self):
         self.past_date = date.today() - timedelta(days=5)

@@ -1,13 +1,16 @@
-"""Unit tests of the log in form."""
 from django import forms
 from django.test import TestCase
+
 from bookclubs.forms import LogInForm
 from bookclubs.models import User
 
-class LogInFormTestCase(TestCase):
-    """Unit tests of the log in form."""
 
-    fixtures = ['bookclubs/tests/fixtures/default_user.json']
+class LogInFormTestCase(TestCase):
+    """Unit tests for the LogInForm."""
+
+    fixtures = [
+        'bookclubs/tests/fixtures/default_user.json',
+    ]
 
     def setUp(self):
         self.form_input = {'username': '@janedoe', 'password': 'Password123'}
@@ -17,7 +20,7 @@ class LogInFormTestCase(TestCase):
         self.assertIn('username', form.fields)
         self.assertIn('password', form.fields)
         password_field = form.fields['password']
-        self.assertTrue(isinstance(password_field.widget,forms.PasswordInput))
+        self.assertTrue(isinstance(password_field.widget, forms.PasswordInput))
 
     def test_form_application_lists_valid_input(self):
         form = LogInForm(data=self.form_input)

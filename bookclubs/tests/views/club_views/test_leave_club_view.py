@@ -1,13 +1,13 @@
 from django.contrib import messages
 from django.test import TestCase
 from django.urls import reverse
-from bookclubs.tests.helpers import reverse_with_next
 
-from bookclubs.models import User, Club, Meeting, Role, Book, MeetingAttendance
+from bookclubs.models import User, Club, Role, Book
+from bookclubs.tests.helpers import reverse_with_next
 
 
 class LeaveClubViewTestCase(TestCase):
-    """Tests for the leaving of a meeting"""
+    """Tests for the leaving of a club"""
 
     VIEW = 'leave_club'
 
@@ -16,7 +16,6 @@ class LeaveClubViewTestCase(TestCase):
         'bookclubs/tests/fixtures/other_users.json',
         'bookclubs/tests/fixtures/default_clubs.json',
         'bookclubs/tests/fixtures/default_book.json',
-
     ]
 
     def setUp(self):

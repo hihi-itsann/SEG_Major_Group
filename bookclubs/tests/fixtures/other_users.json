@@ -1,40 +1,38 @@
 [
-   {
-     "model": "bookclubs.user",
-     "pk": 2,
-     "fields": {
-       "userID": 2,
-       "first_name": "Jane",
-       "last_name": "Doe",
-       "username": "@janedoe",
-       "email": "janedoe@example.org",
-       "bio": "Hello, I'm Jane Doe.",
-       "dob": "2002-07-14",
-       "gender": "F",
-       "location": "York",
-       "meeting_preference": "P",
-       "password": "pbkdf2_sha256$260000$4BNvFuAWoTT1XVU8D6hCay$KqDCG+bHl8TwYcvA60SGhOMluAheVOnF1PMz0wClilc=",
-       "is_active": true
-     }
-   },
-
-   {
-     "model": "bookclubs.user",
-     "pk": 3,
-     "fields": {
-       "userID": 3,
-       "first_name": "Alex",
-       "last_name": "Doe",
-       "username": "@Alexdoe",
-       "email": "Alexdoe@example.org",
-       "bio": "Hello, I'm Alex Doe.",
-       "dob": "2002-07-14",
-       "gender": "O",
-       "location": "London",
-       "meeting_preference": "P",
-       "password": "pbkdf2_sha256$260000$4BNvFuAWoTT1XVU8D6hCay$KqDCG+bHl8TwYcvA60SGhOMluAheVOnF1PMz0wClilc=",
-       "is_active": true
-     }
-   }
-
+  {
+    "model": "bookclubs.user",
+    "pk": 2,
+    "fields": {
+      "userID": 2,
+      "first_name": "Jane",
+      "last_name": "Doe",
+      "username": "@janedoe",
+      "email": "janedoe@example.org",
+      "bio": "Hello, I'm Jane Doe.",
+      "dob": "2002-07-14",
+      "gender": "F",
+      "location": "York",
+      "meeting_preference": "P",
+      "password": "pbkdf2_sha256$260000$4BNvFuAWoTT1XVU8D6hCay$KqDCG+bHl8TwYcvA60SGhOMluAheVOnF1PMz0wClilc=",
+      "is_active": true
+    }
+  },
+  {
+    "model": "bookclubs.user",
+    "pk": 3,
+    "fields": {
+      "userID": 3,
+      "first_name": "Alex",
+      "last_name": "Doe",
+      "username": "@alexdoe",
+      "email": "alexdoe@example.org",
+      "bio": "Hello, I'm Alex Doe.",
+      "dob": "2002-07-14",
+      "gender": "O",
+      "location": "London",
+      "meeting_preference": "P",
+      "password": "pbkdf2_sha256$260000$4BNvFuAWoTT1XVU8D6hCay$KqDCG+bHl8TwYcvA60SGhOMluAheVOnF1PMz0wClilc=",
+      "is_active": true
+    }
+  }
 ]

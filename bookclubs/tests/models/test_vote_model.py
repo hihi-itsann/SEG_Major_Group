@@ -1,13 +1,15 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+
 from bookclubs.models import User, Post, Vote, Club
 
 
 class VoteModelTestCase(TestCase):
+    """Unit tests for the Vote model"""
 
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
-        'bookclubs/tests/fixtures/default_clubs.json'
+        'bookclubs/tests/fixtures/default_clubs.json',
     ]
 
     def setUp(self):
