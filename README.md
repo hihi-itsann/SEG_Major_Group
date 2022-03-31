@@ -12,7 +12,7 @@ This is a readme file for our SEG Major Group Project.
   * [Technologies](#Technologies "Go to Technologies")
   * [Installations](#How_to_run_the_project "Go to Installations")
   * [License](#License "Go to License")
-  * [Reference List](#ReferenceList "Go to Reference List")
+  * [Reference List](#Reference_list)
 
 ## Contributors
 ***Artificial Intelligence Group:***
