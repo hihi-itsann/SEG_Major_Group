@@ -14,7 +14,7 @@ class ShowBookRecommendationsViewTestCase(TestCase):
         'bookclubs/tests/fixtures/default_user.json',
         'bookclubs/tests/fixtures/default_clubs.json',
         'bookclubs/tests/fixtures/default_book.json',
-        'bookclubs/tests/fixtures/other_books.json'
+        'bookclubs/tests/fixtures/other_books.json',
     ]
 
     def setUp(self):

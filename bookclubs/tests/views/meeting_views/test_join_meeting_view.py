@@ -17,7 +17,6 @@ class JoinMeetingViewTestCase(TestCase):
         'bookclubs/tests/fixtures/other_users.json',
         'bookclubs/tests/fixtures/default_clubs.json',
         'bookclubs/tests/fixtures/default_book.json',
-
     ]
 
     def setUp(self):
@@ -61,7 +60,7 @@ class JoinMeetingViewTestCase(TestCase):
             fetch_redirect_response=True
         )
 
-    def test_unsuccessful_when_role_is_ban(self):
+    def test_unsuccessful_join_when_user_is_banned(self):
         Role.objects.create(user=self.member, club=self.club, club_role='BAN')
         self.client.login(username=self.member.username, password="Password123")
         response = self.client.post(self.url, follow=True)
@@ -71,7 +70,7 @@ class JoinMeetingViewTestCase(TestCase):
         self.assertEqual(len(messages_list), 1)
         self.assertEqual(messages_list[0].level, messages.WARNING)
 
-    def test_unsuccessful_when_does_not_have_a_role(self):
+    def test_unsuccessful_when_user_is_not_part_of_club(self):
         self.client.login(username=self.member.username, password="Password123")
         response = self.client.post(self.url, follow=True)
         redirect_url = reverse('feed')

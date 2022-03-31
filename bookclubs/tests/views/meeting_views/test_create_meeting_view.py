@@ -3,11 +3,10 @@ from datetime import date, timedelta
 from django.test import TestCase
 from django.urls import reverse
 
-
 from bookclubs.forms import MeetingForm
+from bookclubs.meeting_link import delete_zoom_meeting
 from bookclubs.models import User, Club, Meeting, Role, Book, MeetingAttendance
 from bookclubs.tests.helpers import reverse_with_next
-from bookclubs.meeting_link import delete_zoom_meeting
 
 
 class CreateMeetingViewTestCase(TestCase):
@@ -20,8 +19,7 @@ class CreateMeetingViewTestCase(TestCase):
         'bookclubs/tests/fixtures/other_users.json',
         'bookclubs/tests/fixtures/default_clubs.json',
         'bookclubs/tests/fixtures/default_book.json',
-        'bookclubs/tests/fixtures/other_books.json'
-
+        'bookclubs/tests/fixtures/other_books.json',
     ]
 
     def setUp(self):
@@ -34,17 +32,12 @@ class CreateMeetingViewTestCase(TestCase):
         self.url = reverse(self.VIEW, kwargs={'club_name': self.club.club_name, 'book_isbn': self.book.ISBN})
         Role.objects.create(user=self.owner, club=self.club, club_role='OWN')
         self.form_input = {
-            # 'club': self.club,
-            # 'book': self.book,
             'topic': 'alpha bravo charlie',
             'description': 'delta foxtrot golf hotel india',
-            # 'meeting_status': self.club.meeting_status,
             'location': 'Bush House',
             'date': date.today() + timedelta(days=5),
             'time_start': '10:00',
-            'duration': 30,
-            # 'join_link': '',
-            # 'start_link': ''
+            'duration': 30
         }
 
     def log_in(self, user):
@@ -176,7 +169,9 @@ class CreateMeetingViewTestCase(TestCase):
         self.assertFalse(form.is_bound)
 
     def test_create_and_delete_online_meeting_successful(self):
-        """Test creattion of an online meeti"""
+        """This test may cause an error due to Zoom API restrictions, if there have been over 100 calls to
+        create_zoom_meeting within 24 hours then this test will fail. Please try again the next day and this
+        test should pass then."""
         Role.objects.create(user=self.user, club=self.online_club, club_role='MEM')
         self.log_in(self.user)
         url = reverse(self.VIEW, kwargs={'club_name': self.online_club.club_name, 'book_isbn': self.another_book.ISBN})

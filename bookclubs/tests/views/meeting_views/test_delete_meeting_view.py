@@ -7,7 +7,7 @@ from django.urls import reverse
 from bookclubs.models import User, Club, Meeting, Role, Book, MeetingAttendance
 
 
-class LeaveMeetingViewTestCase(TestCase):
+class DeleteMeetingViewTestCase(TestCase):
     """Tests for the deletion of a meeting"""
 
     VIEW = 'delete_meeting'
@@ -17,7 +17,6 @@ class LeaveMeetingViewTestCase(TestCase):
         'bookclubs/tests/fixtures/other_users.json',
         'bookclubs/tests/fixtures/default_clubs.json',
         'bookclubs/tests/fixtures/default_book.json',
-
     ]
 
     def setUp(self):
@@ -44,10 +43,10 @@ class LeaveMeetingViewTestCase(TestCase):
         )
         self.url = reverse(self.VIEW, kwargs={'club_name': self.club.club_name, 'meeting_id': self.meeting.id})
 
-    def test_leave_meeting_url(self):
+    def test_delete_meeting_url(self):
         self.assertEqual(self.url, f'/club/{self.club.club_name}/meeting/{self.meeting.id}/delete/')
 
-    def test_host_successfully_delete(self):
+    def test_host_successfully_delete_meeting(self):
         self.client.login(username=self.owner.username, password="Password123")
         meeting_count_before = Meeting.objects.count()
         response = self.client.post(self.url, follow=True)
@@ -60,7 +59,7 @@ class LeaveMeetingViewTestCase(TestCase):
             fetch_redirect_response=True
         )
 
-    def test_attendee_unsuccessfully_delete(self):
+    def test_attendee_unsuccessfully_delete_meeting(self):
         Role.objects.create(user=self.member, club=self.club, club_role='MEM')
         MeetingAttendance.objects.create(
             user=self.member,
@@ -82,7 +81,7 @@ class LeaveMeetingViewTestCase(TestCase):
         self.assertEqual(len(messages_list), 1)
         self.assertEqual(messages_list[0].level, messages.WARNING)
 
-    def test_user_not_in_this_meeting_unsuccessfully_delete(self):
+    def test_user_not_in_this_meeting_unsuccessfully_delete_meeting(self):
         Role.objects.create(user=self.member, club=self.club, club_role='MEM')
         self.client.login(username=self.member.username, password="Password123")
         meeting_count_before = Meeting.objects.count()

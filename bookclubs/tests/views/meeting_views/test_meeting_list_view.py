@@ -8,7 +8,7 @@ from bookclubs.tests.helpers import reverse_with_next
 
 
 class MeetingListViewTestCase(TestCase):
-    """Tests for the viewing a list of the clubs meetings"""
+    """Tests for showing list of club meetings"""
 
     VIEW = 'meeting_list'
 
@@ -17,7 +17,7 @@ class MeetingListViewTestCase(TestCase):
         'bookclubs/tests/fixtures/other_users.json',
         'bookclubs/tests/fixtures/default_clubs.json',
         'bookclubs/tests/fixtures/default_book.json',
-        'bookclubs/tests/fixtures/other_books.json'
+        'bookclubs/tests/fixtures/other_books.json',
     ]
 
     def setUp(self):
@@ -143,5 +143,3 @@ class MeetingListViewTestCase(TestCase):
         response = self.client.get(self.url)
         self.assertTemplateUsed(response, 'meeting_list.html')
         self.assertNotContains(response, f'{past_meeting.book.title}')
-
-
