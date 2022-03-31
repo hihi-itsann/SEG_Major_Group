@@ -14,30 +14,31 @@ This is a readme file for our SEG Major Group Project.
 * Anqi Jin (K20073503)
 
 ## Description
-Book Club is a book clubs management web application where the user can explore and join book clubs in order to discuss about books according to their preferences. This is a networking platform where bookworms can share their thoughts about books they have read during meetings (either in person or online) or simply via creating a post in the clubs they belong to. Our AI system will also recommend users books according to the clubs they have joined (the preferences of the club members will affect the recommendations of the system).
+**Book Club** is a book clubs management web application where the user can explore and join book clubs in order to discuss about books according to their preferences. This is a networking platform where bookworms can share their thoughts about books they have read during meetings (either in person or online) or simply via creating a post in the clubs they belong to. Our AI system will also recommend users books according to the clubs they have joined (the preferences of the club members will affect the recommendations of the system).
+
 ##Features
 
 * When the user has signed up and logged into the website they will be redirected to the club home page where:
-	** A different book quote will be displayed everyday
-	** Profits of reading will be displayed in order to encourage people to read books
+	* A different book quote will be displayed everyday
+	* Profits of reading will be displayed in order to encourage people to read books
 * All users can:
-	** Create a profile and edit it afterwards
-	** Create, join and leave book clubs
-	** Explore different clubs according to their preferences
-	** Create an application to join private clubs (users are automatically accepted to public clubs)
-	** Join meetings that can be either online or in person
-	** Create posts on the club feed
-	** Upvote/downvote, comment on posts
-	** Delete own posts
-	** Explore and rate books in the book list section, and filter them by genre
-	** Add books to their reading list where they can set their reading status as: unread,   
+	* Create a profile and edit it afterwards
+	* Create, join and leave book clubs
+	* Explore different clubs according to their preferences
+	* Create an application to join private clubs (users are automatically accepted to public clubs)
+	* Join meetings that can be either online or in person
+	* Create posts on the club feed
+	* Upvote/downvote, comment on posts
+	* Delete own posts
+	* Explore and rate books in the book list section, and filter them by genre
+	* Add books to their reading list where they can set their reading status as: unread,   
      reading and finished reading.
 * As a club moderator or owner you can:
 	** Create meetings that can be either online or in person
   ** See club applicants, members and banned members
 * As a club owner you can:
 	** Modify club info and delete the club
-* An interactive dinosaur game will be displayed while the system loads the book recommendations 
+* An interactive dinosaur game will be displayed while the system loads the book recommendations
 
 ## Technologies
 * Our project was built employing Python/Django.
@@ -50,7 +51,7 @@ Book Club is a book clubs management web application where the user can explore 
 
 
 ## How to run the project
-** Link to Zena’s document
+* Link to Zena’s document
 ##License
 By contributing, you agree that your contributions will be licensed under its MIT License.
 ## Reference List
