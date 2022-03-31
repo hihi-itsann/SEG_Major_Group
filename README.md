@@ -100,7 +100,21 @@ Book Clubs - Django Web Application Setup Instructions
 
 **8. Run the tests:**  
 
-    python3 manage.py test
+    If the programme gives test errors run first:  
+
+    python3 manage.py collectstatic
+
+    python3 manage.py test  
+
+    If you want to test with coverage:  
+
+    coverage run manage.py test
+
+    coverage report --omit=”*/tests/*”
+
+    coverage html --omit=”*/tests/*”
+
+
 
 ## License
 By contributing, you agree that your contributions will be licensed under its *MIT License*.
