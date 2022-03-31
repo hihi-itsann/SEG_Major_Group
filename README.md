@@ -99,14 +99,12 @@ Book Clubs - Django Web Application Setup Instructions
     python3 manage.py runserver  
 
 **8. Run the tests:**  
-
     If the programme gives test errors run first:  
 
     python3 manage.py collectstatic
 
     python3 manage.py test  
-
-    If you want to test with coverage:  
+  If you want to test with coverage:  
 
     coverage run manage.py test
 
