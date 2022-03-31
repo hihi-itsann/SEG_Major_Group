@@ -402,7 +402,7 @@ class Post(models.Model):
     def toggle_upvote(self, user):
         if Vote.objects.filter(post=self, user=user).count() == 1:
             vote = Vote.objects.get(post=self, user=user)
-            if vote.vote_type == True:
+            if vote.vote_type:
                 vote.delete()
             else:
                 vote.delete()
@@ -413,7 +413,7 @@ class Post(models.Model):
     def toggle_downvote(self, user):
         if Vote.objects.filter(post=self, user=user).count() == 1:
             vote = Vote.objects.get(post=self, user=user)
-            if vote.vote_type == False:
+            if not vote.vote_type:
                 vote.delete()
             else:
                 vote.delete()
