@@ -104,9 +104,9 @@ class Command(BaseCommand):
         )
 
     def create_books(self):
-        for index, book in self.df_books.head(100).iterrows():
+        for index, book in self.df_books.head(500).iterrows():
             # print(f"Seeding book {index}/{len(self.df_books)}", end='\r')
-            print(f"Seeding book {index}/100", end='\r')
+            print(f"Seeding book {index}/500", end='\r')
             try:
 
                 self.create_book(book)
@@ -325,6 +325,7 @@ class Command(BaseCommand):
     def create_meeting(self, club):
         date = self.faker.future_date()
         time_start = self.faker.time(pattern='%H:%M')
+       
         duration = randint(15, 45)
         club = club
         book = self.get_random_book()

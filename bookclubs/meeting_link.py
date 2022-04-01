@@ -4,7 +4,7 @@ import time
 import jwt
 import requests
 
-
+from faker import Faker
 # create a function to generate a token using the pyjwt library
 def generateToken():
     token = jwt.encode(
@@ -20,15 +20,13 @@ def generateToken():
     return token
 
 
-def create_zoom_meeting(date, start_time, duration):
+def create_zoom_meeting(date, time_start, duration):
     email = "bookclub2022@protonmail.com"
 
     headers = {'authorization': 'Bearer %s' % generateToken(),
                'content-type': 'application/json'}
-
     url = "https://api.zoom.us/v2/users/{}/meetings".format(email)
-    date = str(date) + "T" + str(start_time) + ":00"
-    start_time = datetime.datetime.strptime(start_time, "%H:%M")
+    date = str(date) + "T" + str(time_start) + ":00"
     obj = {"topic": "Book Club", "start_time": date, "duration": duration, "password": "1234",
            "timezone": (time.tzname)[0]}
 
