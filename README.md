@@ -75,6 +75,8 @@ This is a readme file for our SEG Major Group Project.
 * **Bootstrap** was used to design the program's front-end
 
 <!-- The location where the software or software component is deployed and sufficient information to access it.  The latter includes access credentials for the different types of user who may employ the software. -->
+## Deployment
+* heroku
 
 ## How to run the project
 Book Clubs - Django Web Application Setup Instructions  
