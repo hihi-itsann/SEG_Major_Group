@@ -6,7 +6,7 @@ from .models import User, Application, Club, Role, Book, BookRatingReview, BookS
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ['id', 'username', 'email', 'meeting_preference',
+    list_display = ['userID', 'username', 'email', 'meeting_preference',
                     'location', 'country', 'city', 'userID']
 
 
