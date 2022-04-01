@@ -1,11 +1,16 @@
-from django.test import TestCase
-from bookclubs.models import User
-from bookclubs.forms import PasswordForm
 from django.contrib.auth.hashers import check_password
+from django.test import TestCase
+
+from bookclubs.forms import PasswordForm
+from bookclubs.models import User
+
 
 class PasswordFormTestCase(TestCase):
+    """Unit tests for the PasswordForm"""
 
-    fixtures = ['bookclubs/tests/fixtures/default_user.json']
+    fixtures = [
+        'bookclubs/tests/fixtures/default_user.json',
+    ]
 
     def setUp(self):
         self.user = User.objects.get(username='@johndoe')

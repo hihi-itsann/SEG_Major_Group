@@ -1,6 +1,8 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
-from bookclubs.models import User, Post, Comment, Club, Role, Book, BookRatingReview, Meeting, ClubBookAverageRating, MeetingAttendance, Application
+from bookclubs.meeting_link import delete_zoom_meeting
+from bookclubs.models import User, Post, Comment, Club, Role, Book, BookRatingReview, Meeting, ClubBookAverageRating, \
+    MeetingAttendance, Application
 
 
 class Command(BaseCommand):
@@ -19,6 +21,7 @@ class Command(BaseCommand):
         if Meeting.objects.all().count() > 0:
             print(f'Unseeding Meeting...', end='\r')
             Meeting.objects.all().delete()
+            delete_zoom_meeting()
             print(f'Unseeded Meeting.')
         if Comment.objects.all().count() > 0:
             print(f'Unseeding Comment...', end='\r')
@@ -53,5 +56,3 @@ class Command(BaseCommand):
             Book.objects.all().delete()
             print(f'Unseeded Book.')
         print('Unseeding finished.')
-
-

@@ -1,20 +1,23 @@
 from django.test import TestCase
-from bookclubs.models import User, Book, BookRatingReview
-from bookclubs.forms import RateReviewForm
 
-class RateFormTestCase(TestCase):
+from bookclubs.forms import RateReviewForm
+from bookclubs.models import User, Book
+
+
+class RateReviewFormTestCase(TestCase):
+    """Unit tests for the RateReviewForm"""
 
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
-        'bookclubs/tests/fixtures/default_book.json'
+        'bookclubs/tests/fixtures/default_book.json',
     ]
 
     def setUp(self):
         self.user = User.objects.get(username='@johndoe')
         self.book = Book.objects.get(ISBN='0195153448')
         self.form_input = {
-            'rate':9,
-            'review':'this is a book review.'
+            'rate': 9,
+            'review': 'this is a book review.'
         }
 
     def test_form_contains_required_fields(self):
@@ -33,6 +36,6 @@ class RateFormTestCase(TestCase):
         self.assertEqual(form.instance.rate, 0)
 
     def test_form_rejects_overlong_review(self):
-        input = {'review': 'x'*521 }
-        form = RateReviewForm(data=input)
+        form_input = {'review': 'x' * 521}
+        form = RateReviewForm(data=form_input)
         self.assertFalse(form.is_valid())

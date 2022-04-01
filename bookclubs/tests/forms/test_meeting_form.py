@@ -1,6 +1,5 @@
 from datetime import date, timedelta
 
-from django import forms
 from django.test import TestCase
 
 from bookclubs.forms import MeetingForm
@@ -8,7 +7,8 @@ from bookclubs.models import Meeting, User, Club, Book, MeetingAttendance
 
 
 class MeetingFormTestCase(TestCase):
-    """Testing the MeetingForm"""
+    """Unit tests for the MeetingForm"""
+
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
         'bookclubs/tests/fixtures/other_users.json',

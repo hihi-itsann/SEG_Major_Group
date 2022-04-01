@@ -1,14 +1,14 @@
 from django.test import TestCase
 from django.urls import reverse
+
 from bookclubs.models import Post, User, Club, Role
 from bookclubs.tests.helpers import reverse_with_next
 
 
 class DeletePostTest(TestCase):
-
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
-        'bookclubs/tests/fixtures/default_clubs.json'
+        'bookclubs/tests/fixtures/default_clubs.json',
     ]
 
     def setUp(self):
@@ -22,9 +22,9 @@ class DeletePostTest(TestCase):
             body="The quick brown fox jumps over the lazy dog."
         )
         self.role = Role.objects.create(
-             user=self.user,
-             club=self.club,
-             club_role='MEM'
+            user=self.user,
+            club=self.club,
+            club_role='MEM'
         )
         self.url = reverse('delete_post', kwargs={'pk': self.post.id})
 
@@ -41,8 +41,8 @@ class DeletePostTest(TestCase):
         post_count_before = Post.objects.count()
         response = self.client.delete(self.url)
         post_count_after = Post.objects.count()
-        self.assertEqual(post_count_after, post_count_before-1)
-        response_url = reverse('club_feed',kwargs={'club_name': self.club.club_name})
+        self.assertEqual(post_count_after, post_count_before - 1)
+        response_url = reverse('club_feed', kwargs={'club_name': self.club.club_name})
         self.assertRedirects(
             response, response_url,
             status_code=302, target_status_code=200,

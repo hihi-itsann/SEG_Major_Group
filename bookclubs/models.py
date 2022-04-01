@@ -1,16 +1,14 @@
 import datetime
-import traceback
-from django.contrib import messages
+import json
+
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator, MinLengthValidator, MinValueValidator, MaxValueValidator
 from django.db import models
-from django.contrib.auth.models import AbstractUser
-from django.db.utils import OperationalError
-from libgravatar import Gravatar
 from django.db.models import Avg
-from django.urls import reverse
+from django.db.utils import OperationalError
 from django.utils.translation import gettext_lazy as _
-import json
+from libgravatar import Gravatar
+
 
 class User(AbstractUser):
     userID = models.IntegerField(unique=True, null=True)
@@ -27,7 +25,7 @@ class User(AbstractUser):
     email = models.EmailField(unique=True, blank=False)
     bio = models.CharField(max_length=520, blank=True)
     dob = models.DateField(blank=True,
-                           null=True)  # blank=False, auto_now_add=False, auto_now=False, default=date.today())
+                           null=True)
     GENDER_CHOICES = (
         ('M', 'Male'),
         ('F', 'Female'),
@@ -37,15 +35,12 @@ class User(AbstractUser):
     location = models.CharField(max_length=50, blank=True)
     city = models.CharField(max_length=50, blank=True)
     country = models.CharField(max_length=50, blank=True)
-    # country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True)
-    # city = models.ForeignKey(City, on_delete=models.CASCADE, null=True)
 
     MEETING_CHOICES = (
         ('O', 'Online'),
         ('P', 'In-person')
     )
     meeting_preference = models.CharField(max_length=1, choices=MEETING_CHOICES, blank=True)
-
 
     class Meta:
         """Model options."""
@@ -89,6 +84,7 @@ class User(AbstractUser):
         posts_downvoted = Vote.objects.filter(user=self, vote_type=False).values_list('post', flat=True)
         return Post.objects.filter(id__in=posts_downvoted)
 
+
 class Book(models.Model):
     ISBN = models.CharField(
         primary_key=True,
@@ -114,8 +110,10 @@ class Book(models.Model):
 
     def get_ISBN(self):
         return self.ISBN
+
     def toJson(self):
         return json.dumps(self, default=lambda o: o.__dict__)
+
     @staticmethod
     def get_genres():
         genres = [('Fiction', 'Fiction'), ('Non-Fiction', 'Non-Fiction')]
@@ -131,11 +129,8 @@ class Book(models.Model):
         finally:
             return genres
 
-    # def getReadingStatus(self,user):
-    #     return BookStatus.objects.get(user=user, book=self).status
     class Meta:
         ordering = ['title']
-        # return self.rating_set.all().aggregate(Avg('rate'))['rate__avg']
 
 
 class BookRatingReview(models.Model):
@@ -239,8 +234,6 @@ class Club(models.Model):
         max_length=100,
         blank=True
     )
-    # country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True)
-    # city = models.ForeignKey(City, on_delete=models.CASCADE, null=True)
 
     public_status = models.CharField(
         choices=PRIVACY_CHOICES,
@@ -393,7 +386,6 @@ class Role(models.Model):
 
 
 class Post(models.Model):
-
     title = models.CharField(max_length=255, blank=False)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     club = models.ForeignKey(Club, on_delete=models.CASCADE)
@@ -410,38 +402,37 @@ class Post(models.Model):
     def toggle_upvote(self, user):
         if Vote.objects.filter(post=self, user=user).count() == 1:
             vote = Vote.objects.get(post=self, user=user)
-            if vote.vote_type == True:
+            if vote.vote_type:
                 vote.delete()
             else:
                 vote.delete()
-                Vote.objects.create(post=self, user=user, vote_type= True)
+                Vote.objects.create(post=self, user=user, vote_type=True)
         else:
-            Vote.objects.create(post=self, user=user, vote_type= True)
+            Vote.objects.create(post=self, user=user, vote_type=True)
 
     def toggle_downvote(self, user):
         if Vote.objects.filter(post=self, user=user).count() == 1:
             vote = Vote.objects.get(post=self, user=user)
-            if vote.vote_type == False:
+            if not vote.vote_type:
                 vote.delete()
             else:
                 vote.delete()
-                Vote.objects.create(post=self, user=user, vote_type= False)
+                Vote.objects.create(post=self, user=user, vote_type=False)
 
         else:
-            Vote.objects.create(post=self, user=user, vote_type= False)
+            Vote.objects.create(post=self, user=user, vote_type=False)
 
     def get_upvotes(self):
-        return Vote.objects.filter(post=self, vote_type= True).count()
+        return Vote.objects.filter(post=self, vote_type=True).count()
 
     def get_downvotes(self):
-        return Vote.objects.filter(post=self, vote_type= False).count()
+        return Vote.objects.filter(post=self, vote_type=False).count()
 
 
 class Vote(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='post_vote')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_vote')
     vote_type = models.BooleanField()
-
 
     class Meta:
         unique_together = ('user', 'post')
@@ -473,7 +464,8 @@ class Meeting(models.Model):
     time_start = models.TimeField(blank=False)
     duration = models.IntegerField(blank=False, default=30)
     join_link = models.URLField(blank=True, null=True)
-    start_link = models.URLField(blank=True,null=True)
+    start_link = models.URLField(blank=True, null=True)
+
     def get_time_end(self):
         time1 = self.time_start
         timedelta = datetime.timedelta(minutes=self.duration)
@@ -500,7 +492,7 @@ class Meeting(models.Model):
             return 'In-Person'
 
     def get_is_time(self):
-        return datetime.datetime.now().date()==self.date and datetime.datetime.now().time() > self.time_start and datetime.datetime.now().time() < self.get_time_end()
+        return datetime.datetime.now().date() == self.date and datetime.datetime.now().time() > self.time_start and datetime.datetime.now().time() < self.get_time_end()
 
     def get_location(self):
         if self.meeting_status == 'ONL':
@@ -508,8 +500,6 @@ class Meeting(models.Model):
                 return f"Meeting Link will be available when it's time"
             else:
                 return f"It's time to join the meeting!"
-
-
         else:
             return f'Meeting Held: {self.location} {self.club.city} {self.club.country}'
 

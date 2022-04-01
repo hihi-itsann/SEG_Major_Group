@@ -1,9 +1,10 @@
-from django.core.exceptions import ValidationError
 from django.test import TestCase
+
 from bookclubs.models import User, Club, Role
 
 
 class RoleModelTestCase(TestCase):
+    """Unit tests for the Role model"""
 
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
@@ -20,6 +21,7 @@ class RoleModelTestCase(TestCase):
         )
 
     def test_role_get_club_role(self):
+        """Test get_club_role method"""
         self.assertEqual(self.role.get_club_role(), 'Owner')
         self.role.club_role = 'MEM'
         self.assertEqual(self.role.get_club_role(), 'Member')

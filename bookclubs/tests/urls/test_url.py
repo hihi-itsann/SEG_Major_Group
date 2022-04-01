@@ -1,18 +1,21 @@
+import random
+
 from django.test import SimpleTestCase
 from django.urls import reverse, resolve
-import random
-from bookclubs.views import home, feed, SignUpView, LogInView, log_out, ProfileUpdateView,\
-                             show_user, PasswordView ,BookListView, ShowBookView, CreateBookRateReviewView,\
-                            create_book_status, delete_book_status, change_book_status, reading_book_list,\
-                            club_feed, create_club, delete_club, create_application,\
-                            withdraw_application, my_applications, application_list, accept_applicant, \
-                            reject_applicant, club_list, my_clubs, member_list, PostCommentView, \
-                            CreatePostView, DeletePostView, CreateCommentView, DeleteCommentView,\
-                            remove_member, transfer_ownership, show_book_recommendations,\
-                            create_meeting
+
+from bookclubs.views import home, feed, SignUpView, LogInView, log_out, ProfileUpdateView, \
+    show_user, PasswordView, BookListView, ShowBookView, CreateBookRateReviewView, \
+    create_book_status, delete_book_status, change_book_status, reading_book_list, \
+    club_feed, create_club, delete_club, create_application, \
+    withdraw_application, my_applications, application_list, accept_applicant, \
+    reject_applicant, club_list, my_clubs, member_list, CreatePostView, DeletePostView, CreateCommentView, \
+    DeleteCommentView, \
+    remove_member, transfer_ownership, show_book_recommendations, \
+    create_meeting
 
 
 class TestUrls(SimpleTestCase):
+    """Unit tests for the urls"""
 
     def test_home_url_is_resolved(self):
         url = reverse('home')
@@ -38,44 +41,44 @@ class TestUrls(SimpleTestCase):
         url = reverse('profile')
         self.assertEquals(resolve(url).func.view_class, ProfileUpdateView)
 
-    # def test_show_user_url_is_resolved(self):
-    #     url = reverse('show_user',args=['some-str'])
-    #     self.assertEquals(resolve(url).func,show_user)
+    def test_show_user_url_is_resolved(self):
+        url = reverse('show_user', args=['some-str'])
+        self.assertEquals(resolve(url).func, show_user)
 
     def test_password_url_is_resolved(self):
         url = reverse('password')
         self.assertEquals(resolve(url).func.view_class, PasswordView)
 
     def test_book_list_url_is_resolved(self):
-        url = reverse('book_list',args=['some-str'])
+        url = reverse('book_list', args=['some-str'])
         self.assertEquals(resolve(url).func.view_class, BookListView)
 
     def test_show_book_url_is_resolved(self):
-        url = reverse('show_book',args=['some-str'])
+        url = reverse('show_book', args=['some-str'])
         self.assertEquals(resolve(url).func.view_class, ShowBookView)
 
     def test_create_book_rating_review_url_is_resolved(self):
-        url = reverse('create_book_rating_review',args=['some-str'])
+        url = reverse('create_book_rating_review', args=['some-str'])
         self.assertEquals(resolve(url).func.view_class, CreateBookRateReviewView)
 
     def test_create_book_status_url_is_resolved(self):
-        url = reverse('create_book_status',args=['some-str'])
+        url = reverse('create_book_status', args=['some-str'])
         self.assertEquals(resolve(url).func, create_book_status)
 
     def test_delete_book_status_url_is_resolved(self):
-        url = reverse('delete_book_status',args=['some-str'])
+        url = reverse('delete_book_status', args=['some-str'])
         self.assertEquals(resolve(url).func, delete_book_status)
 
     def test_change_book_status_url_is_resolved(self):
-        url = reverse('change_book_status',args=['some-str','some-str'])
+        url = reverse('change_book_status', args=['some-str', 'some-str'])
         self.assertEquals(resolve(url).func, change_book_status)
 
     def test_reading_book_list_url_is_resolved(self):
-        url = reverse('reading_book_list',args=['some-str'])
+        url = reverse('reading_book_list', args=['some-str'])
         self.assertEquals(resolve(url).func, reading_book_list)
 
     def test_club_feed_url_is_resolved(self):
-        url = reverse('club_feed',args=['some-str'])
+        url = reverse('club_feed', args=['some-str'])
         self.assertEquals(resolve(url).func, club_feed)
 
     def test_create_club_url_is_resolved(self):
@@ -83,15 +86,15 @@ class TestUrls(SimpleTestCase):
         self.assertEquals(resolve(url).func, create_club)
 
     def test_delete_club_url_is_resolved(self):
-        url = reverse('delete_club',args=['some-str'])
+        url = reverse('delete_club', args=['some-str'])
         self.assertEquals(resolve(url).func, delete_club)
 
     def test_create_application_url_is_resolved(self):
-        url = reverse('create_application',args=['some-str'])
+        url = reverse('create_application', args=['some-str'])
         self.assertEquals(resolve(url).func, create_application)
 
     def test_withdraw_application_url_is_resolved(self):
-        url = reverse('withdraw_application',args=['some-str'])
+        url = reverse('withdraw_application', args=['some-str'])
         self.assertEquals(resolve(url).func, withdraw_application)
 
     def test_my_applications_url_is_resolved(self):
@@ -99,15 +102,15 @@ class TestUrls(SimpleTestCase):
         self.assertEquals(resolve(url).func, my_applications)
 
     def test_application_list_url_is_resolved(self):
-        url = reverse('application_list',args=['some-str'])
+        url = reverse('application_list', args=['some-str'])
         self.assertEquals(resolve(url).func, application_list)
 
     def test_accept_applicant_url_is_resolved(self):
-        url = reverse('accept_applicant',args=['some-str',random.randint(0,100)])
+        url = reverse('accept_applicant', args=['some-str', random.randint(0, 100)])
         self.assertEquals(resolve(url).func, accept_applicant)
 
     def test_reject_applicant_url_is_resolved(self):
-        url = reverse('reject_applicant',args=['some-str',random.randint(0,100)])
+        url = reverse('reject_applicant', args=['some-str', random.randint(0, 100)])
         self.assertEquals(resolve(url).func, reject_applicant)
 
     def test_club_list_url_is_resolved(self):
@@ -119,37 +122,37 @@ class TestUrls(SimpleTestCase):
         self.assertEquals(resolve(url).func, my_clubs)
 
     def test_member_list_url_is_resolved(self):
-        url = reverse('member_list',args=['some-str'])
+        url = reverse('member_list', args=['some-str'])
         self.assertEquals(resolve(url).func, member_list)
 
     def test_create_post_url_is_resolved(self):
-        url = reverse('create_post',args=[random.randint(0,100)])
+        url = reverse('create_post', args=[random.randint(0, 100)])
         self.assertEquals(resolve(url).func.view_class, CreatePostView)
 
     def test_delete_post_url_is_resolved(self):
-        url = reverse('delete_post',args=[random.randint(0,100)])
+        url = reverse('delete_post', args=[random.randint(0, 100)])
         self.assertEquals(resolve(url).func.view_class, DeletePostView)
 
     def test_create_comment_url_is_resolved(self):
-        url = reverse('create_comment',args=[random.randint(0,100)])
+        url = reverse('create_comment', args=[random.randint(0, 100)])
         self.assertEquals(resolve(url).func.view_class, CreateCommentView)
 
     def test_delete_comment_url_is_resolved(self):
-        url = reverse('delete_comment',args=[random.randint(0,100)])
+        url = reverse('delete_comment', args=[random.randint(0, 100)])
         self.assertEquals(resolve(url).func.view_class, DeleteCommentView)
 
     def test_remove_member_url_is_resolved(self):
-        url = reverse('remove_from_club',args=['some-str',random.randint(0,100)])
+        url = reverse('remove_from_club', args=['some-str', random.randint(0, 100)])
         self.assertEquals(resolve(url).func, remove_member)
 
     def test_transfer_ownership_url_is_resolved(self):
-        url = reverse('transfer_ownership',args=['some-str',random.randint(0,100)])
+        url = reverse('transfer_ownership', args=['some-str', random.randint(0, 100)])
         self.assertEquals(resolve(url).func, transfer_ownership)
 
     def test_show_book_recommendations_url_is_resolved(self):
-        url = reverse('show_book_recommendations',args=['some-str'])
+        url = reverse('show_book_recommendations', args=['some-str'])
         self.assertEquals(resolve(url).func, show_book_recommendations)
 
     def test_create_meeting_url_is_resolved(self):
-        url = reverse('create_meeting',args=['some-str','some-str'])
+        url = reverse('create_meeting', args=['some-str', 'some-str'])
         self.assertEquals(resolve(url).func, create_meeting)

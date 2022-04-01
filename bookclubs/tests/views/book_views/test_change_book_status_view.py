@@ -1,11 +1,12 @@
 from django.test import TestCase
 from django.urls import reverse
+
 from bookclubs.models import User, Book, BookStatus
 from bookclubs.tests.helpers import reverse_with_next
 
 
 class ChangeBookStatusViewTestCase(TestCase):
-    """Tests for changing book reading status"""
+    """Tests for changing a book's reading status"""
 
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
@@ -41,7 +42,7 @@ class ChangeBookStatusViewTestCase(TestCase):
         status_after = BookStatus.objects.get(user=self.user, book=self.book).status
         self.assertEqual(status_after, 'F')
         self.assertNotEqual(status_before, status_after)
-        response_url = reverse('show_book',kwargs={'ISBN': self.book.ISBN})
+        response_url = reverse('show_book', kwargs={'ISBN': self.book.ISBN})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
 
     def test_change_book_status_is_unsuccessful(self):
@@ -50,5 +51,5 @@ class ChangeBookStatusViewTestCase(TestCase):
         response = self.client.post(self.url, follow=True)
         status_after = self.book_status.status
         self.assertEqual(status_before, status_after)
-        response_url = reverse('show_book',kwargs={'ISBN': self.book.ISBN})
+        response_url = reverse('show_book', kwargs={'ISBN': self.book.ISBN})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)

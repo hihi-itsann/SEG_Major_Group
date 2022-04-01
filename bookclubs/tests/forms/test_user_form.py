@@ -1,15 +1,17 @@
-"""Unit tests of the user form."""
-from django import forms
-from django.test import TestCase
-from bookclubs.forms import UserForm
-from bookclubs.models import User
 from datetime import date
 
+from django import forms
+from django.test import TestCase
+
+from bookclubs.forms import UserForm
+from bookclubs.models import User
+
+
 class UserFormTestCase(TestCase):
-    """Unit tests of the user form."""
+    """Unit tests of the UserForm."""
 
     fixtures = [
-        'bookclubs/tests/fixtures/default_user.json'
+        'bookclubs/tests/fixtures/default_user.json',
     ]
 
     def setUp(self):

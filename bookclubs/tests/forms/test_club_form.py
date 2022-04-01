@@ -1,11 +1,10 @@
 from django.test import TestCase
 
 from bookclubs.forms import ClubForm
-from bookclubs.models import User, Club
 
 
 class ClubFormTestCase(TestCase):
-    """Testing the ClubForm"""
+    """Unit tests for the ClubForm"""
 
     def setUp(self):
         self.form_input = {
@@ -43,4 +42,3 @@ class ClubFormTestCase(TestCase):
         self.form_input['club_name'] = 'Bad'
         form = ClubForm(data=self.form_input)
         self.assertFalse(form.is_valid())
-

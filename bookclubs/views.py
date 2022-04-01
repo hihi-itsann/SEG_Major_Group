@@ -1,43 +1,36 @@
-from ntpath import join
-# from os import startfile
-from django.contrib import messages
-from webbrowser import get
-from django.db.models import Q  # filter exception
-from django.db.models import F
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
+from django.db.models import Q  # filter exception
 from django.http import Http404
 from django.http import JsonResponse
-from django.http import HttpResponse
 from django.shortcuts import render
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.views import View
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
-from django.shortcuts import redirect, render, get_object_or_404, HttpResponseRedirect
-from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, ClubForm, ApplicationForm, CommentForm, \
+
+from bookclubs.forms import SignUpForm, LogInForm, UserForm, PasswordForm, ClubForm, CommentForm, \
     RateReviewForm, PostForm, MeetingForm, ApplicationForm
-from .helpers import *
-from .models import User, Book, Application, Vote, Comment, Post, BookRatingReview, BookStatus, Club, Meeting, \
-    MeetingAttendance
-from django.core.paginator import Paginator
-from random import choice
 from bookclubs.meeting_link import create_zoom_meeting, get_join_link, get_start_link
-from datetime import datetime
 from bookclubs.recommender.keras import get_recommendations
+from .helpers import *
+from .models import User, Book, Application, Comment, Post, BookRatingReview, BookStatus, Club, Meeting, \
+    MeetingAttendance
 
 
 @login_prohibited
 def home(request):
+    """Shows view for an unregistered user"""
     return render(request, 'home.html')
 
 
 @login_required
 def feed(request):
+    """Feed view for a registered user"""
     return render(request, 'feed.html')
 
 
@@ -109,18 +102,19 @@ class LogInView(LoginProhibitedMixin, View):
 
     def render(self):
         """Render log in template with blank log in form."""
-
         form = LogInForm()
         return render(self.request, 'log_in.html', {'form': form, 'next': self.next})
 
 
 def log_out(request):
+    """Logs current user out"""
     logout(request)
     return redirect('home')
 
 
 @login_required
 def show_user(request, username):
+    """Show details of a specified user"""
     if User.objects.filter(username=username).count() == 1:
         user = User.objects.get(username=username)
         return render(request, 'show_user.html', {'user': user})
@@ -155,21 +149,18 @@ class PasswordView(LoginRequiredMixin, FormView):
 
     def get_form_kwargs(self, **kwargs):
         """Pass the current user to the password change form."""
-
         kwargs = super().get_form_kwargs(**kwargs)
         kwargs.update({'user': self.request.user})
         return kwargs
 
     def form_valid(self, form):
         """Handle valid form by saving the new password."""
-
         form.save()
         login(self.request, self.request.user)
         return super().form_valid(form)
 
     def get_success_url(self):
         """Redirect the user after successful password change."""
-
         messages.add_message(self.request, messages.SUCCESS, "Password updated!")
         return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
@@ -178,6 +169,7 @@ class PasswordView(LoginRequiredMixin, FormView):
 
 class BookListView(LoginRequiredMixin, ListView):
     """View that shows a list of all books"""
+
     model = Book
     template_name = 'book_list.html'
     context_object_name = "books"
@@ -202,6 +194,7 @@ class BookListView(LoginRequiredMixin, ListView):
 
 class ShowBookView(LoginRequiredMixin, DetailView):
     """View that shows book details."""
+
     model = Book
     template_name = 'show_book.html'
     pk_url_kwarg = 'ISBN'
@@ -223,7 +216,6 @@ class ShowBookView(LoginRequiredMixin, DetailView):
 
     def get(self, request, *args, **kwargs):
         """Handle get request, and redirect to book_list if ISBN invalid."""
-
         try:
             return super().get(request, *args, **kwargs)
         except Http404:
@@ -231,6 +223,8 @@ class ShowBookView(LoginRequiredMixin, DetailView):
 
 
 class CreateBookRateReviewView(LoginRequiredMixin, CreateView):
+    """Creates a rating and review for a book"""
+
     model = BookRatingReview
     form_class = RateReviewForm
     template_name = 'show_book.html'
@@ -252,9 +246,10 @@ class CreateBookRateReviewView(LoginRequiredMixin, CreateView):
 @book_exists
 @own_feedback_exists
 def delete_book_rating_review(request, ISBN, pk):
+    """Deletes a rating and review for a book"""
     book = Book.objects.get(ISBN=ISBN)
     rating_review = BookRatingReview.objects.get(book=book, id=pk, user=request.user)
-    rating_review.delete();
+    rating_review.delete()
     messages.add_message(request, messages.SUCCESS, "This review has successfully been deleted!")
     return redirect('show_book', ISBN)
 
@@ -317,6 +312,7 @@ def reading_book_list(request, book_genre='All'):
     args = {'unreadBooks': unreadBooks, 'readingBooks': readingBooks, 'finishedBooks': finishedBooks, 'genres': genres}
     return render(request, 'reading_book_list.html', args)
 
+
 # --------------------------application functions---------------------------------
 
 @login_required
@@ -328,7 +324,7 @@ def create_application(request, club_name):
     if current_club.public_status == 'PUB':
         current_club.club_members.add(request.user, through_defaults={'club_role': 'MEM'})
         current_club.toggle_member(request.user)
-        application = Application.objects.create(user=request.user, club=current_club, statement=' ', status='A')
+        Application.objects.create(user=request.user, club=current_club, statement=' ', status='A')
         messages.add_message(request, messages.SUCCESS, "Club is public. You are now a member!")
         return redirect('my_applications')
     else:
@@ -348,7 +344,7 @@ def create_application(request, club_name):
 @club_exists
 @applicant_required
 def edit_application(request, club_name):
-    """Deletes current application and replaces it with another application with updated statement"""
+    """Edits current application for a club with an updated statement"""
     club_applied = Club.objects.get(club_name=club_name)
     application = Application.objects.get(user=request.user, club=club_applied)
     form = ApplicationForm(instance=application)
@@ -411,7 +407,7 @@ def accept_applicant(request, club_name, user_id):
 @club_exists
 @management_required
 def reject_applicant(request, club_name, user_id):
-    """Changes application status to Rejected"""
+    """Changes application status to Rejected and user is not added to the club"""
     current_club = Club.objects.get(club_name=club_name)
     user = User.objects.get(id=user_id)
     application = Application.objects.get(user=user, club=current_club)
@@ -425,6 +421,7 @@ def reject_applicant(request, club_name, user_id):
 @club_exists
 @membership_required
 def club_feed(request, club_name):
+    """Club feed to show to members, moderators and owners of a club"""
     is_moderator = False
     is_owner = False
     current_club = Club.objects.get(club_name=club_name)
@@ -443,7 +440,7 @@ def club_feed(request, club_name):
 
 @login_required
 def create_club(request):
-    """a user can create a club"""
+    """A user can create a club"""
     if request.method == 'POST':
         form = ClubForm(request.POST)
         if form.is_valid():
@@ -459,6 +456,7 @@ def create_club(request):
 @club_exists
 @owner_required
 def delete_club(request, club_name):
+    """The owner of a club can delete the club"""
     current_club = Club.objects.get(club_name=club_name)
     current_club.delete()
     return feed(request)
@@ -468,6 +466,7 @@ def delete_club(request, club_name):
 @club_exists
 @membership_required
 def leave_club(request, club_req):
+    """A member or moderator of a club can leave a club"""
     club = Club.objects.get(club_name=club_req)
     user = request.user
     cur_role = Role.objects.get(club=club, user=user)
@@ -487,7 +486,7 @@ def leave_club(request, club_req):
 @club_exists
 @owner_required
 def update_club_info(request, club_name):
-    """owner can change information of club"""
+    """The owner can edit the information of club"""
     club = Club.objects.get(club_name=club_name)
     form = ClubForm(instance=club)
     if request.method == 'POST':
@@ -500,13 +499,14 @@ def update_club_info(request, club_name):
 
 @login_required
 def my_clubs(request):
+    """Shows all clubs that the user is a part of (except if they are banned)"""
     clubs = Role.objects.filter(~Q(club_role='BAN'), user=request.user)
     return render(request, 'my_clubs.html', {'clubs': clubs})
 
 
 @login_required
 def club_list(request):
-    clubs = []
+    """Shows all clubs that the user is not yet a part of"""
     club_count = Club.objects.all().count()
 
     if Role.objects.filter(user=request.user):
@@ -552,12 +552,13 @@ def club_list(request):
 @club_exists
 @owner_required
 def ban_member(request, club_name, user_id):
+    """Prevent user from being able to access the club"""
     current_club = Club.objects.get(club_name=club_name)
     try:
         member = User.objects.get(id=user_id, club__club_name=current_club.club_name)
         current_club.ban_member(member)
         messages.add_message(request, messages.SUCCESS, f'You have banned {member.username}.')
-    except (ObjectDoesNotExist):
+    except ObjectDoesNotExist:
         messages.add_message(request, messages.WARNING, "User doesn't exist")
         return redirect('member_list', club_name)
     else:
@@ -568,6 +569,7 @@ def ban_member(request, club_name, user_id):
 @club_exists
 @owner_required
 def unban_member(request, club_name, user_id):
+    """The banned user, becomes a member of the club again"""
     current_club = Club.objects.get(club_name=club_name)
     try:
         banned = User.objects.get(id=user_id, club__club_name=current_club.club_name)
@@ -584,6 +586,7 @@ def unban_member(request, club_name, user_id):
 @club_exists
 @management_required
 def remove_member(request, club_name, user_id):
+    """Remove a member or moderator from a club"""
     current_club = Club.objects.get(club_name=club_name)
     current_user_role = Role.objects.get(club=current_club, user=request.user).club_role
     try:
@@ -605,12 +608,13 @@ def remove_member(request, club_name, user_id):
 @club_exists
 @owner_required
 def transfer_ownership(request, club_name, user_id):
+    """The owner can transfer ownership of a club to a moderator"""
     current_club = Club.objects.get(club_name=club_name)
     try:
         moderator = User.objects.get(id=user_id, club__club_name=current_club.club_name)
         current_club.transfer_ownership(request.user, moderator)
         messages.success(request, f'You have transferred owner privileges to {moderator.username}!')
-    except (ObjectDoesNotExist):
+    except ObjectDoesNotExist:
         messages.add_message(request, messages.WARNING, "User doesn't exist")
         return redirect('member_list', club_name)
     else:
@@ -621,12 +625,13 @@ def transfer_ownership(request, club_name, user_id):
 @club_exists
 @owner_required
 def demote_moderator(request, club_name, user_id):
+    """The owner of a club can demote a moderator to the position of member"""
     current_club = Club.objects.get(club_name=club_name)
     try:
         moderator = User.objects.get(id=user_id, club__club_name=current_club.club_name)
         current_club.toggle_member(moderator)
         messages.success(request, f'You have demoted {moderator.username} to the position of member!')
-    except (ObjectDoesNotExist):
+    except ObjectDoesNotExist:
         messages.add_message(request, messages.WARNING, "User doesn't exist")
         return redirect('member_list', club_name)
     else:
@@ -637,12 +642,13 @@ def demote_moderator(request, club_name, user_id):
 @club_exists
 @owner_required
 def promote_member(request, club_name, user_id):
+    """The owner of a club can promote a member to the position of moderator"""
     current_club = Club.objects.get(club_name=club_name)
     try:
         changing_user = User.objects.get(id=user_id)
         current_club.toggle_moderator(changing_user)
         messages.success(request, f'You have promoted {changing_user.username} to the position of moderator!')
-    except (ObjectDoesNotExist):
+    except ObjectDoesNotExist:
         messages.add_message(request, messages.WARNING, "User doesn't exist")
         return redirect('member_list', club_name)
     else:
@@ -653,6 +659,7 @@ def promote_member(request, club_name, user_id):
 @club_exists
 @membership_required
 def member_list(request, club_name):
+    """Shows a list of users who are part of the club"""
     is_owner = False
     is_moderator = False
     current_club = Club.objects.get(club_name=club_name)
@@ -683,6 +690,7 @@ def member_list(request, club_name):
 
 @login_required
 def post_upvote(request, post_id):
+    """Up-vote to agree with a post"""
     user_upvoting = request.user
     post = Post.objects.get(id=post_id)
     club = Club.objects.get(id=post.club.id)
@@ -693,6 +701,7 @@ def post_upvote(request, post_id):
 
 @login_required
 def post_downvote(request, post_id):
+    """Down-vote to disagree with a post"""
     user_downvoting = request.user
     post = Post.objects.get(id=post_id)
     club = Club.objects.get(id=post.club.id)
@@ -702,11 +711,13 @@ def post_downvote(request, post_id):
 
 
 class PostCommentView(LoginRequiredMixin, ListView):
+    """Show posts and comments"""
     model = Post
     template_name = 'club_feed.html'
 
 
 class CreatePostView(LoginRequiredMixin, CreateView):
+    """User who is part of a club can create a post"""
     model = Post
     form_class = PostForm
     template_name = 'create_post.html'
@@ -732,6 +743,7 @@ class DeletePostView(LoginRequiredMixin, DeleteView):
 
 
 class CreateCommentView(LoginRequiredMixin, CreateView):
+    """User who is part of a club can create a comment for a post"""
     model = Comment
     form_class = CommentForm
     template_name = 'create_comment.html'
@@ -748,6 +760,7 @@ class CreateCommentView(LoginRequiredMixin, CreateView):
 
 
 class DeleteCommentView(LoginRequiredMixin, DeleteView):
+    """User who commented can delete that comment"""
     model = Comment
     template_name = 'delete_comment.html'
 
@@ -759,8 +772,6 @@ class DeleteCommentView(LoginRequiredMixin, DeleteView):
 
 
 # --------------------meeting functions-----------------------------------------
-import json
-from django.core.serializers.json import DjangoJSONEncoder
 
 
 @login_required
@@ -790,10 +801,6 @@ def show_book_recommendations_show(request, club_name):
     data = dict()
     data['recommended_books'] = list(recommended_books.values())
     data['club_name'] = club_name
-    # books=Book.objects.all().filter(ISBN='0060914068')
-    # data = dict()
-    # data['recommended_books'] = list(books.values())
-    # data['club_name'] = club_name
 
     return JsonResponse(data)
 
@@ -803,7 +810,7 @@ def show_book_recommendations_show(request, club_name):
 @membership_required
 @not_last_host
 def create_meeting(request, club_name, book_isbn):
-    """Creates a new meeting within a club"""
+    """Creates a new meeting within a club, if an online meeting, it creates a zoom link for that meeting"""
     current_club = Club.objects.get(club_name=club_name)
     chosen_book = Book.objects.get(ISBN=book_isbn)
     form = MeetingForm(request.POST)
@@ -855,7 +862,7 @@ def meeting_list(request, club_name):
 @club_and_meeting_exists
 @membership_required
 def show_meeting(request, club_name, meeting_id):
-    """Show a meeting"""
+    """Show the details of a meeting"""
     meeting = Meeting.objects.get(id=meeting_id)
     is_host = meeting.is_host(request.user)
     is_attendee_only = meeting.is_attendee_only(request.user)
@@ -889,7 +896,7 @@ def leave_meeting(request, club_name, meeting_id):
 @membership_required
 @meeting_management_required
 def delete_meeting(request, club_name, meeting_id):
-    """Meeting is deleted"""
+    """Meeting is deleted by the host"""
     meeting = Meeting.objects.get(id=meeting_id)
     MeetingAttendance.objects.filter(user=request.user, meeting=meeting).delete()
     meeting.delete()

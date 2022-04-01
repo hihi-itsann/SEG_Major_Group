@@ -1,16 +1,19 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+
 from bookclubs.models import User, Post, Comment, Club
 
+
 class CommentModelTestCase(TestCase):
+    """Unit tests for the Comment model"""
 
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
-        'bookclubs/tests/fixtures/default_clubs.json'
+        'bookclubs/tests/fixtures/default_clubs.json',
     ]
 
     def setUp(self):
-        super(TestCase,self).setUp()
+        super(TestCase, self).setUp()
         self.user = User.objects.get(username='@johndoe')
         self.club = Club.objects.get(club_name='private_online')
         self.post = Post.objects.create(
@@ -24,7 +27,6 @@ class CommentModelTestCase(TestCase):
             related_post=self.post,
             body="this is a comment."
         )
-
 
     def test_valid_comment(self):
         try:

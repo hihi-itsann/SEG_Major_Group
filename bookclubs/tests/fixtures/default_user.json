@@ -1,22 +1,22 @@
 [
-   {
-     "model": "bookclubs.user",
-     "pk": 1,
-     "fields": {
-       "userID": 1,
-       "first_name": "John",
-       "last_name": "Doe",
-       "username": "@johndoe",
-       "email": "johndoe@example.org",
-       "bio": "Hello, I'm John Doe.",
-       "dob": "2002-08-12",
-       "gender": "M",
-       "location": "London",
-       "city": "London",
-       "country": "UK",
-       "meeting_preference": "O",
-       "password": "pbkdf2_sha256$260000$4BNvFuAWoTT1XVU8D6hCay$KqDCG+bHl8TwYcvA60SGhOMluAheVOnF1PMz0wClilc=",
-       "is_active": true
-     }
-   }
+  {
+    "model": "bookclubs.user",
+    "pk": 1,
+    "fields": {
+      "userID": 1,
+      "first_name": "John",
+      "last_name": "Doe",
+      "username": "@johndoe",
+      "email": "johndoe@example.org",
+      "bio": "Hello, I'm John Doe.",
+      "dob": "2002-08-12",
+      "gender": "M",
+      "location": "London",
+      "city": "London",
+      "country": "UK",
+      "meeting_preference": "O",
+      "password": "pbkdf2_sha256$260000$4BNvFuAWoTT1XVU8D6hCay$KqDCG+bHl8TwYcvA60SGhOMluAheVOnF1PMz0wClilc=",
+      "is_active": true
+    }
+  }
 ]

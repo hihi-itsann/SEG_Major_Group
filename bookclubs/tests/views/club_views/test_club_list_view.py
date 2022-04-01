@@ -1,10 +1,13 @@
 from django.test import TestCase
 from django.urls import reverse
+
 from bookclubs.models import User, Club, Role
 from bookclubs.tests.helpers import reverse_with_next
 
 
 class ClubListViewTest(TestCase):
+    """Tests for viewing clubs"""
+
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
     ]

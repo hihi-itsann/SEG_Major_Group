@@ -1,14 +1,14 @@
+from datetime import datetime
+
 from django.conf import settings
 from django.contrib import messages
-from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect
-from datetime import datetime
 
 from .models import Club, Role, Application, Book, BookRatingReview, BookStatus, Meeting, MeetingAttendance
 
 
 def login_prohibited(view_function):
-    """check that the user is logged in"""
+    """Check that the user is logged in"""
 
     def modified_view_function(request):
         if request.user.is_authenticated:
@@ -20,7 +20,7 @@ def login_prohibited(view_function):
 
 
 def management_required(view_function):
-    """check whether the user is an officer or the owner"""
+    """Check whether the user is a moderator or the owner of a club"""
 
     def modified_view_function(request, club_name, *args, **kwargs):
         current_club = Club.objects.get(club_name=club_name)
@@ -43,7 +43,7 @@ def management_required(view_function):
 
 
 def meeting_management_required(view_function):
-    """check whether the user is an attendee or the host"""
+    """Check whether the user is an attendee or the host of a meeting"""
 
     def modified_view_function(request, club_name, meeting_id, *args, **kwargs):
         current_meeting = Meeting.objects.get(id=meeting_id)
@@ -62,7 +62,7 @@ def meeting_management_required(view_function):
 
 
 def owner_required(view_function):
-    """check whether the user is the owner"""
+    """Check whether the user is the owner of a club"""
 
     def modified_view_function(request, club_name, *args, **kwargs):
         current_club = Club.objects.get(club_name=club_name)
@@ -85,7 +85,7 @@ def owner_required(view_function):
 
 
 def membership_required(view_function):
-    """check whether the user is a member"""
+    """Check whether the user is a member of a club"""
 
     def modified_view_function(request, club_name, *args, **kwargs):
         current_club = Club.objects.get(club_name=club_name)
@@ -104,7 +104,7 @@ def membership_required(view_function):
 
 
 def non_applicant_required(view_function):
-    """check to make sure user is not a member or an applicant"""
+    """Check to make sure user is not a member of the club or an applicant to the club"""
 
     def modified_view_function(request, club_name, *args, **kwargs):
         current_club = Club.objects.get(club_name=club_name)
@@ -139,7 +139,7 @@ def non_applicant_required(view_function):
 
 
 def applicant_required(view_function):
-    """check to make sure user an applicant"""
+    """Check to make sure user an applicant to a club"""
 
     def modified_view_function(request, club_name, *args, **kwargs):
         current_club = Club.objects.get(club_name=club_name)
@@ -175,7 +175,7 @@ def applicant_required(view_function):
 
 
 def club_exists(view_function):
-    """check whether the club exists"""
+    """Check whether the club exists"""
 
     def modified_view_function(request, club_name, *args, **kwargs):
         if Club.objects.filter(club_name=club_name).count() == 1:
@@ -188,7 +188,7 @@ def club_exists(view_function):
 
 
 def club_and_book_exists(view_function):
-    """check whether the club and book exists"""
+    """Check whether the club and book exists"""
 
     def modified_view_function(request, club_name, book_isbn, *args, **kwargs):
         if Club.objects.filter(club_name=club_name).count() == 1:
@@ -205,7 +205,7 @@ def club_and_book_exists(view_function):
 
 
 def club_and_meeting_exists(view_function):
-    """check whether the club and meeting exists"""
+    """Check whether the club and meeting exists"""
 
     def modified_view_function(request, club_name, meeting_id, *args, **kwargs):
         if Club.objects.filter(club_name=club_name).count() == 1:
@@ -222,6 +222,7 @@ def club_and_meeting_exists(view_function):
 
 
 def not_last_host(view_function):
+    """Check that a meeting cannot be created if it was the same person that created the last active meeting"""
     def modified_view_function(request, club_name, *args, **kwargs):
         current_club = Club.objects.get(club_name=club_name)
         current_date = datetime.now().date()
@@ -243,7 +244,7 @@ def not_last_host(view_function):
 
 
 def book_exists(view_function):
-    """check whether the book exists"""
+    """Check whether the book exists"""
 
     def modified_view_function(request, ISBN, *args, **kwargs):
         if Book.objects.filter(ISBN=ISBN).count() == 1:
@@ -256,7 +257,7 @@ def book_exists(view_function):
 
 
 def own_feedback_exists(view_function):
-    """check whether the book_and_book_rating_review exists"""
+    """Check whether the book_and_book_rating_review exists"""
 
     def modified_view_function(request, ISBN, pk, *args, **kwargs):
         if BookRatingReview.objects.filter(id=pk, user=request.user).count() == 1:
@@ -272,7 +273,7 @@ def own_feedback_exists(view_function):
 
 
 def bookStatus_does_not_exists(view_function):
-    """check whether the book status exists"""
+    """Check whether the book status exists"""
 
     def modified_view_function(request, ISBN, *args, **kwargs):
         book = Book.objects.get(ISBN=ISBN)
@@ -286,7 +287,7 @@ def bookStatus_does_not_exists(view_function):
 
 
 def bookStatus_exists(view_function):
-    """check whether the book status exists"""
+    """Check whether the book status exists"""
 
     def modified_view_function(request, ISBN, *args, **kwargs):
         book = Book.objects.get(ISBN=ISBN)

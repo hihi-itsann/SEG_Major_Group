@@ -6,7 +6,7 @@ from bookclubs.tests.helpers import reverse_with_next
 
 
 class ApplicationListViewTestCase(TestCase):
-    """Tests for the application list owner/ moderator view"""
+    """Tests for the application list that owners/ moderators can view"""
 
     VIEW = 'application_list'
 
@@ -27,7 +27,7 @@ class ApplicationListViewTestCase(TestCase):
     def log_in(self, user):
         self.client.login(username=user.username, password="Password123")
 
-    def test_edit_application_url(self):
+    def test_application_list_url(self):
         self.assertEqual(self.url, f'/club/{self.club.club_name}/applications/')
 
     def test_application_list_redirects_when_not_logged_in(self):

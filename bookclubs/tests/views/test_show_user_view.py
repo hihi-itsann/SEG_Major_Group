@@ -1,16 +1,16 @@
 from django.test import TestCase
 from django.urls import reverse
+
 from bookclubs.models import User
 from bookclubs.tests.helpers import reverse_with_next
 
 
 class ShowUserViewTestCase(TestCase):
-
     VIEW = 'show_user'
 
     fixtures = [
         'bookclubs/tests/fixtures/default_user.json',
-        'bookclubs/tests/fixtures/other_users.json'
+        'bookclubs/tests/fixtures/other_users.json',
     ]
 
     def setUp(self):
