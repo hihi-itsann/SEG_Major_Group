@@ -59,12 +59,12 @@ class Command(BaseCommand):
 
         self.create_comments()
 
-        self.create_test_subjects()
 
         self.create_meetings()
         self.meetings = Meeting.objects.all()
 
         self.create_meeting_attendance() 
+        self.create_test_subjects()
 
     def create_test_users(self):
         dob = self.faker.date_of_birth(minimum_age=8, maximum_age=100)
@@ -173,13 +173,24 @@ class Command(BaseCommand):
         self.create_test_comments(test_club)
 
         self.create_test_meetings(test_club)
-
+        
         
        
 
     def create_test_meetings(self,club):
-        for i in range(5):
-            self.create_meeting(club)
+        test_meeting=self.create_meeting(club)
+        test_meeting_host =MeetingAttendance.objects.create(
+                                user=self.owner,
+                                meeting=test_meeting,
+                                meeting_role='H'
+                            )
+        test_meeting_attendee=MeetingAttendance.objects.create(
+                                user=self.member,
+                                meeting=test_meeting,
+                                meeting_role='A'
+                            )
+
+            
     def create_test_comments(self,club):
         for i in range(5):
             comment = Comment()
@@ -204,14 +215,7 @@ class Command(BaseCommand):
 
     def create_test_applications(self,club):
         for i in range(5):
-            user = self.get_random_non_member(club)
-            statement = self.faker.text(max_nb_chars=200)
-            Application.objects.create(
-                user=user,
-                club=club,
-                statement=statement,
-                status='P'
-        )
+            self.create_application(club)
     def load_data_from_csv(self):
         # self.df_users= pd.read_csv(self.usersPath, sep = ';',names = ['User-ID', 'Location', 'Age'], quotechar = '"',
         # encoding = 'latin-1',header = 0)
@@ -254,7 +258,7 @@ class Command(BaseCommand):
         )
 
     def create_books(self):
-        for index, book in self.df_books.head(5).iterrows():
+        for index, book in self.df_books.head(500).iterrows():
             # print(f"Seeding book {index}/{len(self.df_books)}", end='\r')
             print(f"Seeding book {index}/500", end='\r')
             try:
@@ -492,7 +496,7 @@ class Command(BaseCommand):
             location = self.faker.street_name()
             join_link = None
             start_link = None
-        Meeting.objects.create(
+        meeting=Meeting.objects.create(
             club=club,
             book=book,
             topic=topic,
@@ -505,7 +509,7 @@ class Command(BaseCommand):
             join_link=join_link,
             start_link=start_link
         )
-
+        return meeting
     def get_random_club(self):
         index = randint(0, self.clubs.count() - 1)
         return self.clubs[index]

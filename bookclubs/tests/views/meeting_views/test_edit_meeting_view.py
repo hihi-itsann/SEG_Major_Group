@@ -102,6 +102,7 @@ class EditMeetingViewTestCase(TestCase):
         after_count = Meeting.objects.count()
         self.assertEqual(after_count, before_count)
         response_url = reverse('show_meeting', kwargs={'club_name': self.club.club_name, 'meeting_id': self.meeting.id})
+        print(response_url)
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'show_meeting.html')
         self.meeting.refresh_from_db()

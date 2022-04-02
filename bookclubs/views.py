@@ -791,15 +791,15 @@ def show_book_recommendations_show(request, club_name):
     """Choose a book for the meeting"""
     current_club = Club.objects.get(club_name=club_name)
     recommendations = get_recommendations(current_club.id)
-
     if len(recommendations) == 0:
         recommended_books = []
 
     else:
-        recommended_books = Book.objects.all().filter(ISBN__in=recommendations)
+        print("inside else")
+        recommended_books = list((Book.objects.all().filter(ISBN__in=recommendations)).values())
 
     data = dict()
-    data['recommended_books'] = list(recommended_books.values())
+    data['recommended_books'] = recommended_books
     data['club_name'] = club_name
 
     return JsonResponse(data)
