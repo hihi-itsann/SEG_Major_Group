@@ -795,7 +795,6 @@ def show_book_recommendations_show(request, club_name):
         recommended_books = []
 
     else:
-        print("inside else")
         recommended_books = list((Book.objects.all().filter(ISBN__in=recommendations)).values())
 
     data = dict()
