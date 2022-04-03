@@ -66,134 +66,130 @@ class Command(BaseCommand):
         self.meetings = Meeting.objects.all()
 
         self.create_meeting_attendance()
+
         self.create_test_subjects()
 
     def create_test_users(self):
         dob = self.faker.date_of_birth(minimum_age=8, maximum_age=100)
-        # dob=self.get_dob_from_age(user['Age'])
         gender = self.faker.random_choices(elements=('M', 'F', 'O'), length=1)[0]
         meeting_preference = self.faker.random_choices(elements=('O', 'P'), length=1)[0]
 
-        self.owner=User.objects.create_user(
-                    userID=self.users.count()+1,
-                    username='@Owner',
-                    first_name='Owner first name',
-                    last_name='Owner last name',
-                    email='Owner@gmail.com',
-                    password=Command.DEFAULT_PASSWORD,
-                    bio="Owner bio information",
-                    dob=dob,
-                    gender=gender,
-                    location="King's bush house",
-                    city="London",
-                    country="UK",
-                    meeting_preference=meeting_preference
-                )
-
-        self.moderator=User.objects.create_user(
-                    userID=self.users.count()+1,
-                    username='@Moderator',
-                    first_name='Moderator first name',
-                    last_name='Moderator last name',
-                    email='Moderator@gmail.com',
-                    password=Command.DEFAULT_PASSWORD,
-                    bio="Moderator bio information",
-                    dob=dob,
-                    gender=gender,
-                    location="King's bush house",
-                    city="London",
-                    country="UK",
-                    meeting_preference=meeting_preference
-                )
-
-        self.member=User.objects.create_user(
-                    userID=self.users.count()+1,
-                    username='@Member',
-                    first_name='Member first name',
-                    last_name='Member last name',
-                    email='Member@gmail.com',
-                    password=Command.DEFAULT_PASSWORD,
-                    bio="Member bio information",
-                    dob=dob,
-                    gender=gender,
-                    location="King's bush house",
-                    city="London",
-                    country="UK",
-                    meeting_preference=meeting_preference
-                )
-
-
-        self.banned_member=User.objects.create_user(
-                    userID=self.users.count()+1,
-                    username='@BannedMember',
-                    first_name='BannedMember first name',
-                    last_name='BannedMember last name',
-                    email='BannedMember@gmail.com',
-                    password=Command.DEFAULT_PASSWORD,
-                    bio="BannedMember bio information",
-                    dob=dob,
-                    gender=gender,
-                    location="King's bush house",
-                    city="London",
-                    country="UK",
-                    meeting_preference=meeting_preference
-                )
-    def create_test_subjects(self):
-        test_club=club = Club.objects.create(
-                                club_name='Test Club 1',
-                                description="This is the best club",
-                                meeting_status='ONL',
-                                location="King's bush house",
-                                city="London",
-                                country="UK",
-                                public_status='PRI',
-                                genre="Fiction"
-                            )
-        club_owner_role=Role.objects.create(
-                            user=self.owner,
-                            club=test_club,
-                            club_role='OWN'
-                        )
-        club_moderator_role=Role.objects.create(
-                    user=self.moderator,
-                    club=test_club,
-                    club_role='MOD'
-                )
-        club_banned_member_role=Role.objects.create(
-                    user=self.banned_member,
-                    club=test_club,
-                    club_role='BAN'
+        self.owner = User.objects.create_user(
+            userID=self.users.count() + 1,
+            username='@Owner',
+            first_name='Owner first name',
+            last_name='Owner last name',
+            email='Owner@gmail.com',
+            password=Command.DEFAULT_PASSWORD,
+            bio="Owner bio information",
+            dob=dob,
+            gender=gender,
+            location="King's Bush House",
+            city="London",
+            country="UK",
+            meeting_preference=meeting_preference
         )
-        club_member_role=Role.objects.create(
-                    user=self.member,
-                    club=test_club,
-                    club_role='MEM'
-                )
+
+        self.moderator = User.objects.create_user(
+            userID=self.users.count() + 1,
+            username='@Moderator',
+            first_name='Moderator first name',
+            last_name='Moderator last name',
+            email='Moderator@gmail.com',
+            password=Command.DEFAULT_PASSWORD,
+            bio="Moderator bio information",
+            dob=dob,
+            gender=gender,
+            location="King's Bush House",
+            city="London",
+            country="UK",
+            meeting_preference=meeting_preference
+        )
+
+        self.member = User.objects.create_user(
+            userID=self.users.count() + 1,
+            username='@Member',
+            first_name='Member first name',
+            last_name='Member last name',
+            email='Member@gmail.com',
+            password=Command.DEFAULT_PASSWORD,
+            bio="Member bio information",
+            dob=dob,
+            gender=gender,
+            location="King's Bush House",
+            city="London",
+            country="UK",
+            meeting_preference=meeting_preference
+        )
+
+        self.banned_member = User.objects.create_user(
+            userID=self.users.count() + 1,
+            username='@BannedMember',
+            first_name='BannedMember first name',
+            last_name='BannedMember last name',
+            email='BannedMember@gmail.com',
+            password=Command.DEFAULT_PASSWORD,
+            bio="BannedMember bio information",
+            dob=dob,
+            gender=gender,
+            location="King's Bush House",
+            city="London",
+            country="UK",
+            meeting_preference=meeting_preference
+        )
+
+    def create_test_subjects(self):
+        test_club = Club.objects.create(
+            club_name='Test Club 1',
+            description="This is the best club",
+            meeting_status='ONL',
+            location="King's Bush House",
+            city="London",
+            country="UK",
+            public_status='PRI',
+            genre="Fiction"
+        )
+        club_owner_role = Role.objects.create(
+            user=self.owner,
+            club=test_club,
+            club_role='OWN'
+        )
+        club_moderator_role = Role.objects.create(
+            user=self.moderator,
+            club=test_club,
+            club_role='MOD'
+        )
+        club_banned_member_role = Role.objects.create(
+            user=self.banned_member,
+            club=test_club,
+            club_role='BAN'
+        )
+        club_member_role = Role.objects.create(
+            user=self.member,
+            club=test_club,
+            club_role='MEM'
+        )
+
         self.create_test_applications(test_club)
         self.create_test_posts(test_club)
-
         self.create_test_comments(test_club)
-
+        self.create_test_votes(test_club)
         self.create_test_meetings(test_club)
 
+    def create_test_meetings(self, club):
+        test_meeting = self.create_meeting(club)
+        test_meeting_host = MeetingAttendance.objects.create(
+            user=self.owner,
+            meeting=test_meeting,
+            meeting_role='H'
+        )
+        test_meeting_attendee = MeetingAttendance.objects.create(
+            user=self.member,
+            meeting=test_meeting,
+            meeting_role='A'
+        )
 
-
-
-    def create_test_meetings(self,club):
-        test_meeting=self.create_meeting(club)
-        test_meeting_host =MeetingAttendance.objects.create(
-                                user=self.owner,
-                                meeting=test_meeting,
-                                meeting_role='H'
-                            )
-        test_meeting_attendee=MeetingAttendance.objects.create(
-                                user=self.member,
-                                meeting=test_meeting,
-                                meeting_role='A'
-                            )
-
-
-    def create_test_comments(self,club):
+    def create_test_comments(self, club):
         for i in range(5):
             comment = Comment()
             comment.author = self.get_random_member(club)
@@ -203,7 +199,7 @@ class Command(BaseCommand):
             datetime = self.faker.past_datetime(start_date='-365d', tzinfo=pytz.UTC)
             Comment.objects.filter(id=comment.id).update(created_at=datetime)
 
-    def create_test_posts(self,club):
+    def create_test_posts(self, club):
         for i in range(5):
             post = Post()
             post.title = self.faker.text(max_nb_chars=255)
@@ -214,10 +210,17 @@ class Command(BaseCommand):
             datetime = self.faker.past_datetime(start_date='-365d', tzinfo=pytz.UTC)
             Post.objects.filter(id=post.id).update(post_datetime=datetime)
 
-
-    def create_test_applications(self,club):
+    def create_test_applications(self, club):
         for i in range(5):
             self.create_application(club)
+
+    def create_test_votes(self, club):
+        for i in range(5):
+            user = self.get_random_member(club)
+            post = self.get_random_post(club)
+            if Vote.objects.filter(user=user, post=post).count() == 0:
+                self.create_vote(user, post)
+
     def load_data_from_csv(self):
         # self.df_users= pd.read_csv(self.usersPath, sep = ';',names = ['User-ID', 'Location', 'Age'], quotechar = '"',
         # encoding = 'latin-1',header = 0)
@@ -497,7 +500,7 @@ class Command(BaseCommand):
             location = self.faker.street_name()
             join_link = None
             start_link = None
-        meeting=Meeting.objects.create(
+        meeting = Meeting.objects.create(
             club=club,
             book=book,
             topic=topic,
