@@ -5,6 +5,7 @@ from random import randint, random, choice
 import pandas as pd
 import pytz
 from django.core.management.base import BaseCommand
+from django.db import IntegrityError
 from faker import Faker
 
 from bookclubs.meeting_link import create_zoom_meeting, get_join_link, get_start_link
@@ -212,7 +213,10 @@ class Command(BaseCommand):
 
     def create_test_applications(self, club):
         for i in range(5):
-            self.create_application(club)
+            try:
+                self.create_application(club)
+            except IntegrityError:
+                continue
 
     def create_test_votes(self, club):
         for i in range(5):
@@ -625,4 +629,4 @@ def create_email(first_name, last_name):
 
 
 def create_club_name(location):
-    return location + ' Book Club'
+    return location.title() + ' Book Club'
