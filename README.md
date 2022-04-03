@@ -97,12 +97,11 @@ The location where the software is deployed is **Heroku**.
 * **Meeting attendee** is _@Member_  
 * **Posts, comments, votes, applications** and **ratings** are randomly created  
 
+**Zoom meeting credentials**:  
 * **Email used to register a Zoom account**: bookclub2022@protonmail.com
-* **Password**: BookClub
-
+* **Password**: BookClub  
 * **Zoom account**: bookclub2022@protonmail.com
-* **Password**: BookClub2022
-
+* **Password**: BookClub2022  
 * **Zoom API JWT credentials**:
 	* **API key** :Z8KPddIlSg-N9LTbgh5jnQ
 	* **API Secret**: c18QSFhXlaHbG6gP7HI9XGhWyaM6FQTKgYfl
