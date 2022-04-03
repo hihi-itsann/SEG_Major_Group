@@ -80,21 +80,21 @@ This is a readme file for our SEG Major Group Project.
 The location where the software is deployed is **Heroku**.  
 
 * **Test club** = Test club 1(online and private)  
-* **Owner**:  
-  * Username = _@Owner_
-  * Password = Password123  
-* **Moderator**:  
-  * Username = _@Moderator_
-  * Password = Password123  
-* **Member**:  
-  * Username = _@Member_
-  * Password = Password123  
-* **Banned member**:  
-  * Username = _@BannedMember_
-  * Password = Password123  
+* **Owner of Test Club**:  
+  * Username: _@Owner_
+  * Password: Password123  
+* **Moderator of Test Club**:  
+  * Username: _@Moderator_
+  * Password: Password123  
+* **Member of Test Club**:  
+  * Username: _@Member_
+  * Password: Password123  
+* **Banned from Test Club**:  
+  * Username: _@BannedMember_
+  * Password: Password123  
 * **Meeting host** is _@Owner_  
 * **Meeting attendee** is _@Member_  
-* **Post comments applications** and **ratings** are randomly created  
+* **Posts, comments, votes, applications** and **ratings** are randomly created  
 
 ## How to run the project
 Book Clubs - Django Web Application Setup Instructions  
