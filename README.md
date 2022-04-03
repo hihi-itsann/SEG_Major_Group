@@ -10,12 +10,14 @@ This is a readme file for our SEG Major Group Project.
   * [Description](#Description "Go to Description")
   * [Features](#Features "Go to Features")
   * [Technologies](#Technologies "Go to Technologies")
+  * [Deployment](#Deployment "Go to Deployment")
   * [Installations](#How-to-run-the-project "Go to Installations")
   * [License](#License "Go to License")
   * [Reference List](#Reference-list "Go to Reference List")
 
 ## Contributors
-**Team Name: Major Group**
+**Team Name: Major Group**  
+
 :space_invader:***Artificial Intelligence Group:***
   * Rishi Ganeshan (K20004392)
   * Encheng Wu (K20070867)
@@ -66,7 +68,7 @@ This is a readme file for our SEG Major Group Project.
 * An interactive dinosaur game will be displayed while the system loads the book recommendations
 
 ## Technologies
-* Our project was built employing Python/Django.
+* Our project was built employing **Python/Django**.
 * **Keras**, **TensorFlow**, **Numpy** and **Pandas** were used to produce the (AI) Recommender system
 * **Libgravatar** was used to show the users’ profile pictures
 * **Coverage** was used for monitoring the program’s testing
@@ -76,42 +78,77 @@ This is a readme file for our SEG Major Group Project.
 
 <!-- The location where the software or software component is deployed and sufficient information to access it.  The latter includes access credentials for the different types of user who may employ the software. -->
 ## Deployment
-* heroku
+The location where the software is deployed is **Heroku**.  
+
+* **Test club**: Test club 1(online and private)  
+* **Owner of Test Club**:  
+  * Username: _@Owner_
+  * Password: Password123  
+* **Moderator of Test Club**:  
+  * Username: _@Moderator_
+  * Password: Password123  
+* **Member of Test Club**:  
+  * Username: _@Member_
+  * Password: Password123  
+* **Banned from Test Club**:  
+  * Username: _@BannedMember_
+  * Password: Password123  
+* **Meeting host** is _@Owner_  
+* **Meeting attendee** is _@Member_  
+* **Posts, comments, votes, applications** and **ratings** are randomly created  
+
+**Zoom meeting credentials**:  
+* **Email used to register a Zoom account**: bookclub2022@protonmail.com
+* **Password**: BookClub  
+* **Zoom account**: bookclub2022@protonmail.com
+* **Password**: BookClub2022  
+* **Zoom API JWT credentials**:
+	* **API key** :Z8KPddIlSg-N9LTbgh5jnQ
+	* **API Secret**: c18QSFhXlaHbG6gP7HI9XGhWyaM6FQTKgYfl
 
 ## How to run the project
 Book Clubs - Django Web Application Setup Instructions  
 
-**1. Install virtual environment:**  
+**1. Access where the source code is saved from the terminal:**  
+
+    cd <full path to project>
+
+**2. Install virtual environment package:**  
+    
+    pip3 install virtualenv
+
+
+**3. Install virtual environment:**  
 
     virtualenv venv  
 
-**2. Launch virtual environment:**  
+**4. Launch virtual environment:**  
 
     source venv/bin/activate  
 
-**3. Install required applications:**  
+**5. Install required applications:**  
 
     pip3 install -r requirements.txt  
 
-**4. Get the database:**  
+**6. Get the database:**  
 
     python3 manage.py makemigrations
     python3 manage.py migrate  
 
-**5. Create Super User:**  
+**7. Create Super User:**  
 
     python3 manage.py createsuperuser  
 
-**6. Seeder and unseeder (Seeder can only be run once, unless run unseed again):**  
+**8. Seeder and unseeder (Seeder can only be run once, unless run unseed again):**  
 
     python3 manage.py seed
     python3 manage.py unseed  
 
-**7. Run the server/application:**  
+**9. Run the server/application:**  
 
     python3 manage.py runserver  
 
-**8. Run the tests:**  
+**10. Run the tests:**  
   *-If the program gives test errors run first:*  
 
     python3 manage.py collectstatic  
