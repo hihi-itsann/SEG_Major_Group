@@ -1,6 +1,6 @@
 import json
 import urllib.request
-from random import randint, random
+from random import randint, random, choice
 
 import pandas as pd
 import pytz
@@ -9,7 +9,7 @@ from faker import Faker
 
 from bookclubs.meeting_link import create_zoom_meeting, get_join_link, get_start_link
 from bookclubs.models import User, Post, Comment, Club, Role, Book, BookRatingReview, Meeting, MeetingAttendance, \
-    Application
+    Application, Vote
 
 
 class Command(BaseCommand):
@@ -25,6 +25,7 @@ class Command(BaseCommand):
     DEFAULT_PASSWORD = 'Password123'
     USER_IN_CLUB_PROBABILITY = 0.2
     USER_RATE_BOOK_PROBABILITY = 0.3
+    USER_VOTE_POST_PROBABILITY = 0.7
     # ratingsPath = 'bookclubs/recommender/dataset/BX-Book-Ratings.csv'
     booksPath = 'bookclubs/dataset/BX-Books.csv'
 
@@ -59,11 +60,12 @@ class Command(BaseCommand):
 
         self.create_comments()
 
+        self.create_votes()
 
         self.create_meetings()
         self.meetings = Meeting.objects.all()
 
-        self.create_meeting_attendance() 
+        self.create_meeting_attendance()
         self.create_test_subjects()
 
     def create_test_users(self):
@@ -71,7 +73,7 @@ class Command(BaseCommand):
         # dob=self.get_dob_from_age(user['Age'])
         gender = self.faker.random_choices(elements=('M', 'F', 'O'), length=1)[0]
         meeting_preference = self.faker.random_choices(elements=('O', 'P'), length=1)[0]
-      
+
         self.owner=User.objects.create_user(
                     userID=self.users.count()+1,
                     username='@Owner',
@@ -87,7 +89,7 @@ class Command(BaseCommand):
                     country="UK",
                     meeting_preference=meeting_preference
                 )
-        
+
         self.moderator=User.objects.create_user(
                     userID=self.users.count()+1,
                     username='@Moderator',
@@ -103,7 +105,7 @@ class Command(BaseCommand):
                     country="UK",
                     meeting_preference=meeting_preference
                 )
-        
+
         self.member=User.objects.create_user(
                     userID=self.users.count()+1,
                     username='@Member',
@@ -120,7 +122,7 @@ class Command(BaseCommand):
                     meeting_preference=meeting_preference
                 )
 
-        
+
         self.banned_member=User.objects.create_user(
                     userID=self.users.count()+1,
                     username='@BannedMember',
@@ -173,9 +175,9 @@ class Command(BaseCommand):
         self.create_test_comments(test_club)
 
         self.create_test_meetings(test_club)
-        
-        
-       
+
+
+
 
     def create_test_meetings(self,club):
         test_meeting=self.create_meeting(club)
@@ -190,7 +192,7 @@ class Command(BaseCommand):
                                 meeting_role='A'
                             )
 
-            
+
     def create_test_comments(self,club):
         for i in range(5):
             comment = Comment()
@@ -479,7 +481,6 @@ class Command(BaseCommand):
     def create_meeting(self, club):
         date = self.faker.future_date()
         time_start = self.faker.time(pattern='%H:%M')
-       
         duration = randint(15, 45)
         club = club
         book = self.get_random_book()
@@ -510,6 +511,7 @@ class Command(BaseCommand):
             start_link=start_link
         )
         return meeting
+
     def get_random_club(self):
         index = randint(0, self.clubs.count() - 1)
         return self.clubs[index]
@@ -588,6 +590,27 @@ class Command(BaseCommand):
         all_out_of_club = User.objects.all().exclude(id__in=all_in_club)
         index = randint(0, all_out_of_club.count() - 1)
         return all_out_of_club[index]
+
+    def create_votes(self):
+        for post in self.posts:
+            print(f"Seeding votes...", end='\r')
+            user_ids = Role.objects.filter(club=post.club).exclude(club_role='BAN').values_list('user', flat=True)
+            users_in_club = self.users.filter(id__in=user_ids)
+            for user in users_in_club:
+                try:
+                    if random() < self.USER_VOTE_POST_PROBABILITY:
+                        self.create_vote(user, post)
+                except:
+                    continue
+        print("Vote seeding complete.      ")
+
+    def create_vote(self, user, post):
+        vote_type = bool(choice([True, False]))
+        Vote.objects.create(
+            user=user,
+            post=post,
+            vote_type=vote_type
+        )
 
 
 def create_username(first_name, last_name):
