@@ -109,37 +109,46 @@ The location where the software is deployed is **Heroku**.
 ## How to run the project
 Book Clubs - Django Web Application Setup Instructions  
 
-**1. Install virtual environment:**  
+**1. Access where the source code is saved from the terminal:**  
+
+    cd <full path to project>
+
+**2. Install virtual environment package:**  
+    
+    pip3 install virtualenv
+
+
+**3. Install virtual environment:**  
 
     virtualenv venv  
 
-**2. Launch virtual environment:**  
+**4. Launch virtual environment:**  
 
     source venv/bin/activate  
 
-**3. Install required applications:**  
+**5. Install required applications:**  
 
     pip3 install -r requirements.txt  
 
-**4. Get the database:**  
+**6. Get the database:**  
 
     python3 manage.py makemigrations
     python3 manage.py migrate  
 
-**5. Create Super User:**  
+**7. Create Super User:**  
 
     python3 manage.py createsuperuser  
 
-**6. Seeder and unseeder (Seeder can only be run once, unless run unseed again):**  
+**8. Seeder and unseeder (Seeder can only be run once, unless run unseed again):**  
 
     python3 manage.py seed
     python3 manage.py unseed  
 
-**7. Run the server/application:**  
+**9. Run the server/application:**  
 
     python3 manage.py runserver  
 
-**8. Run the tests:**  
+**10. Run the tests:**  
   *-If the program gives test errors run first:*  
 
     python3 manage.py collectstatic  
