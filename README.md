@@ -79,7 +79,7 @@ This is a readme file for our SEG Major Group Project.
 ## Deployment
 The location where the software is deployed is **Heroku**.  
 
-* **Test club** = Test club 1(online and private)  
+* **Test club**: Test club 1(online and private)  
 * **Owner of Test Club**:  
   * Username: _@Owner_
   * Password: Password123  
