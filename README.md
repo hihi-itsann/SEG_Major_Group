@@ -16,6 +16,7 @@ This is a readme file for our SEG Major Group Project.
 
 ## Contributors
 **Team Name: Major Group**  
+
 :space_invader:***Artificial Intelligence Group:***
   * Rishi Ganeshan (K20004392)
   * Encheng Wu (K20070867)
@@ -78,21 +79,21 @@ This is a readme file for our SEG Major Group Project.
 ## Deployment
 The location where the software is deployed is **Heroku**.  
 
-**Test club** = Test club 1(online and private)  
+* **Test club** = Test club 1(online and private)  
 * **Owner**:  
-  * Username = @Owner
+  * Username = _@Owner_
   * Password = Password123  
 * **Moderator**:  
-  * Username = @Moderator
+  * Username = _@Moderator_
   * Password = Password123  
 * **Member**:  
-  * Username = @Member
+  * Username = _@Member_
   * Password = Password123  
 * **Banned member**:  
-  * Username = @BannedMember  
+  * Username = _@BannedMember_
   * Password = Password123  
-* **Meeting host** is @Owner  
-* **Meeting attendee** is @Member  
+* **Meeting host** is _@Owner_  
+* **Meeting attendee** is _@Member_  
 * **Post comments applications** and **ratings** are randomly created  
 
 ## How to run the project
