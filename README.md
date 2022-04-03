@@ -76,23 +76,36 @@ This is a readme file for our SEG Major Group Project.
 
 <!-- The location where the software or software component is deployed and sufficient information to access it.  The latter includes access credentials for the different types of user who may employ the software. -->
 ## Deployment
-The location where the software is deployed is **Heroku**.
-Test club = Test club 1(online and private)
-Owner:
+The location where the software is deployed is **Heroku**.  
+
+Test club = Test club 1(online and private)  
+
+Owner:  
+
 *Username = @Owner
-*Password = Password123
-Moderator:
+*Password = Password123  
+
+Moderator:  
+
 *Username = @Moderator
-*Password = Password123
-Member:
+*Password = Password123  
+
+Member:  
+
 *Username = @Member
-*Password = Password123
-Banned member:
-*Username = @BannedMember
-*Password = Password123
-Meeting host is @Owner
-Meeting attendee is @Member
-Post comments applications and ratings are randomly created
+*Password = Password123  
+
+Banned member:  
+
+*Username = @BannedMember  
+*Password = Password123  
+
+Meeting host is @Owner  
+
+Meeting attendee is @Member  
+
+Post comments applications and ratings are randomly created  
+
 
 ## How to run the project
 Book Clubs - Django Web Application Setup Instructions  
