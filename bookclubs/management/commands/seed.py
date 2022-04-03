@@ -440,7 +440,6 @@ class Command(BaseCommand):
         return all_out_of_club[index]
 
     def create_votes(self):
-        self.users
         for post in self.posts:
             print(f"Seeding votes...", end='\r')
             user_ids = Role.objects.filter(club=post.club).exclude(club_role='BAN').values_list('user', flat=True)

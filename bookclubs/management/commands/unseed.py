@@ -26,7 +26,7 @@ class Command(BaseCommand):
         if Vote.objects.all().count() > 0:
             print(f'Unseeding Vote...', end='\r')
             Vote.objects.all().delete()
-            print(f'Unseeded Vote.')
+            print(f'Unseeded Vote.') 
         if Comment.objects.all().count() > 0:
             print(f'Unseeding Comment...', end='\r')
             Comment.objects.all().delete()
