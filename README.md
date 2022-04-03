@@ -107,7 +107,7 @@ The location where the software is deployed is **Heroku**.
 	* **API Secret**: c18QSFhXlaHbG6gP7HI9XGhWyaM6FQTKgYfl
 
 ## How to run the project
-Book Clubs - Django Web Application Setup Instructions  
+Book Clubs - Django Web Application Set Up Instructions  
 
 **1. Access where the source code is saved from the terminal:**  
 
