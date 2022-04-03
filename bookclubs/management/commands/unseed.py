@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand
 
 from bookclubs.meeting_link import delete_zoom_meeting
 from bookclubs.models import User, Post, Comment, Club, Role, Book, BookRatingReview, Meeting, ClubBookAverageRating, \
-    MeetingAttendance, Application, Vote
+    MeetingAttendance, Application
 
 
 class Command(BaseCommand):
@@ -23,10 +23,6 @@ class Command(BaseCommand):
             Meeting.objects.all().delete()
             delete_zoom_meeting()
             print(f'Unseeded Meeting.')
-        if Vote.objects.all().count() > 0:
-            print(f'Unseeding Vote...', end='\r')
-            Vote.objects.all().delete()
-            print(f'Unseeded Vote.')
         if Comment.objects.all().count() > 0:
             print(f'Unseeding Comment...', end='\r')
             Comment.objects.all().delete()
