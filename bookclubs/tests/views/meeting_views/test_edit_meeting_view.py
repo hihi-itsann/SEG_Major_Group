@@ -23,7 +23,7 @@ class EditMeetingViewTestCase(TestCase):
     def setUp(self):
         self.host = User.objects.get(username='@johndoe')
         self.user = User.objects.get(username='@janedoe')
-        self.club = Club.objects.get(club_name='private_online')
+        self.club = Club.objects.get(club_name='private_in-person')
         self.book = Book.objects.get(ISBN="0195153448")
         Role.objects.create(user=self.host, club=self.club, club_role='OWN')
         self.membership = Role.objects.create(user=self.user, club=self.club, club_role='MEM')
@@ -45,15 +45,12 @@ class EditMeetingViewTestCase(TestCase):
         )
         self.url = reverse(self.VIEW, kwargs={'club_name': self.club.club_name, 'meeting_id': self.meeting.id})
         self.form_input = {
-            'club': self.club,
-            'book': self.book,
             'topic': 'Edited',
             'description': 'delta foxtrot golf hotel india',
-            'meeting_status': 'OFF',
             'location': 'Bush House',
-            'date': '2022-04-01',
+            'date': date.today() + timedelta(days=5),
             'time_start': '11:00',
-            'duration': 60
+            'duration': 45
         }
 
     def log_in(self, user):
@@ -102,7 +99,6 @@ class EditMeetingViewTestCase(TestCase):
         after_count = Meeting.objects.count()
         self.assertEqual(after_count, before_count)
         response_url = reverse('show_meeting', kwargs={'club_name': self.club.club_name, 'meeting_id': self.meeting.id})
-        print(response_url)
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'show_meeting.html')
         self.meeting.refresh_from_db()
