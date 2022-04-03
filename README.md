@@ -15,7 +15,7 @@ This is a readme file for our SEG Major Group Project.
   * [Reference List](#Reference-list "Go to Reference List")
 
 ## Contributors
-**Team Name: Major Group**
+**Team Name: Major Group**  
 :space_invader:***Artificial Intelligence Group:***
   * Rishi Ganeshan (K20004392)
   * Encheng Wu (K20070867)
@@ -66,7 +66,7 @@ This is a readme file for our SEG Major Group Project.
 * An interactive dinosaur game will be displayed while the system loads the book recommendations
 
 ## Technologies
-* Our project was built employing Python/Django.
+* Our project was built employing **Python/Django**.
 * **Keras**, **TensorFlow**, **Numpy** and **Pandas** were used to produce the (AI) Recommender system
 * **Libgravatar** was used to show the users’ profile pictures
 * **Coverage** was used for monitoring the program’s testing
@@ -78,22 +78,22 @@ This is a readme file for our SEG Major Group Project.
 ## Deployment
 The location where the software is deployed is **Heroku**.  
 
-Test club = Test club 1(online and private)  
-* Owner:  
+**Test club** = Test club 1(online and private)  
+* **Owner**:  
   * Username = @Owner
   * Password = Password123  
-* Moderator:  
+* **Moderator**:  
   * Username = @Moderator
   * Password = Password123  
-* Member:  
+* **Member**:  
   * Username = @Member
   * Password = Password123  
-* Banned member:  
+* **Banned member**:  
   * Username = @BannedMember  
   * Password = Password123  
-* Meeting host is @Owner  
-* Meeting attendee is @Member  
-* Post comments applications and ratings are randomly created  
+* **Meeting host** is @Owner  
+* **Meeting attendee** is @Member  
+* **Post comments applications** and **ratings** are randomly created  
 
 ## How to run the project
 Book Clubs - Django Web Application Setup Instructions  
