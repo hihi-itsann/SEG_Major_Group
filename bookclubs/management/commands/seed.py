@@ -7,7 +7,7 @@ from bookclubs.models import User, Post, Vote, Comment, Club, Role, Book, BookRa
 
 import pytz
 from faker import Faker
-from random import randint, random
+from random import randint, random, choice
 from faker.providers import BaseProvider, address, date_time, misc
 import pandas as pd
 import datetime
@@ -31,7 +31,7 @@ class Command(BaseCommand):
     DEFAULT_PASSWORD = 'Password123'
     USER_IN_CLUB_PROBABILITY = 0.2
     USER_RATE_BOOK_PROBABILITY = 0.3
-    USER_VOTE_POST_PROBABILITY = 0.4
+    USER_VOTE_POST_PROBABILITY = 0.7
     # ratingsPath = 'bookclubs/recommender/dataset/BX-Book-Ratings.csv'
     booksPath = 'bookclubs/dataset/BX-Books.csv'
 
@@ -66,10 +66,10 @@ class Command(BaseCommand):
 
         self.create_votes()
 
-        # self.create_meetings()
-        # self.meetings = Meeting.objects.all()
-        #
-        # self.create_meeting_attendance()
+        self.create_meetings()
+        self.meetings = Meeting.objects.all()
+
+        self.create_meeting_attendance()
 
     def load_data_from_csv(self):
         # self.df_users= pd.read_csv(self.usersPath, sep = ';',names = ['User-ID', 'Location', 'Age'], quotechar = '"', encoding = 'latin-1',header = 0)
@@ -440,24 +440,25 @@ class Command(BaseCommand):
         return all_out_of_club[index]
 
     def create_votes(self):
-        #Method with try except. Go through clubs, go through posts
+        self.users
         for post in self.posts:
             print(f"Seeding votes...", end='\r')
-            try:
-                if random() < self.USER_VOTE_POST_PROBABILITY:
-                    self.create_vote(post)
-            except:
-                continue
+            user_ids = Role.objects.filter(club=post.club).exclude(club_role='BAN').values_list('user', flat=True)
+            users_in_club = self.users.filter(id__in=user_ids)
+            for user in users_in_club:
+                try:
+                    if random() < self.USER_VOTE_POST_PROBABILITY:
+                        self.create_vote(user, post)
+                except:
+                    continue
         print("Vote seeding complete.      ")
 
-    def create_vote(self, post):
-        # Method to create vote with random user
-        user=self.get_random_member(post.club),
-        vote = self.faker.random_bool()
+    def create_vote(self, user, post):
+        vote_type = bool(choice([True, False]))
         Vote.objects.create(
             user=user,
             post=post,
-            vote=vote
+            vote_type=vote_type
         )
 
 
