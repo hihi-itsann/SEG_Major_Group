@@ -51,7 +51,7 @@ class BookStatusAdmin(admin.ModelAdmin):
 @admin.register(Vote)
 class VoteAdmin(admin.ModelAdmin):
     list_display = [
-        'user', 'post'
+        'user', 'vote_type', 'post'
     ]
 
 
