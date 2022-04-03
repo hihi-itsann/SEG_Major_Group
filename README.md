@@ -76,7 +76,7 @@ This is a readme file for our SEG Major Group Project.
 
 <!-- The location where the software or software component is deployed and sufficient information to access it.  The latter includes access credentials for the different types of user who may employ the software. -->
 ## Deployment
-* The location where the software is deployed is **Heroku**.
+The location where the software is deployed is **Heroku**.
 Test club = Test club 1(online and private)
 Owner:
 *Username = @Owner
