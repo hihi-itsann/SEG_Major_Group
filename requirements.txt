@@ -1,3 +1,5 @@
+coverage==6.0.1
+cssselect==1.1.0
 Django==3.2.5
 django-bootstrap-pagination==1.7.1
 django-core==1.4.1
