@@ -375,17 +375,17 @@ class Command(BaseCommand):
         club_count = 0
         while club_count < self.CLUB_COUNT:
             print(f"Seeding club {club_count}/{self.CLUB_COUNT}", end='\r')
-            # try:
-            self.create_club()
-            # except:
-            #     continue
+            try:
+                self.create_club()
+            except:
+                continue
             club_count += 1
         print("Club seeding complete.      ")
 
     def create_club(self):
         description = self.faker.text(max_nb_chars=520)
         meeting_status = self.faker.random_choices(elements=('ONL', 'OFF'), length=3)[0]
-        location = self.faker.street_name()
+        location = self.faker.street_name(max_nb_chars=10)
         city = self.faker.city()
         country = self.faker.country()
         club_name = create_club_name(location)
