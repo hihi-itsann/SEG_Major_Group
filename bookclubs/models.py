@@ -206,7 +206,7 @@ class Club(models.Model):
 
     club_name = models.CharField(
         unique=True,
-        max_length=20,
+        max_length=255,
         blank=False,
         validators=[
             RegexValidator(
