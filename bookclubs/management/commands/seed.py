@@ -375,10 +375,10 @@ class Command(BaseCommand):
         club_count = 0
         while club_count < self.CLUB_COUNT:
             print(f"Seeding club {club_count}/{self.CLUB_COUNT}", end='\r')
-            try:
-                self.create_club()
-            except:
-                continue
+            # try:
+            self.create_club()
+            # except:
+            #     continue
             club_count += 1
         print("Club seeding complete.      ")
 
