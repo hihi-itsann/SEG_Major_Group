@@ -17,3 +17,5 @@ pytz==2022.1
 requests==2.27.1
 tensorflow-cpu
 gunicorn
+python-decouple
+whitenoise
