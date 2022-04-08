@@ -227,11 +227,11 @@ class Club(models.Model):
         blank=False
     )
     city = models.CharField(
-        max_length=100,
+        max_length=256,
         blank=True
     )
     country = models.CharField(
-        max_length=100,
+        max_length=256,
         blank=True
     )
 
@@ -242,7 +242,7 @@ class Club(models.Model):
     )
 
     genre = models.CharField(
-        max_length=100,
+        max_length=256,
         default='Fiction',
         blank=False
     )
