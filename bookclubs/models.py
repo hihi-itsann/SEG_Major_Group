@@ -247,7 +247,7 @@ class Club(models.Model):
         blank=False
     )
 
-    description = models.CharField(
+    description = models.TextField(
         max_length=520,
         blank=False
     )
