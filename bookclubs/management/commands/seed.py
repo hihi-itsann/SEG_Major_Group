@@ -33,6 +33,7 @@ class Command(BaseCommand):
     # usersPath   = 'bookclubs/recommender/dataset/BX-Users.csv'
 
     def __init__(self):
+        super().__init__()
         self.faker = Faker('en_GB')
 
     def handle(self, *args, **options):
