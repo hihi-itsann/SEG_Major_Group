@@ -585,7 +585,7 @@ class Command(BaseCommand):
 
     def create_application(self, club):
         user = self.get_random_non_member(club)
-        statement = self.faker.text(max_nb_chars=200)
+        statement = self.faker.text(max_nb_chars=256)
         Application.objects.create(
             user=user,
             club=club,
