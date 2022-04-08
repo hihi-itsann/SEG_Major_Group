@@ -100,7 +100,7 @@ class Book(models.Model):
     image_url_s = models.URLField(blank=False)
     image_url_m = models.URLField(blank=False)
     image_url_l = models.URLField(blank=False)
-    genre = models.CharField(max_length=100, blank=True)
+    genre = models.CharField(max_length=256, blank=True)
 
     def getAverageRate(self):
         return self.bookratingreview_set.all().aggregate(Avg('rate'))['rate__avg']
@@ -247,7 +247,7 @@ class Club(models.Model):
         blank=False
     )
 
-    description = models.TextField(
+    description = models.CharField(
         max_length=520,
         blank=False
     )
