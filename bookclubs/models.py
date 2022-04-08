@@ -223,7 +223,6 @@ class Club(models.Model):
     )
 
     location = models.CharField(
-        max_length=100,
         blank=False
     )
     city = models.CharField(
