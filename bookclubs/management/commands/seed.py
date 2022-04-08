@@ -34,6 +34,9 @@ class Command(BaseCommand):
 
     def __init__(self):
         super().__init__()
+        self.owner = None
+        self.moderator = None
+        self.member = None
         self.faker = Faker('en_GB')
 
     def handle(self, *args, **options):
@@ -376,10 +379,10 @@ class Command(BaseCommand):
         club_count = 0
         while club_count < self.CLUB_COUNT:
             print(f"Seeding club {club_count}/{self.CLUB_COUNT}", end='\r')
-            # try:
-            self.create_club()
-            # except:
-            #     continue
+            try:
+                self.create_club()
+            except:
+                continue
             club_count += 1
         print("Club seeding complete.      ")
 
