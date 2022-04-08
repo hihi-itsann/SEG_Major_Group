@@ -391,7 +391,7 @@ class Command(BaseCommand):
         country = self.faker.country()
         club_name = create_club_name(location)
         public_status = self.faker.random_choices(elements=('PUB', 'PRI'), length=3)[0]
-        genre = self.faker.text(max_nb_chars=520)
+        genre = self.faker.text(max_nb_chars=100)
         club = Club.objects.create(
             club_name=club_name,
             description=description,
