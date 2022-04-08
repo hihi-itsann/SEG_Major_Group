@@ -34,9 +34,6 @@ class Command(BaseCommand):
 
     def __init__(self):
         super().__init__()
-        self.owner = None
-        self.moderator = None
-        self.member = None
         self.faker = Faker('en_GB')
 
     def handle(self, *args, **options):
@@ -181,18 +178,6 @@ class Command(BaseCommand):
         self.create_test_votes(test_club)
         self.create_test_meetings(test_club)
 
-    def create_test_meetings(self, club):
-        test_meeting = self.create_meeting(club)
-        test_meeting_host = MeetingAttendance.objects.create(
-            user=self.owner,
-            meeting=test_meeting,
-            meeting_role='H'
-        )
-        test_meeting_attendee = MeetingAttendance.objects.create(
-            user=self.member,
-            meeting=test_meeting,
-            meeting_role='A'
-        )
 
     def create_test_comments(self, club):
         for i in range(5):
@@ -228,6 +213,44 @@ class Command(BaseCommand):
             post = self.get_random_post(club)
             if Vote.objects.filter(user=user, post=post).count() == 0:
                 self.create_vote(user, post)
+
+    def create_test_meetings(self, club):
+        date = self.faker.future_date()
+        time_start = self.faker.time(pattern='%H:%M')
+        duration = randint(15, 45)
+        club = club
+        book = self.get_random_book()
+        topic = 'Test Meeting'
+        description = "@Owner is the host. @Member is an attendee."
+        meeting_status = club.meeting_status
+        location = 'Meeting link to be created...'
+        create_zoom_meeting(date, time_start, duration)
+        join_link = get_join_link()
+        start_link = get_start_link()
+        test_meeting = Meeting.objects.create(
+            club=club,
+            book=book,
+            topic=topic,
+            description=description,
+            meeting_status=meeting_status,
+            location=location,
+            date=date,
+            time_start=time_start,
+            duration=duration,
+            join_link=join_link,
+            start_link=start_link
+        )
+        
+        test_meeting_host = MeetingAttendance.objects.create(
+            user=self.owner,
+            meeting=test_meeting,
+            meeting_role='H'
+        )
+        test_meeting_attendee = MeetingAttendance.objects.create(
+            user=self.member,
+            meeting=test_meeting,
+            meeting_role='A'
+        )
 
     def load_data_from_csv(self):
         # self.df_users= pd.read_csv(self.usersPath, sep = ';',names = ['User-ID', 'Location', 'Age'], quotechar = '"',
@@ -632,4 +655,4 @@ def create_email(first_name, last_name):
 
 
 def create_club_name(location):
-    return location.split()[0].title() + ' Book Club'
+    return location.title() + ' Book Club'
