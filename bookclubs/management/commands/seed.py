@@ -500,7 +500,6 @@ class Command(BaseCommand):
             create_zoom_meeting(date, time_start, duration)
             join_link = get_join_link()
             start_link = get_start_link()
-
         else:
             location = self.faker.street_name()
             join_link = None

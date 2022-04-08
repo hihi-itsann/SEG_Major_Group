@@ -459,7 +459,7 @@ class Meeting(models.Model):
     topic = models.CharField(max_length=120, default='', blank=False)
     description = models.TextField(max_length=520, blank=True)
     meeting_status = models.CharField(choices=MEETING_CHOICES, default='OFF', max_length=3)
-    location = models.CharField(max_length=120, blank=True)
+    location = models.CharField(max_length=256, blank=True)
     date = models.DateField(blank=False)
     time_start = models.TimeField(blank=False)
     duration = models.IntegerField(blank=False, default=30)
