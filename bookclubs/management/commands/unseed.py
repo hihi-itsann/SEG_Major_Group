@@ -21,7 +21,10 @@ class Command(BaseCommand):
         if Meeting.objects.all().count() > 0:
             print(f'Unseeding Meeting...', end='\r')
             Meeting.objects.all().delete()
-            delete_zoom_meeting()
+            try:
+                delete_zoom_meeting()
+            except KeyError:
+                continue
             print(f'Unseeded Meeting.')
         if Vote.objects.all().count() > 0:
             print(f'Unseeding Vote...', end='\r')
